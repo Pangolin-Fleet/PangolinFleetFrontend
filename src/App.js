@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { FaCar, FaTools, FaFileAlt } from "react-icons/fa";
 
-// Corrected imports based on your file names
 import VehiclePage from "./components/VehiclePage";
 import MaintenancePage from "./components/MaintenancePage";
+import InUsePage from "./components/InUsePage";
 import ReportPage from "./components/ReportPage";
 import Header from "./components/Header";
 import AddVehicleModal from "./components/AddVehicleModal";
@@ -16,16 +16,17 @@ function App() {
   const [currentPage, setCurrentPage] = useState("Vehicles");
   const [showModal, setShowModal] = useState(false);
   const [editVehicleId, setEditVehicleId] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
   const [newVehicle, setNewVehicle] = useState({
     vin: "", license: "", name: "", driver: "", mileage: 0,
-    status: "Available", disc: "", insurance: "", description: ""
+    status: "Available", disc: "", insurance: "", description: "",
+    destination: ""
   });
   const [animatedId, setAnimatedId] = useState(null);
   const [statusCounts, setStatusCounts] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
-  // Count vehicles by status
   useEffect(() => {
     const counts = {};
     Object.keys(statusColors).forEach(status => {
@@ -40,12 +41,6 @@ function App() {
     setTimeout(() => setAnimatedId(null), 500);
   };
 
-  const updateStatus = (id, status) => {
-    setAnimatedId(id);
-    setVehicles(vehicles.map(v => (v.id === id ? { ...v, status } : v)));
-    setTimeout(() => setAnimatedId(null), 500);
-  };
-
   const deleteVehicle = (id) => setVehicles(vehicles.filter(v => v.id !== id));
   const editVehicle = (id, field, value) => setVehicles(vehicles.map(v => (v.id === id ? { ...v, [field]: value } : v)));
 
@@ -56,8 +51,20 @@ function App() {
     }
     const id = vehicles.length ? Math.max(...vehicles.map(v => v.id)) + 1 : 1;
     setVehicles([...vehicles, { ...newVehicle, id }]);
-    setNewVehicle({ vin: "", license: "", name: "", driver: "", mileage: 0, status: "Available", disc: "", insurance: "", description: "" });
+    setNewVehicle({ vin: "", license: "", name: "", driver: "", mileage: 0, status: "Available", disc: "", insurance: "", description: "", destination: "" });
     setShowModal(false);
+  };
+
+  const updateStatus = (id, status, extra = {}) => {
+    setVehicles(prev =>
+      prev.map(v =>
+        v.id === id ? { ...v, status, ...extra } : v
+      )
+    );
+  };
+
+  const saveDestination = (id, destination) => {
+    updateStatus(id, "In Use", { destination });
   };
 
   const filteredVehicles = vehicles.filter(v =>
@@ -68,19 +75,23 @@ function App() {
   );
 
   return (
-    <div className="app-container">
-      <aside className="sidebar">
+    <div className={`app-container ${darkMode ? "dark" : ""}`}>
+      <aside className={`sidebar ${darkMode ? "dark" : ""}`}>
         <div className="logo">Pangolin Fleet</div>
         <nav>
-          {["Vehicles", "Maintenance", "Reports"].map(page => (
+          {["Vehicles", "In Use", "Maintenance", "Reports"].map(page => (
             <button key={page} onClick={() => setCurrentPage(page)} className={currentPage === page ? "active" : ""}>
               {page === "Vehicles" && <FaCar />}
               {page === "Maintenance" && <FaTools />}
               {page === "Reports" && <FaFileAlt />}
+              {page === "In Use" && <FaCar />}
               {page}
             </button>
           ))}
         </nav>
+        <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
+          {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
       </aside>
 
       <main>
@@ -106,22 +117,33 @@ function App() {
             setSearchQuery={setSearchQuery}
             filterStatus={filterStatus}
             setFilterStatus={setFilterStatus}
+            darkMode={darkMode}
+          />
+        )}
+
+        {currentPage === "In Use" && (
+          <InUsePage
+            vehicles={vehicles.filter(v => v.status === "In Use")}
+            saveDestination={saveDestination}
+            darkMode={darkMode}
           />
         )}
 
         {currentPage === "Maintenance" && (
           <MaintenancePage
-            vehicles={filteredVehicles.filter(v => v.status === "In Maintenance")}
+            vehicles={vehicles.filter(v => v.status === "In Maintenance")}
             editVehicle={editVehicle}
+            updateStatus={updateStatus}
             editVehicleId={editVehicleId}
             setEditVehicleId={setEditVehicleId}
             completeMaintenance={(id) => updateStatus(id, "Available")}
             animatedId={animatedId}
+            darkMode={darkMode}
           />
         )}
 
         {currentPage === "Reports" && (
-          <ReportPage vehicles={vehicles} />
+          <ReportPage vehicles={vehicles} darkMode={darkMode} />
         )}
       </main>
 

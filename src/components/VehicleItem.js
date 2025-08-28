@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function VehicleItem({
+export function VehicleItem({
   vehicle,
   incrementMileage,
   updateStatus,
@@ -8,36 +8,43 @@ export default function VehicleItem({
   editVehicle,
   editVehicleId,
   setEditVehicleId,
-  animatedId
+  animatedId,
+  theme
 }) {
   const isAnimating = animatedId === vehicle.id;
 
+  const statusColor = {
+    "Available": "#27ae60",
+    "In Use": "#7f8c8d",
+    "In Maintenance": "#e67e22"
+  };
+
   return (
     <div
-      className={`vehicle-card ${isAnimating ? "animating" : ""}`}
+      className={`vehicle-card ${isAnimating ? "animating" : ""} ${theme === "dark" ? "dark-card" : ""}`}
       style={{
-        border: "1px solid #ccc",
-        borderRadius: "12px",
+        border: `2px solid ${statusColor[vehicle.status]}`,
         padding: "15px",
+        borderRadius: "12px",
         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
         transition: "transform 0.2s",
-        background: "#fff"
+        background: theme === "dark" ? "#1e1e1e" : "#fff",
+        color: theme === "dark" ? "#eee" : "#000"
       }}
     >
-      <h3 style={{ margin: "0 0 10px 0" }}>{vehicle.name}</h3>
-      <p style={{ margin: "4px 0" }}><strong>VIN:</strong> {vehicle.vin}</p>
-      <p style={{ margin: "4px 0" }}><strong>Driver:</strong> {vehicle.driver}</p>
-      <p style={{ margin: "4px 0" }}><strong>Mileage:</strong> {vehicle.mileage}</p>
-      <p style={{ margin: "4px 0" }}><strong>Description:</strong> {vehicle.description}</p>
+      <h3>{vehicle.name}</h3>
+      <p><strong>VIN:</strong> {vehicle.vin}</p>
+      <p><strong>Driver:</strong> {vehicle.driver}</p>
+      <p><strong>Mileage:</strong> {vehicle.mileage} km</p>
+      <p><strong>Description:</strong> {vehicle.description}</p>
+      {vehicle.destination && <p><strong>Destination:</strong> {vehicle.destination}</p>}
 
-      {/* Status Dropdown */}
-      <div style={{ marginTop: "10px" }}>
-        <label htmlFor={`status-${vehicle.id}`} style={{ marginRight: "8px" }}>Status:</label>
+      <div className="status-section">
+        <label>Status:</label>
         <select
-          id={`status-${vehicle.id}`}
           value={vehicle.status}
           onChange={(e) => updateStatus(vehicle.id, e.target.value)}
-          style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #ccc" }}
+          style={{ padding: "6px 10px", borderRadius: "6px", border: "1px solid #ccc", width: "100%" }}
         >
           <option value="Available">Available</option>
           <option value="In Use">In Use</option>
@@ -45,20 +52,9 @@ export default function VehicleItem({
         </select>
       </div>
 
-      {/* Buttons */}
-      <div style={{ marginTop: "12px", display: "flex", gap: "10px" }}>
-        <button
-          onClick={() => incrementMileage(vehicle.id, 10)}
-          style={{ padding: "6px 10px", borderRadius: "6px", border: "none", background: "#3498db", color: "#fff", cursor: "pointer" }}
-        >
-          +10 Mileage
-        </button>
-        <button
-          onClick={() => deleteVehicle(vehicle.id)}
-          style={{ padding: "6px 10px", borderRadius: "6px", border: "none", background: "#e74c3c", color: "#fff", cursor: "pointer" }}
-        >
-          Delete
-        </button>
+      <div className="card-buttons">
+        <button onClick={() => incrementMileage(vehicle.id, 10)}>+10 km</button>
+        <button className="delete-btn" onClick={() => deleteVehicle(vehicle.id)}>Delete</button>
       </div>
     </div>
   );

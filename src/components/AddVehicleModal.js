@@ -1,22 +1,35 @@
 import React from "react";
 
-const AddVehicleModal = ({ newVehicle, setNewVehicle, setShowModal, addVehicle }) => {
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewVehicle(prev => ({ ...prev, [name]: value }));
-  };
-
+export default function AddVehicleModal({ newVehicle, setNewVehicle, setShowModal, addVehicle }) {
   return (
-    <div style={{ position: "fixed", top: "20%", left: "30%", width: "40%", padding: "20px", background: "white", border: "1px solid #ccc" }}>
-      <h3>Add New Vehicle</h3>
-      <input name="vin" placeholder="VIN" value={newVehicle.vin} onChange={handleChange} />
-      <input name="name" placeholder="Name" value={newVehicle.name} onChange={handleChange} />
-      <input name="driver" placeholder="Driver" value={newVehicle.driver} onChange={handleChange} />
-      <input name="description" placeholder="Description" value={newVehicle.description} onChange={handleChange} />
-      <button onClick={addVehicle}>Add Vehicle</button>
-      <button onClick={() => setShowModal(false)}>Cancel</button>
+    <div className="modal-overlay">
+      <div className="modal">
+        <h3>Add Vehicle</h3>
+        <input
+          placeholder="VIN"
+          value={newVehicle.vin}
+          onChange={e => setNewVehicle({ ...newVehicle, vin: e.target.value })}
+        />
+        <input
+          placeholder="Vehicle Name"
+          value={newVehicle.name}
+          onChange={e => setNewVehicle({ ...newVehicle, name: e.target.value })}
+        />
+        <input
+          placeholder="Driver"
+          value={newVehicle.driver}
+          onChange={e => setNewVehicle({ ...newVehicle, driver: e.target.value })}
+        />
+        <textarea
+          placeholder="Description"
+          value={newVehicle.description}
+          onChange={e => setNewVehicle({ ...newVehicle, description: e.target.value })}
+        />
+        <div className="modal-buttons">
+          <button onClick={addVehicle}>Add</button>
+          <button onClick={() => setShowModal(false)}>Cancel</button>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default AddVehicleModal;
+}

@@ -1,11 +1,11 @@
 export const statusColors = {
   "Available": "#27ae60",
-  "In Maintenance": "#e74c3c",
-  "Pending": "#f39c12"
+  "In Use": "#7f8c8d",
+  "In Maintenance": "#e67e22"
 };
 
 export const initialVehicles = [
-  { id: 1, vin: "VIN001", name: "Ford Ranger", driver: "John", mileage: 1200, status: "Available", disc: "Diesel", insurance: "Full", description: "Pickup truck" },
-  { id: 2, vin: "VIN002", name: "Toyota Hilux", driver: "Mike", mileage: 850, status: "In Maintenance", disc: "Diesel", insurance: "Partial", description: "Workhorse truck" },
-  { id: 3, vin: "VIN003", name: "Nissan Navara", driver: "Anna", mileage: 950, status: "Available", disc: "Diesel", insurance: "Full", description: "Reliable utility vehicle" }
+  { id: 1, vin: "VIN001", name: "Toyota Corolla", driver: "John Doe", mileage: 12000, status: "Available", description: "Company car" },
+  { id: 2, vin: "VIN002", name: "Ford Ranger", driver: "Jane Smith", mileage: 5000, status: "In Use", description: "Delivery vehicle" },
+  { id: 3, vin: "VIN003", name: "Honda Civic", driver: "Mike Ross", mileage: 8000, status: "In Maintenance", description: "Engine repair" }
 ];
