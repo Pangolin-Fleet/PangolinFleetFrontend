@@ -125,6 +125,7 @@ function App() {
           <InUsePage
             vehicles={vehicles.filter(v => v.status === "In Use")}
             saveDestination={saveDestination}
+              updateStatus={updateStatus}
             darkMode={darkMode}
           />
         )}
