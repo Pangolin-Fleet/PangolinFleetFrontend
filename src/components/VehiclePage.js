@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import { 
-  FaCar, FaCheckCircle, FaTools, FaExclamationTriangle, 
-  FaFileInvoice, FaShieldAlt, FaClipboardList, FaPlus, FaSearch, FaEdit, FaSave 
-} from "react-icons/fa";
-import { VehicleItem } from "./VehicleItem";
+import { FaCar, FaCheckCircle, FaTools, FaExclamationTriangle, FaFileInvoice, FaShieldAlt, FaPlus, FaSearch, FaEdit, FaSave } from "react-icons/fa";
 
 export default function VehiclePage({
   vehicles,
@@ -11,7 +7,6 @@ export default function VehiclePage({
   updateStatus,
   deleteVehicle,
   editVehicle,
-  animatedId,
   statusCounts,
   searchQuery,
   setSearchQuery,
@@ -38,34 +33,20 @@ export default function VehiclePage({
 
   const isExpired = (date) => date && new Date(date) < new Date();
 
-  const cardStyle = (bg) => ({
-    flex: "1",
-    padding: "20px",
-    borderRadius: "16px",
-    background: `linear-gradient(135deg, ${bg}CC, ${bg}FF)`,
-    color: "#fff",
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "flex-start",
-    minWidth: "180px",
-    maxWidth: "220px",
-    boxShadow: "0 8px 16px rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.15)",
-    marginRight: "16px",
-    marginBottom: "16px",
-    transition: "transform 0.2s",
-    cursor: "default"
-  });
+  const statusColors = {
+    "Available": "#27ae60",
+    "In Use": "#2980b9",
+    "In Maintenance": "#f39c12"
+  };
 
-  const cards = [
-    { label: "Total Vehicles", value: totalVehicles, icon: <FaCar />, bg: "#2c3e50" },
-    { label: "Available", value: available, icon: <FaCheckCircle />, bg: "#27ae60" },
-    { label: "In Use", value: inUse, icon: <FaCar />, bg: "#2980b9" },
-    { label: "Maintenance", value: maintenance, icon: <FaTools />, bg: "#f39c12" },
-    { label: "Service Due", value: serviceDue, icon: <FaExclamationTriangle />, bg: "#e67e22" },
-    { label: "Insurance Exp.", value: insuranceExp, icon: <FaFileInvoice />, bg: "#c0392b" },
-    { label: "Disc Exp.", value: discExp, icon: <FaShieldAlt />, bg: "#8e44ad" },
-    { label: "Other Info", value: "-", icon: <FaClipboardList />, bg: "#34495e" }
+  const summaryCards = [
+    { label: "Total Vehicles", value: totalVehicles, icon: <FaCar />, color: "#34495e" },
+    { label: "Available", value: available, icon: <FaCheckCircle />, color: "#27ae60" },
+    { label: "In Use", value: inUse, icon: <FaCar />, color: "#2980b9" },
+    { label: "Maintenance", value: maintenance, icon: <FaTools />, color: "#f39c12" },
+    { label: "Service Due", value: serviceDue, icon: <FaExclamationTriangle />, color: "#e67e22" },
+    { label: "Insurance Exp.", value: insuranceExp, icon: <FaFileInvoice />, color: "#c0392b" },
+    { label: "Disc Exp.", value: discExp, icon: <FaShieldAlt />, color: "#8e44ad" }
   ];
 
   const handleEditClick = (vehicle) => {
@@ -74,25 +55,19 @@ export default function VehiclePage({
   };
 
   const handleSaveClick = (id) => {
-    editVehicle(id, "name", editableVehicle.name);
-    editVehicle(id, "mileage", Number(editableVehicle.mileage));
-    editVehicle(id, "disc", editableVehicle.disc);
-    editVehicle(id, "insurance", editableVehicle.insurance);
+    ["name","mileage","disc","insurance","status"].forEach(field => {
+      editVehicle(id, field, editableVehicle[field]);
+    });
     setEditingId(null);
     setEditableVehicle({});
   };
 
   return (
-    <div>
-      {/* Top Bar: Title + Search + Filter + Add Vehicle */}
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        marginBottom: "24px", flexWrap: "wrap", gap: "12px"
-      }}>
-        <h2 style={{ color: darkMode ? "#fff" : "#000", marginRight: "12px" }}>Fleet Summary</h2>
-
+    <div style={{ padding: "24px" }}>
+      {/* Top Bar */}
+      <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "12px", marginBottom: "24px" }}>
+        <h2 style={{ color: darkMode ? "#fff" : "#000" }}>Fleet Summary</h2>
         <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-          {/* Search Bar */}
           <div style={{ display: "flex", alignItems: "center", border: `1px solid ${darkMode ? '#555' : '#ccc'}`, borderRadius: "8px", padding: "4px 8px", background: darkMode ? "#555" : "#fff" }}>
             <FaSearch style={{ marginRight: "6px", color: darkMode ? "#fff" : "#555" }} />
             <input
@@ -104,7 +79,6 @@ export default function VehiclePage({
             />
           </div>
 
-          {/* Filter Dropdown */}
           <select
             value={filterStatus}
             onChange={e => setFilterStatus(e.target.value)}
@@ -116,20 +90,9 @@ export default function VehiclePage({
             <option value="In Maintenance">Maintenance</option>
           </select>
 
-          {/* Add Vehicle Button */}
           <button
             onClick={() => setShowModal(true)}
-            style={{
-              padding: "8px 16px",
-              background: "#3498db",
-              color: "#fff",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "6px"
-            }}
+            style={{ padding: "8px 16px", background: "#3498db", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px" }}
           >
             <FaPlus /> Add Vehicle
           </button>
@@ -137,9 +100,12 @@ export default function VehiclePage({
       </div>
 
       {/* Summary Cards */}
-      <div style={{ display: "flex", flexWrap: "wrap", marginBottom: "32px", gap: "16px" }}>
-        {cards.map((card, idx) => (
-          <div key={idx} style={cardStyle(card.bg)} onMouseEnter={e => e.currentTarget.style.transform = "translateY(-6px)"} onMouseLeave={e => e.currentTarget.style.transform = "translateY(0px)"}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "32px" }}>
+        {summaryCards.map((card, idx) => (
+          <div key={idx} style={{ flex: "1 1 calc(33% - 16px)", padding: "20px", borderRadius: "16px", background: card.color, color: "#fff", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", minWidth: "200px", boxShadow: "0 8px 16px rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.15)", cursor: "default", transition: "transform 0.2s" }}
+            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-6px)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "translateY(0px)"}
+          >
             <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
               <div style={{ fontSize: "32px", marginRight: "12px" }}>{card.icon}</div>
               <div style={{ fontSize: "28px", fontWeight: "700" }}>{card.value}</div>
@@ -149,94 +115,101 @@ export default function VehiclePage({
         ))}
       </div>
 
-      {/* Vehicle List */}
-      <div className="vehicle-list">
+      {/* Vehicle Cards */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+        gap: "24px"
+      }}>
         {vehicles.map(vehicle => (
           <div
             key={vehicle.id}
             style={{
-              marginBottom: "16px",
-              padding: "14px",
-              borderRadius: "12px",
-              border: `1px solid ${darkMode ? "#444" : "#ddd"}`,
-              background: darkMode ? "#2c2c2c" : "#fff",
-              boxShadow: darkMode ? "0 4px 12px rgba(0,0,0,0.5)" : "0 2px 4px rgba(0,0,0,0.1)",
-              color: darkMode ? "#fff" : "#000",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px"
+              position: "relative",
+              borderRadius: "20px",
+              overflow: "hidden",
+              background: darkMode ? "#1f1f1f" : "#fff",
+              boxShadow: darkMode ? "0 10px 25px rgba(0,0,0,0.7)" : "0 10px 25px rgba(0,0,0,0.2)",
+              transition: "transform 0.3s, box-shadow 0.3s",
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = "translateY(-8px)";
+              e.currentTarget.style.boxShadow = darkMode
+                ? "0 15px 35px rgba(0,0,0,0.8)"
+                : "0 15px 35px rgba(0,0,0,0.3)";
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = "translateY(0)";
+              e.currentTarget.style.boxShadow = darkMode
+                ? "0 10px 25px rgba(0,0,0,0.7)"
+                : "0 10px 25px rgba(0,0,0,0.2)";
             }}
           >
-            {editingId === vehicle.id ? (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
-                {["name", "mileage", "disc", "insurance"].map((field) => (
-                  <input
-                    key={field}
-                    type={field === "mileage" ? "number" : "date"}
-                    value={editableVehicle[field] || ""}
-                    onChange={e => setEditableVehicle({ ...editableVehicle, [field]: e.target.value })}
-                    placeholder={field}
-                    style={{
-                      flex: "1",
-                      minWidth: "120px",
-                      padding: "6px 10px",
-                      borderRadius: "6px",
-                      border: `1px solid ${darkMode ? "#555" : "#ccc"}`,
-                      background: darkMode ? "#333" : "#f9f9f9",
-                      color: (field === "disc" || field === "insurance") && isExpired(editableVehicle[field])
-                        ? "#e74c3c"
-                        : darkMode ? "#fff" : "#000",
-                      fontSize: "14px"
-                    }}
-                  />
-                ))}
-                <button
-                  onClick={() => handleSaveClick(vehicle.id)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "6px",
-                    background: "#2ecc71",
-                    color: "#fff",
-                    border: "none",
-                    cursor: "pointer",
-                    alignSelf: "center",
-                    fontSize: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px"
-                  }}
-                >
-                  <FaSave /> Save
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <VehicleItem
-                  vehicle={vehicle}
-                  incrementMileage={() => incrementMileage(vehicle.id, 100)}
-                  updateStatus={updateStatus}
-                  deleteVehicle={deleteVehicle}
-                  theme={darkMode ? "dark" : "light"}
-                />
-                <button
-                  onClick={() => handleEditClick(vehicle)}
-                  style={{
-                    padding: "6px 12px",
-                    borderRadius: "6px",
-                    background: "#3498db",
-                    color: "#fff",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "14px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "4px"
-                  }}
-                >
-                  <FaEdit /> Edit
-                </button>
-              </div>
-            )}
+            {/* Gradient Header */}
+            <div style={{
+              background: vehicle.status === "In Use" 
+                ? "linear-gradient(135deg, #2980b9, #6dd5fa)"
+                : vehicle.status === "Available"
+                ? "linear-gradient(135deg, #27ae60, #2ecc71)"
+                : "linear-gradient(135deg, #f39c12, #f1c40f)",
+              padding: "20px",
+              color: "#fff",
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              fontWeight: "700",
+              fontSize: "16px"
+            }}>
+              <span>{vehicle.name}</span>
+              <span>{vehicle.status}</span>
+            </div>
+
+            {/* Vehicle Details */}
+            <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+              {editingId === vehicle.id ? (
+                <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+                  {["name","mileage","disc","insurance","status"].map(field => (
+                    field === "status" ? (
+                      <select
+                        key={field}
+                        value={editableVehicle.status || vehicle.status}
+                        onChange={e => setEditableVehicle({...editableVehicle, status: e.target.value})}
+                        style={{ padding:"10px", borderRadius:"10px", border:`1px solid ${darkMode?"#555":"#ccc"}`, background:darkMode?"#333":"#f9f9f9", color:darkMode?"#fff":"#000" }}
+                      />
+                    ) : (
+                      <input
+                        key={field}
+                        type={field==="mileage"?"number":field==="disc"||field==="insurance"?"date":"text"}
+                        value={editableVehicle[field] || vehicle[field] || ""}
+                        onChange={e => setEditableVehicle({...editableVehicle,[field]:e.target.value})}
+                        style={{ padding:"10px", borderRadius:"10px", border:`1px solid ${darkMode?"#555":"#ccc"}`, background:darkMode?"#333":"#f9f9f9", color:(field==="disc"||field==="insurance") && isExpired(editableVehicle[field] || vehicle[field]) ? "#e74c3c" : darkMode?"#fff":"#000" }}
+                      />
+                    )
+                  ))}
+                  <button onClick={() => handleSaveClick(vehicle.id)} style={{ padding:"12px", borderRadius:"12px", background:"#2ecc71", color:"#fff", border:"none", cursor:"pointer", width:"100%" }}>Save</button>
+                </div>
+              ) : (
+                <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
+                  <div>
+                    <div><strong>{vehicle.name}</strong> (Mileage: {vehicle.mileage})</div>
+                    <div style={{ fontSize:"12px", marginTop:"4px", color:isExpired(vehicle.insurance)?"#e74c3c":darkMode?"#fff":"#000"}}>Insurance: {vehicle.insurance || "N/A"}</div>
+                    <div style={{ fontSize:"12px", marginTop:"2px", color:isExpired(vehicle.disc)?"#e74c3c":darkMode?"#fff":"#000"}}>Disc: {vehicle.disc || "N/A"}</div>
+                  </div>
+                  <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
+                    <button onClick={() => incrementMileage(vehicle.id,100)} style={{ padding:"12px", borderRadius:"10px", background:"#f39c12", color:"#fff", border:"none", cursor:"pointer", width:"100%" }}>+100 km</button>
+                    <select value={vehicle.status} onChange={e => updateStatus(vehicle.id, e.target.value)} style={{ padding:"12px", borderRadius:"10px", border:`1px solid ${darkMode?"#555":"#ccc"}`, background:darkMode?"#333":"#f9f9f9", color:darkMode?"#fff":"#000", width:"100%" }}>
+                      <option value="Available">Available</option>
+                      <option value="In Use">In Use</option>
+                      <option value="In Maintenance">Maintenance</option>
+                    </select>
+                    <div style={{ display:"flex", gap:"8px" }}>
+                      <button onClick={() => handleEditClick(vehicle)} style={{ padding:"12px", borderRadius:"10px", background:"#3498db", color:"#fff", border:"none", cursor:"pointer", flex:1 }}>Edit</button>
+                      <button onClick={() => deleteVehicle(vehicle.id)} style={{ padding:"12px", borderRadius:"10px", background:"#e74c3c", color:"#fff", border:"none", cursor:"pointer", flex:1 }}>Delete</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         ))}
       </div>

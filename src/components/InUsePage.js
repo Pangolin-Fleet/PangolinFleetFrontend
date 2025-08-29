@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { VehicleItem } from "./VehicleItem";
+import { FaMapMarkerAlt, FaArrowRight, FaCheck, FaUndo } from "react-icons/fa";
 
 export default function InUsePage({ vehicles, saveDestination, updateStatus, darkMode }) {
   const [destinationInputs, setDestinationInputs] = useState({});
@@ -22,34 +23,61 @@ export default function InUsePage({ vehicles, saveDestination, updateStatus, dar
     updateStatus(id, newStatus, newStatus === "Available" ? { destination: "" } : {});
   };
 
+  const statusColors = {
+    "Available": "#27ae60",
+    "In Use": "#2980b9",
+    "In Maintenance": "#f39c12"
+  };
+
   return (
-    <div className="vehicle-list">
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+      gap: "24px",
+      padding: "24px"
+    }}>
       {vehicles.map(vehicle => (
         <div
           key={vehicle.id}
           style={{
-            marginBottom: "16px",
-            padding: "12px",                 // slightly bigger outer card
-            border: `1px solid ${darkMode ? '#555' : '#ddd'}`,
-            borderRadius: "10px",
-            background: darkMode ? "#2c2c2c" : "#fefefe",
+            borderRadius: "16px",
+            overflow: "hidden",
+            background: darkMode ? "#2c2c2c" : "#fff",
             boxShadow: darkMode 
-              ? "0 2px 8px rgba(0,0,0,0.5)" 
-              : "0 2px 8px rgba(0,0,0,0.15)"
+              ? "0 6px 20px rgba(0,0,0,0.5)" 
+              : "0 6px 20px rgba(0,0,0,0.15)",
+            display: "flex",
+            flexDirection: "column",
+            transition: "transform 0.2s, box-shadow 0.2s"
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = "translateY(-6px)";
+            e.currentTarget.style.boxShadow = darkMode
+              ? "0 12px 30px rgba(0,0,0,0.6)"
+              : "0 12px 30px rgba(0,0,0,0.25)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = darkMode
+              ? "0 6px 20px rgba(0,0,0,0.5)"
+              : "0 6px 20px rgba(0,0,0,0.15)";
           }}
         >
-          <div
-            style={{
-              width: "100%",                  // inner card takes full width
-              padding: "16px",                // inner spacing
-              borderRadius: "8px",
-              background: darkMode ? "#3b3b3b" : "#fff",
-              border: `1px solid ${darkMode ? "#555" : "#ccc"}`,
-              boxShadow: darkMode
-                ? "0 1px 6px rgba(0,0,0,0.6)"
-                : "0 1px 6px rgba(0,0,0,0.1)"
-            }}
-          >
+          {/* Gradient Header */}
+          <div style={{
+            background: vehicle.status === "In Use" 
+              ? "linear-gradient(135deg, #2980b9, #6dd5fa)"
+              : "linear-gradient(135deg, #27ae60, #2ecc71)",
+            padding: "18px 20px",
+            color: "#fff",
+            fontWeight: "700",
+            fontSize: "16px"
+          }}>
+            {vehicle.name} - {vehicle.status}
+          </div>
+
+          {/* Vehicle Details */}
+          <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "14px" }}>
             <VehicleItem
               vehicle={vehicle}
               incrementMileage={() => {}}
@@ -58,53 +86,88 @@ export default function InUsePage({ vehicles, saveDestination, updateStatus, dar
               theme={darkMode ? "dark" : "light"}
             />
 
-            <input
-              type="text"
-              placeholder="Enter Destination"
-              value={destinationInputs[vehicle.id] || ""}
-              onChange={(e) => handleDestinationChange(vehicle.id, e.target.value)}
-              style={{
-                marginTop: "12px",
-                padding: "8px",
-                width: "100%",
-                borderRadius: "6px",
-                border: `1px solid ${darkMode ? '#555' : '#ccc'}`,
-                background: darkMode ? '#555' : '#fff',
-                color: darkMode ? '#fff' : '#000'
-              }}
-            />
+            {/* Destination Input */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <FaMapMarkerAlt style={{ color: "#3498db", fontSize: "18px" }} />
+                <input
+                  type="text"
+                  placeholder="Enter Destination..."
+                  value={destinationInputs[vehicle.id] || ""}
+                  onChange={e => handleDestinationChange(vehicle.id, e.target.value)}
+                  style={{
+                    flex: 1,
+                    padding: "12px",
+                    borderRadius: "10px",
+                    border: "none",
+                    background: darkMode ? "#333" : "#f4f4f4",
+                    color: darkMode ? "#fff" : "#333",
+                    fontSize: "14px",
+                    outline: "none",
+                    boxShadow: darkMode 
+                      ? "inset 0 0 5px rgba(255,255,255,0.1)" 
+                      : "inset 0 0 5px rgba(0,0,0,0.05)"
+                  }}
+                />
+              </div>
 
-            <div style={{ marginTop: "12px", display: "flex", gap: "8px" }}>
               <button
                 onClick={() => handleSave(vehicle.id)}
                 style={{
-                  flex: 1,
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  background: "#3498db",
-                  color: "#fff",
+                  padding: "12px",
+                  borderRadius: "10px",
                   border: "none",
-                  cursor: "pointer"
-                }}
-              >
-                Save Destination
-              </button>
-
-              <button
-                onClick={() => toggleStatus(vehicle.id)}
-                style={{
-                  flex: 1,
-                  padding: "8px 12px",
-                  borderRadius: "6px",
-                  background: vehicle.status === "In Use" ? "#e74c3c" : "#2ecc71",
+                  background: "linear-gradient(135deg, #3498db, #6dd5fa)",
                   color: "#fff",
-                  border: "none",
-                  cursor: "pointer"
+                  fontWeight: "700",
+                  cursor: "pointer",
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: "6px",
+                  transition: "transform 0.2s"
                 }}
+                onMouseEnter={e => e.currentTarget.style.transform = "scale(1.03)"}
+                onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
               >
-                {vehicle.status === "In Use" ? "Mark Available" : "Mark In Use"}
+                <FaArrowRight /> Save
               </button>
             </div>
+
+            {/* Status Toggle */}
+            <button
+              onClick={() => toggleStatus(vehicle.id)}
+              style={{
+                padding: "12px",
+                borderRadius: "10px",
+                border: "none",
+                background: vehicle.status === "In Use"
+                  ? "linear-gradient(135deg, #e74c3c, #ff6b6b)"
+                  : "linear-gradient(135deg, #27ae60, #2ecc71)",
+                color: "#fff",
+                fontWeight: "700",
+                cursor: "pointer",
+                textAlign: "center",
+                fontSize: "14px",
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "6px",
+                transition: "transform 0.2s, box-shadow 0.2s"
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.transform = "scale(1.03)";
+                e.currentTarget.style.boxShadow = "0 5px 15px rgba(0,0,0,0.25)";
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.transform = "scale(1)";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              {vehicle.status === "In Use" ? <><FaUndo /> Mark Available</> : <><FaCheck /> Mark In Use</>}
+            </button>
           </div>
         </div>
       ))}
