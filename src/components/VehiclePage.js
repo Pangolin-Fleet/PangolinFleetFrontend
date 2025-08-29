@@ -1,6 +1,192 @@
-import React, { useState } from "react";
-import { FaCar, FaCheckCircle, FaTools, FaExclamationTriangle, FaFileInvoice, FaShieldAlt, FaPlus, FaSearch, FaEdit, FaSave } from "react-icons/fa";
+import React, { useState, useMemo } from "react";
+import { FaCar, FaCheckCircle, FaTools, FaExclamationTriangle, FaFileInvoice, FaShieldAlt, FaPlus, FaSearch } from "react-icons/fa";
 
+// --- SummaryCard Component ---
+function SummaryCard({ label, value, icon, color }) {
+  return (
+    <div
+      style={{
+        flex: "1 1 calc(33% - 16px)",
+        padding: "20px",
+        borderRadius: "16px",
+        background: color,
+        color: "#fff",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "flex-start",
+        minWidth: "200px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.15)",
+        cursor: "default",
+        transition: "transform 0.2s"
+      }}
+      onMouseEnter={e => e.currentTarget.style.transform = "translateY(-6px)"}
+      onMouseLeave={e => e.currentTarget.style.transform = "translateY(0px)"}
+    >
+      <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
+        <div style={{ fontSize: "32px", marginRight: "12px" }}>{icon}</div>
+        <div style={{ fontSize: "28px", fontWeight: "700" }}>{value}</div>
+      </div>
+      <div style={{ fontSize: "16px", opacity: 0.9 }}>{label}</div>
+    </div>
+  );
+}
+
+// --- VehicleCard Component ---
+function VehicleCard({
+  vehicle,
+  darkMode,
+  editingId,
+  editableVehicle,
+  setEditableVehicle,
+  handleEditClick,
+  handleSaveClick,
+  incrementMileage,
+  updateStatus,
+  deleteVehicle
+}) {
+  const isExpired = (date) => date && new Date(date) < new Date();
+
+  const statusGradient = {
+    "In Use": "linear-gradient(135deg, #2980b9, #6dd5fa)",
+    "Available": "linear-gradient(135deg, #27ae60, #2ecc71)",
+    "In Maintenance": "linear-gradient(135deg, #f39c12, #f1c40f)"
+  };
+
+  // Add driverName and driverLicense to editable fields
+  const fields = ["name", "mileage", "disc", "insurance", "status", "driverName", "driverLicense"];
+
+  return (
+    <div
+      style={{
+        position: "relative",
+        borderRadius: "20px",
+        overflow: "hidden",
+        background: darkMode ? "#1f1f1f" : "#fff",
+        boxShadow: darkMode ? "0 10px 25px rgba(0,0,0,0.7)" : "0 10px 25px rgba(0,0,0,0.2)",
+        transition: "transform 0.3s, box-shadow 0.3s",
+      }}
+      onMouseEnter={e => {
+        e.currentTarget.style.transform = "translateY(-8px)";
+        e.currentTarget.style.boxShadow = darkMode
+          ? "0 15px 35px rgba(0,0,0,0.8)"
+          : "0 15px 35px rgba(0,0,0,0.3)";
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.boxShadow = darkMode
+          ? "0 10px 25px rgba(0,0,0,0.7)"
+          : "0 10px 25px rgba(0,0,0,0.2)";
+      }}
+    >
+      {/* Gradient Header */}
+      <div
+        style={{
+          background: statusGradient[vehicle.status] || "#777",
+          padding: "20px",
+          color: "#fff",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          fontWeight: "700",
+          fontSize: "16px"
+        }}
+      >
+        <span>{vehicle.name}</span>
+        <span>{vehicle.status}</span>
+      </div>
+
+      {/* Vehicle Details */}
+      <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
+        {editingId === vehicle.id ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            {fields.map(field => {
+              if (field === "status") {
+                return (
+                  <select
+                    key={field}
+                    value={editableVehicle.status ?? vehicle.status}
+                    onChange={e => setEditableVehicle({ ...editableVehicle, status: e.target.value })}
+                    style={{
+                      padding: "10px",
+                      borderRadius: "10px",
+                      border: `1px solid ${darkMode ? "#555" : "#ccc"}`,
+                      background: darkMode ? "#333" : "#f9f9f9",
+                      color: darkMode ? "#fff" : "#000"
+                    }}
+                  >
+                    <option value="Available">Available</option>
+                    <option value="In Use">In Use</option>
+                    <option value="In Maintenance">Maintenance</option>
+                  </select>
+                );
+              } else {
+                return (
+                  <input
+                    key={field}
+                    type={field === "mileage" ? "number" : field.includes("disc") || field.includes("insurance") ? "date" : "text"}
+                    value={editableVehicle[field] ?? vehicle[field] ?? ""}
+                    onChange={e => setEditableVehicle({ ...editableVehicle, [field]: e.target.value })}
+                    placeholder={field === "driverLicense" ? "Driver License" : field === "driverName" ? "Driver Name" : ""}
+                    style={{
+                      padding: "10px",
+                      borderRadius: "10px",
+                      border: `1px solid ${darkMode ? "#555" : "#ccc"}`,
+                      background: darkMode ? "#333" : "#f9f9f9",
+                      color:
+                        (field === "disc" || field === "insurance") && isExpired(editableVehicle[field] ?? vehicle[field])
+                          ? "#e74c3c"
+                          : darkMode
+                          ? "#fff"
+                          : "#000"
+                    }}
+                  />
+                );
+              }
+            })}
+            <button
+              onClick={() => handleSaveClick(vehicle.id)}
+              style={{
+                padding: "12px",
+                borderRadius: "12px",
+                background: "#2ecc71",
+                color: "#fff",
+                border: "none",
+                cursor: "pointer",
+                width: "100%"
+              }}
+            >
+              Save
+            </button>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div>
+              <div><strong>{vehicle.name}</strong> (Mileage: {vehicle.mileage})</div>
+              <div style={{ fontSize: "12px", marginTop: "4px", color: isExpired(vehicle.insurance) ? "#e74c3c" : darkMode ? "#fff" : "#000" }}>Insurance: {vehicle.insurance || "N/A"}</div>
+              <div style={{ fontSize: "12px", marginTop: "2px", color: isExpired(vehicle.disc) ? "#e74c3c" : darkMode ? "#fff" : "#000" }}>Disc: {vehicle.disc || "N/A"}</div>
+              <div style={{ fontSize: "12px", marginTop: "2px", color: darkMode ? "#fff" : "#000" }}>Driver: {vehicle.driverName || "N/A"} ({vehicle.driverLicense || "N/A"})</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              <button onClick={() => incrementMileage(vehicle.id, 100)} style={{ padding: "12px", borderRadius: "10px", background: "#f39c12", color: "#fff", border: "none", cursor: "pointer", width: "100%" }}>+100 km</button>
+              <select value={vehicle.status} onChange={e => updateStatus(vehicle.id, e.target.value)} style={{ padding: "12px", borderRadius: "10px", border: `1px solid ${darkMode ? "#555" : "#ccc"}`, background: darkMode ? "#333" : "#f9f9f9", color: darkMode ? "#fff" : "#000", width: "100%" }}>
+                <option value="Available">Available</option>
+                <option value="In Use">In Use</option>
+                <option value="In Maintenance">Maintenance</option>
+              </select>
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button onClick={() => handleEditClick(vehicle)} style={{ padding: "12px", borderRadius: "10px", background: "#3498db", color: "#fff", border: "none", cursor: "pointer", flex: 1 }}>Edit</button>
+                <button onClick={() => deleteVehicle(vehicle.id)} style={{ padding: "12px", borderRadius: "10px", background: "#e74c3c", color: "#fff", border: "none", cursor: "pointer", flex: 1 }}>Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// --- Main VehiclePage Component ---
 export default function VehiclePage({
   vehicles,
   incrementMileage,
@@ -19,7 +205,6 @@ export default function VehiclePage({
   setNewVehicle,
   addVehicle
 }) {
-
   const [editingId, setEditingId] = useState(null);
   const [editableVehicle, setEditableVehicle] = useState({});
 
@@ -27,17 +212,10 @@ export default function VehiclePage({
   const available = statusCounts["Available"] || 0;
   const inUse = statusCounts["In Use"] || 0;
   const maintenance = statusCounts["In Maintenance"] || 0;
-  const serviceDue = vehicles.filter(v => v.mileage >= 10000).length;
-  const insuranceExp = vehicles.filter(v => v.insurance && new Date(v.insurance) < new Date()).length;
-  const discExp = vehicles.filter(v => v.disc && new Date(v.disc) < new Date()).length;
 
-  const isExpired = (date) => date && new Date(date) < new Date();
-
-  const statusColors = {
-    "Available": "#27ae60",
-    "In Use": "#2980b9",
-    "In Maintenance": "#f39c12"
-  };
+  const serviceDue = useMemo(() => vehicles.filter(v => v.mileage >= 10000).length, [vehicles]);
+  const insuranceExp = useMemo(() => vehicles.filter(v => v.insurance && new Date(v.insurance) < new Date()).length, [vehicles]);
+  const discExp = useMemo(() => vehicles.filter(v => v.disc && new Date(v.disc) < new Date()).length, [vehicles]);
 
   const summaryCards = [
     { label: "Total Vehicles", value: totalVehicles, icon: <FaCar />, color: "#34495e" },
@@ -51,11 +229,19 @@ export default function VehiclePage({
 
   const handleEditClick = (vehicle) => {
     setEditingId(vehicle.id);
-    setEditableVehicle({ ...vehicle });
+    setEditableVehicle({
+      name: vehicle.name ?? "",
+      mileage: vehicle.mileage ?? 0,
+      disc: vehicle.disc ?? "",
+      insurance: vehicle.insurance ?? "",
+      status: vehicle.status ?? "Available",
+      driverName: vehicle.driverName ?? "",
+      driverLicense: vehicle.driverLicense ?? ""
+    });
   };
 
   const handleSaveClick = (id) => {
-    ["name","mileage","disc","insurance","status"].forEach(field => {
+    ["name", "mileage", "disc", "insurance", "status", "driverName", "driverLicense"].forEach(field => {
       editVehicle(id, field, editableVehicle[field]);
     });
     setEditingId(null);
@@ -101,18 +287,7 @@ export default function VehiclePage({
 
       {/* Summary Cards */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: "16px", marginBottom: "32px" }}>
-        {summaryCards.map((card, idx) => (
-          <div key={idx} style={{ flex: "1 1 calc(33% - 16px)", padding: "20px", borderRadius: "16px", background: card.color, color: "#fff", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "flex-start", minWidth: "200px", boxShadow: "0 8px 16px rgba(0,0,0,0.25), 0 4px 8px rgba(0,0,0,0.15)", cursor: "default", transition: "transform 0.2s" }}
-            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-6px)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "translateY(0px)"}
-          >
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-              <div style={{ fontSize: "32px", marginRight: "12px" }}>{card.icon}</div>
-              <div style={{ fontSize: "28px", fontWeight: "700" }}>{card.value}</div>
-            </div>
-            <div style={{ fontSize: "16px", opacity: 0.9 }}>{card.label}</div>
-          </div>
-        ))}
+        {summaryCards.map((card, idx) => <SummaryCard key={idx} {...card} />)}
       </div>
 
       {/* Vehicle Cards */}
@@ -122,95 +297,19 @@ export default function VehiclePage({
         gap: "24px"
       }}>
         {vehicles.map(vehicle => (
-          <div
+          <VehicleCard
             key={vehicle.id}
-            style={{
-              position: "relative",
-              borderRadius: "20px",
-              overflow: "hidden",
-              background: darkMode ? "#1f1f1f" : "#fff",
-              boxShadow: darkMode ? "0 10px 25px rgba(0,0,0,0.7)" : "0 10px 25px rgba(0,0,0,0.2)",
-              transition: "transform 0.3s, box-shadow 0.3s",
-            }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = "translateY(-8px)";
-              e.currentTarget.style.boxShadow = darkMode
-                ? "0 15px 35px rgba(0,0,0,0.8)"
-                : "0 15px 35px rgba(0,0,0,0.3)";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = "translateY(0)";
-              e.currentTarget.style.boxShadow = darkMode
-                ? "0 10px 25px rgba(0,0,0,0.7)"
-                : "0 10px 25px rgba(0,0,0,0.2)";
-            }}
-          >
-            {/* Gradient Header */}
-            <div style={{
-              background: vehicle.status === "In Use" 
-                ? "linear-gradient(135deg, #2980b9, #6dd5fa)"
-                : vehicle.status === "Available"
-                ? "linear-gradient(135deg, #27ae60, #2ecc71)"
-                : "linear-gradient(135deg, #f39c12, #f1c40f)",
-              padding: "20px",
-              color: "#fff",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              fontWeight: "700",
-              fontSize: "16px"
-            }}>
-              <span>{vehicle.name}</span>
-              <span>{vehicle.status}</span>
-            </div>
-
-            {/* Vehicle Details */}
-            <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "16px" }}>
-              {editingId === vehicle.id ? (
-                <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
-                  {["name","mileage","disc","insurance","status"].map(field => (
-                    field === "status" ? (
-                      <select
-                        key={field}
-                        value={editableVehicle.status || vehicle.status}
-                        onChange={e => setEditableVehicle({...editableVehicle, status: e.target.value})}
-                        style={{ padding:"10px", borderRadius:"10px", border:`1px solid ${darkMode?"#555":"#ccc"}`, background:darkMode?"#333":"#f9f9f9", color:darkMode?"#fff":"#000" }}
-                      />
-                    ) : (
-                      <input
-                        key={field}
-                        type={field==="mileage"?"number":field==="disc"||field==="insurance"?"date":"text"}
-                        value={editableVehicle[field] || vehicle[field] || ""}
-                        onChange={e => setEditableVehicle({...editableVehicle,[field]:e.target.value})}
-                        style={{ padding:"10px", borderRadius:"10px", border:`1px solid ${darkMode?"#555":"#ccc"}`, background:darkMode?"#333":"#f9f9f9", color:(field==="disc"||field==="insurance") && isExpired(editableVehicle[field] || vehicle[field]) ? "#e74c3c" : darkMode?"#fff":"#000" }}
-                      />
-                    )
-                  ))}
-                  <button onClick={() => handleSaveClick(vehicle.id)} style={{ padding:"12px", borderRadius:"12px", background:"#2ecc71", color:"#fff", border:"none", cursor:"pointer", width:"100%" }}>Save</button>
-                </div>
-              ) : (
-                <div style={{ display:"flex", flexDirection:"column", gap:"12px" }}>
-                  <div>
-                    <div><strong>{vehicle.name}</strong> (Mileage: {vehicle.mileage})</div>
-                    <div style={{ fontSize:"12px", marginTop:"4px", color:isExpired(vehicle.insurance)?"#e74c3c":darkMode?"#fff":"#000"}}>Insurance: {vehicle.insurance || "N/A"}</div>
-                    <div style={{ fontSize:"12px", marginTop:"2px", color:isExpired(vehicle.disc)?"#e74c3c":darkMode?"#fff":"#000"}}>Disc: {vehicle.disc || "N/A"}</div>
-                  </div>
-                  <div style={{ display:"flex", flexDirection:"column", gap:"10px" }}>
-                    <button onClick={() => incrementMileage(vehicle.id,100)} style={{ padding:"12px", borderRadius:"10px", background:"#f39c12", color:"#fff", border:"none", cursor:"pointer", width:"100%" }}>+100 km</button>
-                    <select value={vehicle.status} onChange={e => updateStatus(vehicle.id, e.target.value)} style={{ padding:"12px", borderRadius:"10px", border:`1px solid ${darkMode?"#555":"#ccc"}`, background:darkMode?"#333":"#f9f9f9", color:darkMode?"#fff":"#000", width:"100%" }}>
-                      <option value="Available">Available</option>
-                      <option value="In Use">In Use</option>
-                      <option value="In Maintenance">Maintenance</option>
-                    </select>
-                    <div style={{ display:"flex", gap:"8px" }}>
-                      <button onClick={() => handleEditClick(vehicle)} style={{ padding:"12px", borderRadius:"10px", background:"#3498db", color:"#fff", border:"none", cursor:"pointer", flex:1 }}>Edit</button>
-                      <button onClick={() => deleteVehicle(vehicle.id)} style={{ padding:"12px", borderRadius:"10px", background:"#e74c3c", color:"#fff", border:"none", cursor:"pointer", flex:1 }}>Delete</button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+            vehicle={vehicle}
+            darkMode={darkMode}
+            editingId={editingId}
+            editableVehicle={editableVehicle}
+            setEditableVehicle={setEditableVehicle}
+            handleEditClick={handleEditClick}
+            handleSaveClick={handleSaveClick}
+            incrementMileage={incrementMileage}
+            updateStatus={updateStatus}
+            deleteVehicle={deleteVehicle}
+          />
         ))}
       </div>
     </div>

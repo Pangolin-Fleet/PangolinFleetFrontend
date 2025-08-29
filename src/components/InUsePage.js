@@ -1,33 +1,69 @@
 import React, { useState } from "react";
-import { VehicleItem } from "./VehicleItem";
 import { FaMapMarkerAlt, FaArrowRight, FaCheck, FaUndo } from "react-icons/fa";
 
-export default function InUsePage({ vehicles, saveDestination, updateStatus, darkMode }) {
+export default function InUsePage({
+  vehicles,
+  saveDestination,
+  updateStatus,
+  incrementMileage,
+  editVehicleId,
+  setEditVehicleId,
+  darkMode
+}) {
   const [destinationInputs, setDestinationInputs] = useState({});
 
   const handleDestinationChange = (id, value) => {
     setDestinationInputs(prev => ({ ...prev, [id]: value }));
   };
 
-  const handleSave = (id) => {
-    const destination = destinationInputs[id];
-    if (!destination) return;
-    saveDestination(id, destination);
-    setDestinationInputs(prev => ({ ...prev, [id]: "" }));
+  const handleSave = (vehicle) => {
+    const destination = destinationInputs[vehicle.id];
+    if (destination) {
+      saveDestination(vehicle.id, destination);
+    }
+    setEditVehicleId(null); // exit edit mode
   };
 
-  const toggleStatus = (id) => {
-    const vehicle = vehicles.find(v => v.id === id);
-    if (!vehicle) return;
+  const toggleStatus = (vehicle) => {
     const newStatus = vehicle.status === "In Use" ? "Available" : "In Use";
-    updateStatus(id, newStatus, newStatus === "Available" ? { destination: "" } : {});
+    updateStatus(vehicle.id, newStatus, newStatus === "Available" ? { destination: "" } : {});
   };
 
-  const statusColors = {
-    "Available": "#27ae60",
-    "In Use": "#2980b9",
-    "In Maintenance": "#f39c12"
-  };
+  const cardStyle = (vehicle) => ({
+    position: "relative",
+    borderRadius: "20px",
+    overflow: "hidden",
+    background: darkMode ? "#1f1f1f" : "#fff",
+    boxShadow: darkMode
+      ? "0 10px 25px rgba(0,0,0,0.7)"
+      : "0 10px 25px rgba(0,0,0,0.2)",
+    transition: "transform 0.3s, box-shadow 0.3s",
+    cursor: "pointer"
+  });
+
+  const headerStyle = (status) => ({
+    background: status === "In Use"
+      ? "linear-gradient(135deg, #2980b9, #6dd5fa)"
+      : "linear-gradient(135deg, #27ae60, #2ecc71)",
+    padding: "20px",
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: "16px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center"
+  });
+
+  const buttonStyle = (bg, color = "#fff") => ({
+    padding: "10px",
+    borderRadius: "8px",
+    background: bg,
+    color,
+    fontWeight: "600",
+    cursor: "pointer",
+    flex: 1,
+    border: "none"
+  });
 
   return (
     <div style={{
@@ -39,135 +75,90 @@ export default function InUsePage({ vehicles, saveDestination, updateStatus, dar
       {vehicles.map(vehicle => (
         <div
           key={vehicle.id}
-          style={{
-            borderRadius: "16px",
-            overflow: "hidden",
-            background: darkMode ? "#2c2c2c" : "#fff",
-            boxShadow: darkMode 
-              ? "0 6px 20px rgba(0,0,0,0.5)" 
-              : "0 6px 20px rgba(0,0,0,0.15)",
-            display: "flex",
-            flexDirection: "column",
-            transition: "transform 0.2s, box-shadow 0.2s"
-          }}
+          style={cardStyle(vehicle)}
           onMouseEnter={e => {
-            e.currentTarget.style.transform = "translateY(-6px)";
+            e.currentTarget.style.transform = "translateY(-8px)";
             e.currentTarget.style.boxShadow = darkMode
-              ? "0 12px 30px rgba(0,0,0,0.6)"
-              : "0 12px 30px rgba(0,0,0,0.25)";
+              ? "0 15px 35px rgba(0,0,0,0.8)"
+              : "0 15px 35px rgba(0,0,0,0.3)";
           }}
           onMouseLeave={e => {
             e.currentTarget.style.transform = "translateY(0)";
             e.currentTarget.style.boxShadow = darkMode
-              ? "0 6px 20px rgba(0,0,0,0.5)"
-              : "0 6px 20px rgba(0,0,0,0.15)";
+              ? "0 10px 25px rgba(0,0,0,0.7)"
+              : "0 10px 25px rgba(0,0,0,0.2)";
           }}
         >
-          {/* Gradient Header */}
-          <div style={{
-            background: vehicle.status === "In Use" 
-              ? "linear-gradient(135deg, #2980b9, #6dd5fa)"
-              : "linear-gradient(135deg, #27ae60, #2ecc71)",
-            padding: "18px 20px",
-            color: "#fff",
-            fontWeight: "700",
-            fontSize: "16px"
-          }}>
-            {vehicle.name} - {vehicle.status}
+          {/* Header */}
+          <div style={headerStyle(vehicle.status)}>
+            <span>{vehicle.name}</span>
+            <span>{vehicle.status}</span>
           </div>
 
-          {/* Vehicle Details */}
-          <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "14px" }}>
-            <VehicleItem
-              vehicle={vehicle}
-              incrementMileage={() => {}}
-              deleteVehicle={() => {}}
-              updateStatus={(id, status) => updateStatus(id, status)}
-              theme={darkMode ? "dark" : "light"}
-            />
+          {/* Vehicle Info */}
+          <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+            <p><strong>VIN:</strong> {vehicle.vin}</p>
+            <p><strong>Driver:</strong> {vehicle.driver}</p>
+            <p><strong>Mileage:</strong> {vehicle.mileage} km</p>
+            <p><strong>Description:</strong> {vehicle.description}</p>
 
-            {/* Destination Input */}
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {/* Destination */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                <FaMapMarkerAlt style={{ color: "#3498db", fontSize: "18px" }} />
-                <input
-                  type="text"
-                  placeholder="Enter Destination..."
-                  value={destinationInputs[vehicle.id] || ""}
-                  onChange={e => handleDestinationChange(vehicle.id, e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: "12px",
-                    borderRadius: "10px",
-                    border: "none",
-                    background: darkMode ? "#333" : "#f4f4f4",
-                    color: darkMode ? "#fff" : "#333",
-                    fontSize: "14px",
-                    outline: "none",
-                    boxShadow: darkMode 
-                      ? "inset 0 0 5px rgba(255,255,255,0.1)" 
-                      : "inset 0 0 5px rgba(0,0,0,0.05)"
-                  }}
-                />
+                <FaMapMarkerAlt style={{ color: "#3498db" }} />
+                {editVehicleId === vehicle.id ? (
+                  <input
+                    type="text"
+                    placeholder="Enter Destination..."
+                    value={destinationInputs[vehicle.id] || vehicle.destination || ""}
+                    onChange={e => handleDestinationChange(vehicle.id, e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: "10px",
+                      borderRadius: "8px",
+                      border: "1px solid #ccc",
+                      background: darkMode ? "#2c2c2c" : "#f2f2f2",
+                      color: darkMode ? "#fff" : "#000",
+                      outline: "none"
+                    }}
+                  />
+                ) : (
+                  <span>{vehicle.destination || "No destination"}</span>
+                )}
               </div>
 
-              <button
-                onClick={() => handleSave(vehicle.id)}
-                style={{
-                  padding: "12px",
-                  borderRadius: "10px",
-                  border: "none",
-                  background: "linear-gradient(135deg, #3498db, #6dd5fa)",
-                  color: "#fff",
-                  fontWeight: "700",
-                  cursor: "pointer",
-                  width: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: "6px",
-                  transition: "transform 0.2s"
-                }}
-                onMouseEnter={e => e.currentTarget.style.transform = "scale(1.03)"}
-                onMouseLeave={e => e.currentTarget.style.transform = "scale(1)"}
-              >
-                <FaArrowRight /> Save
-              </button>
+              {editVehicleId === vehicle.id ? (
+                <button
+                  onClick={() => handleSave(vehicle)}
+                  style={buttonStyle("#3498db")}
+                >
+                  <FaArrowRight /> Save
+                </button>
+              ) : (
+                <button
+                  onClick={() => setEditVehicleId(vehicle.id)}
+                  style={buttonStyle("#f1c40f", "#000")}
+                >
+                  Edit
+                </button>
+              )}
             </div>
 
-            {/* Status Toggle */}
-            <button
-              onClick={() => toggleStatus(vehicle.id)}
-              style={{
-                padding: "12px",
-                borderRadius: "10px",
-                border: "none",
-                background: vehicle.status === "In Use"
-                  ? "linear-gradient(135deg, #e74c3c, #ff6b6b)"
-                  : "linear-gradient(135deg, #27ae60, #2ecc71)",
-                color: "#fff",
-                fontWeight: "700",
-                cursor: "pointer",
-                textAlign: "center",
-                fontSize: "14px",
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: "6px",
-                transition: "transform 0.2s, box-shadow 0.2s"
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.transform = "scale(1.03)";
-                e.currentTarget.style.boxShadow = "0 5px 15px rgba(0,0,0,0.25)";
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.transform = "scale(1)";
-                e.currentTarget.style.boxShadow = "none";
-              }}
-            >
-              {vehicle.status === "In Use" ? <><FaUndo /> Mark Available</> : <><FaCheck /> Mark In Use</>}
-            </button>
+            {/* Actions */}
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              <button
+                onClick={() => toggleStatus(vehicle)}
+                style={buttonStyle(vehicle.status === "In Use" ? "#e74c3c" : "#27ae60")}
+              >
+                {vehicle.status === "In Use" ? <><FaUndo /> Mark Available</> : <><FaCheck /> Mark In Use</>}
+              </button>
+              <button
+                onClick={() => incrementMileage(vehicle.id, 10)}
+                style={buttonStyle("#3498db")}
+              >
+                +10 km
+              </button>
+            </div>
           </div>
         </div>
       ))}

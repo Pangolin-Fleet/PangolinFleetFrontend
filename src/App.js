@@ -125,6 +125,9 @@ function App() {
           <InUsePage
             vehicles={vehicles.filter(v => v.status === "In Use")}
             saveDestination={saveDestination}
+             incrementMileage={incrementMileage}   // so +10 km works
+    editVehicleId={editVehicleId}         // current edit vehicle id
+    setEditVehicleId={setEditVehicleId} 
               updateStatus={updateStatus}
             darkMode={darkMode}
           />
