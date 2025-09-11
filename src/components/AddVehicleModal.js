@@ -1,75 +1,86 @@
 import React from "react";
-import { FaTimes } from "react-icons/fa";
 
 export default function AddVehicleModal({ newVehicle, setNewVehicle, setShowModal, addVehicle, darkMode }) {
+  const handleChange = e => {
+    const { name, value } = e.target;
+    setNewVehicle(prev => ({ ...prev, [name]: value }));
+  };
 
-  const handleChange = (field, value) => {
-    setNewVehicle({ ...newVehicle, [field]: value });
+  const handleSubmit = e => {
+    e.preventDefault();
+    addVehicle(newVehicle);
+    setShowModal(false);
   };
 
   return (
     <div style={{
       position: "fixed",
-      top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.6)",
+      inset: 0,
+      background: "rgba(0,0,0,0.5)",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       zIndex: 1000
     }}>
-      <div style={{
-        background: darkMode ? "#2c2c2c" : "#fff",
+      <form onSubmit={handleSubmit} style={{
+        background: darkMode ? "#222" : "#fff",
         padding: "24px",
         borderRadius: "16px",
-        width: "400px",
-        maxHeight: "90vh",
-        overflowY: "auto",
-        position: "relative",
+        width: "100%",
+        maxWidth: "500px",
         display: "flex",
         flexDirection: "column",
         gap: "12px",
-        boxShadow: "0 8px 16px rgba(0,0,0,0.3)"
+        boxShadow: darkMode ? "0 10px 25px rgba(0,0,0,0.7)" : "0 10px 25px rgba(0,0,0,0.2)"
       }}>
-        <button onClick={() => setShowModal(false)} style={{
-          position: "absolute", top: "12px", right: "12px",
-          background: "transparent", border: "none", color: darkMode ? "#fff" : "#000", fontSize: "20px", cursor: "pointer"
-        }}><FaTimes /></button>
-
         <h2 style={{ marginBottom: "12px", color: darkMode ? "#fff" : "#000" }}>Add Vehicle</h2>
 
-        {[
-          { label: "Name", field: "name", type: "text" },
-          { label: "VIN", field: "vin", type: "text" },
-          { label: "License", field: "license", type: "text" },
-          { label: "Driver", field: "driver", type: "text" },
-          { label: "Mileage", field: "mileage", type: "number" },
-          { label: "Status", field: "status", type: "text" },
-          { label: "DISC Expiration", field: "disc", type: "date" },
-          { label: "Insurance Expiration", field: "insurance", type: "date" },
-          { label: "Description", field: "description", type: "text" }
-        ].map(input => (
-          <div key={input.field} style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
-            <label style={{ color: darkMode ? "#fff" : "#000", fontSize: "14px" }}>{input.label}</label>
-            <input
-              type={input.type}
-              value={newVehicle[input.field]}
-              onChange={e => handleChange(input.field, e.target.value)}
-              style={{
-                padding: "8px", borderRadius: "8px", border: `1px solid ${darkMode ? "#555" : "#ccc"}`,
-                background: darkMode ? "#333" : "#f9f9f9",
-                color: darkMode ? "#fff" : "#000"
-              }}
-            />
-          </div>
+        {["vin", "make", "model", "year", "mileage", "description"].map(field => (
+          <input
+            key={field}
+            name={field}
+            type={field === "year" || field === "mileage" ? "number" : "text"}
+            placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+            value={newVehicle[field] || ""}
+            onChange={handleChange}
+            style={{
+              padding: "10px",
+              borderRadius: "8px",
+              border: `1px solid ${darkMode ? "#555" : "#ccc"}`,
+              background: darkMode ? "#333" : "#f9f9f9",
+              color: darkMode ? "#fff" : "#000"
+            }}
+            required={["vin","make","model","year","mileage"].includes(field)}
+          />
         ))}
 
-        <button onClick={addVehicle} style={{
-          padding: "10px 0", marginTop: "12px",
-          borderRadius: "12px", border: "none",
-          background: "#3498db", color: "#fff",
-          fontWeight: "700", cursor: "pointer"
-        }}>Add Vehicle</button>
-      </div>
+        <select
+          name="status"
+          value={newVehicle.status || "Available"}
+          onChange={handleChange}
+          style={{ padding: "10px", borderRadius: "8px", border: `1px solid ${darkMode ? "#555" : "#ccc"}`, background: darkMode ? "#333" : "#f9f9f9", color: darkMode ? "#fff" : "#000" }}
+        >
+          <option value="Available">Available</option>
+          <option value="In Use">In Use</option>
+          <option value="In Maintenance">In Maintenance</option>
+        </select>
+
+        {["insuranceExpiryDate", "discExpiryDate"].map(field => (
+          <input
+            key={field}
+            name={field}
+            type="date"
+            value={newVehicle[field] || ""}
+            onChange={handleChange}
+            style={{ padding: "10px", borderRadius: "8px", border: `1px solid ${darkMode ? "#555" : "#ccc"}`, background: darkMode ? "#333" : "#f9f9f9", color: darkMode ? "#fff" : "#000" }}
+          />
+        ))}
+
+        <div style={{ display: "flex", gap: "12px", marginTop: "8px" }}>
+          <button type="submit" style={{ flex: 1, padding: "12px", borderRadius: "10px", border: "none", background: "#27ae60", color: "#fff", cursor: "pointer", fontWeight: "700" }}>Add</button>
+          <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: "12px", borderRadius: "10px", border: "none", background: "#e74c3c", color: "#fff", cursor: "pointer", fontWeight: "700" }}>Cancel</button>
+        </div>
+      </form>
     </div>
   );
 }

@@ -7,71 +7,135 @@ import InUsePage from "./components/InUsePage";
 import ReportPage from "./components/ReportPage";
 import Header from "./components/Header";
 import AddVehicleModal from "./components/AddVehicleModal";
-import { statusColors, initialVehicles } from "./data";
+
+import vehicleService from "./service/VehicleService";
+import { statusColors } from "./data";
 
 import "./App.css";
 
 function App() {
-  const [vehicles, setVehicles] = useState(initialVehicles);
+  const [vehicles, setVehicles] = useState([]);
   const [currentPage, setCurrentPage] = useState("Vehicles");
   const [showModal, setShowModal] = useState(false);
-  const [editVehicleId, setEditVehicleId] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [newVehicle, setNewVehicle] = useState({
-    vin: "", license: "", name: "", driver: "", mileage: 0,
-    status: "Available", disc: "", insurance: "", description: "",
-    destination: ""
+    vin: "",
+    make: "",
+    model: "",
+    year: "",
+    mileage: "",
+    status: "Available",
+    description: "",
+    discExpiryDate: "",
+    insuranceExpiryDate: "",
   });
-  const [animatedId, setAnimatedId] = useState(null);
   const [statusCounts, setStatusCounts] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
+  // Fetch vehicles on load
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const response = await vehicleService.getAllVehicles();
+        setVehicles(response);
+      } catch (error) {
+        console.error("Failed to fetch vehicles:", error);
+      }
+    };
+    fetchVehicles();
+  }, []);
+
+  // Update status counts
   useEffect(() => {
     const counts = {};
-    Object.keys(statusColors).forEach(status => {
-      counts[status] = vehicles.filter(v => v.status === status).length;
+    Object.keys(statusColors).forEach((status) => {
+      counts[status] = vehicles.filter((v) => v.status === status).length;
     });
     setStatusCounts(counts);
   }, [vehicles]);
 
-  const incrementMileage = (id, amount) => {
-    setAnimatedId(id);
-    setVehicles(vehicles.map(v => (v.id === id ? { ...v, mileage: v.mileage + amount } : v)));
-    setTimeout(() => setAnimatedId(null), 500);
-  };
-
-  const deleteVehicle = (id) => setVehicles(vehicles.filter(v => v.id !== id));
-  const editVehicle = (id, field, value) => setVehicles(vehicles.map(v => (v.id === id ? { ...v, [field]: value } : v)));
-
-  const addVehicle = () => {
-    if (!newVehicle.vin || !newVehicle.name || !newVehicle.driver || !newVehicle.description) {
+  // Add Vehicle
+  const addVehicle = async (vehicle) => {
+    if (!vehicle.vin || !vehicle.make || !vehicle.model || !vehicle.year || !vehicle.mileage) {
       alert("Please fill all required fields");
       return;
     }
-    const id = vehicles.length ? Math.max(...vehicles.map(v => v.id)) + 1 : 1;
-    setVehicles([...vehicles, { ...newVehicle, id }]);
-    setNewVehicle({ vin: "", license: "", name: "", driver: "", mileage: 0, status: "Available", disc: "", insurance: "", description: "", destination: "" });
-    setShowModal(false);
+
+    try {
+      const payload = {
+        ...vehicle,
+        year: Number(vehicle.year),
+        mileage: Number(vehicle.mileage),
+      };
+      const savedVehicle = await vehicleService.addVehicle(payload);
+      setVehicles([...vehicles, savedVehicle]);
+      setNewVehicle({
+        vin: "",
+        make: "",
+        model: "",
+        year: "",
+        mileage: "",
+        status: "Available",
+        description: "",
+        discExpiryDate: "",
+        insuranceExpiryDate: "",
+      });
+      setShowModal(false);
+      alert("Vehicle added successfully!");
+    } catch (error) {
+      console.error("Failed to add vehicle:", error);
+      alert("Failed to add vehicle. Check backend connection.");
+    }
   };
 
-  const updateStatus = (id, status, extra = {}) => {
-    setVehicles(prev =>
-      prev.map(v =>
-        v.id === id ? { ...v, status, ...extra } : v
-      )
-    );
+  // Update Vehicle
+  const updateVehicle = async (vin, updatedVehicle) => {
+    try {
+      const saved = await vehicleService.updateVehicle(vin, updatedVehicle);
+      setVehicles((prev) => prev.map((v) => (v.vin === vin ? saved : v)));
+    } catch (error) {
+      console.error("Failed to update vehicle:", error);
+      alert("Failed to update vehicle.");
+    }
   };
 
-  const saveDestination = (id, destination) => {
-    updateStatus(id, "In Use", { destination });
+  // Delete Vehicle
+  const deleteVehicle = async (vin) => {
+    try {
+      await vehicleService.deleteVehicle(vin);
+      setVehicles((prev) => prev.filter((v) => v.vin !== vin));
+    } catch (error) {
+      console.error("Failed to delete vehicle:", error);
+      alert("Failed to delete vehicle.");
+    }
   };
 
-  const filteredVehicles = vehicles.filter(v =>
-    (v.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    v.vin.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    v.driver.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    (filterStatus ? v.status === filterStatus : true)
+  // Helper Methods
+  const incrementMileage = async (vin, amount) => {
+    const vehicle = vehicles.find((v) => v.vin === vin);
+    if (!vehicle) return;
+    const updated = { ...vehicle, mileage: vehicle.mileage + amount };
+    await updateVehicle(vin, updated);
+  };
+
+  const updateStatus = async (vin, status, extra = {}) => {
+    const vehicle = vehicles.find((v) => v.vin === vin);
+    if (!vehicle) return;
+    const updated = { ...vehicle, status, ...extra };
+    await updateVehicle(vin, updated);
+  };
+
+  const saveDestination = async (vin, destination) => {
+    await updateStatus(vin, "In Use", { destination });
+  };
+
+  const filteredVehicles = vehicles.filter(
+    (v) =>
+      (v.make?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.vin?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (filterStatus ? v.status === filterStatus : true)
   );
 
   return (
@@ -79,8 +143,12 @@ function App() {
       <aside className={`sidebar ${darkMode ? "dark" : ""}`}>
         <div className="logo">Pangolin Fleet</div>
         <nav>
-          {["Vehicles", "In Use", "Maintenance", "Reports"].map(page => (
-            <button key={page} onClick={() => setCurrentPage(page)} className={currentPage === page ? "active" : ""}>
+          {["Vehicles", "In Use", "Maintenance", "Reports"].map((page) => (
+            <button
+              key={page}
+              onClick={() => setCurrentPage(page)}
+              className={currentPage === page ? "active" : ""}
+            >
               {page === "Vehicles" && <FaCar />}
               {page === "Maintenance" && <FaTools />}
               {page === "Reports" && <FaFileAlt />}
@@ -103,15 +171,12 @@ function App() {
             incrementMileage={incrementMileage}
             updateStatus={updateStatus}
             deleteVehicle={deleteVehicle}
-            editVehicle={editVehicle}
-            editVehicleId={editVehicleId}
-            setEditVehicleId={setEditVehicleId}
+            editVehicle={updateVehicle}
             showModal={showModal}
             setShowModal={setShowModal}
             newVehicle={newVehicle}
             setNewVehicle={setNewVehicle}
             addVehicle={addVehicle}
-            animatedId={animatedId}
             statusCounts={statusCounts}
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -123,32 +188,24 @@ function App() {
 
         {currentPage === "In Use" && (
           <InUsePage
-            vehicles={vehicles.filter(v => v.status === "In Use")}
+            vehicles={vehicles.filter((v) => v.status === "In Use")}
             saveDestination={saveDestination}
-             incrementMileage={incrementMileage}   // so +10 km works
-    editVehicleId={editVehicleId}         // current edit vehicle id
-    setEditVehicleId={setEditVehicleId} 
-              updateStatus={updateStatus}
+            incrementMileage={incrementMileage}
+            updateStatus={updateStatus}
             darkMode={darkMode}
           />
         )}
 
         {currentPage === "Maintenance" && (
           <MaintenancePage
-            vehicles={vehicles.filter(v => v.status === "In Maintenance")}
-            editVehicle={editVehicle}
+            vehicles={vehicles.filter((v) => v.status === "In Maintenance")}
             updateStatus={updateStatus}
-            editVehicleId={editVehicleId}
-            setEditVehicleId={setEditVehicleId}
-            completeMaintenance={(id) => updateStatus(id, "Available")}
-            animatedId={animatedId}
+            incrementMileage={incrementMileage}
             darkMode={darkMode}
           />
         )}
 
-        {currentPage === "Reports" && (
-          <ReportPage vehicles={vehicles} darkMode={darkMode} />
-        )}
+        {currentPage === "Reports" && <ReportPage vehicles={vehicles} darkMode={darkMode} />}
       </main>
 
       {showModal && (
@@ -157,6 +214,7 @@ function App() {
           setNewVehicle={setNewVehicle}
           setShowModal={setShowModal}
           addVehicle={addVehicle}
+          darkMode={darkMode}
         />
       )}
     </div>
