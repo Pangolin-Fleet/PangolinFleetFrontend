@@ -1,216 +1,187 @@
-import React, { useState } from "react";
-import { FaCheck, FaUndo, FaPlus } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import vehicleService from "../service/VehicleService";
+import maintenanceService from "../service/MaintenanceService"; // Axios service
+import "./MaintenancePage.css";
 
-export default function MaintenancePage({ vehicles, updateStatus, updateVehicle, theme }) {
-  const darkMode = theme === "dark";
+export default function MaintenancePage() {
+  const [vehicles, setVehicles] = useState([]);
+  const [form, setForm] = useState({
+    vin: "",
+    severity: "Low",
+    problem: "",
+    mileage: "",
+    mechanic: "",
+    cost: "",
+    date: "",
+  });
 
   const severityColors = {
-    Low: "#27ae60",
-    Medium: "#f39c12",
-    High: "#c0392b",
+    Low: "#2ecc71",      // Green
+    Medium: "#f1c40f",   // Yellow
+    High: "#e67e22",     // Orange
+    Critical: "#e74c3c", // Red
   };
 
-  // Store newIssue and newSeverity per vehicle
-  const [issueInputs, setIssueInputs] = useState({});
-
-  const handleAddIssue = (vehicle) => {
-    const input = issueInputs[vehicle.vin] || { note: "", severity: "Low" };
-    if (!input.note) return;
-
-    const updatedIssues = vehicle.issues ? [...vehicle.issues] : [];
-    updatedIssues.push({ note: input.note, severity: input.severity });
-    updateVehicle(vehicle.vin, { ...vehicle, issues: updatedIssues });
-
-    setIssueInputs(prev => ({ ...prev, [vehicle.vin]: { note: "", severity: "Low" } }));
-  };
-
-  const handleInputChange = (vin, field, value) => {
-    setIssueInputs(prev => ({
-      ...prev,
-      [vin]: {
-        ...prev[vin],
-        [field]: value
+  useEffect(() => {
+    const fetchVehicles = async () => {
+      try {
+        const data = await vehicleService.getAllVehicles();
+        setVehicles(data);
+      } catch (err) {
+        console.error("Error fetching vehicles:", err);
       }
-    }));
+    };
+    fetchVehicles();
+  }, []);
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSaveNotes = (vehicle, index, note) => {
-    const updatedIssues = [...vehicle.issues];
-    updatedIssues[index].note = note;
-    updateVehicle(vehicle.vin, { ...vehicle, issues: updatedIssues });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.vin) return alert("Please select a vehicle.");
+
+    // Backend expects a Vehicle object
+    const vehicleObj = { vin: form.vin };
+
+    const payload = {
+      vehicle: vehicleObj,
+      severity: form.severity,
+      problem: form.problem,
+      mileage: Number(form.mileage),
+      mechanic: form.mechanic,
+      cost: Number(form.cost),
+      serviceDate: form.date, // maps frontend "date" to backend
+    };
+
+    try {
+      const response = await maintenanceService.addMaintenance(payload);
+      console.log("Maintenance saved:", response);
+      alert("Maintenance saved successfully!");
+
+      // Reset form
+      setForm({
+        vin: "",
+        severity: "Low",
+        problem: "",
+        mileage: "",
+        mechanic: "",
+        cost: "",
+        date: "",
+      });
+    } catch (err) {
+      console.error("Error saving maintenance:", err);
+      alert("Failed to save maintenance. Check console.");
+    }
   };
 
   return (
-    <div style={{
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(350px, 1fr))",
-      gap: "24px",
-      padding: "24px",
-      minHeight: "100vh",
-      background: darkMode ? "#121212" : "#f5f5f5",
-    }}>
-      {vehicles.map(vehicle => {
-        const input = issueInputs[vehicle.vin] || { note: "", severity: "Low" };
+    <div className="maintenance-container">
+      <div
+        className="maintenance-card"
+        style={{ borderTopColor: severityColors[form.severity] }}
+      >
+        <h2 className="card-header">⚙️ Log Vehicle Maintenance</h2>
 
-        return (
-          <div key={vehicle.vin} style={{
-            borderRadius: "16px",
-            overflow: "hidden",
-            background: darkMode ? "#1e1e1e" : "#fff",
-            boxShadow: darkMode 
-              ? "0 10px 20px rgba(0,0,0,0.8)"
-              : "0 8px 16px rgba(0,0,0,0.1)",
-            display: "flex",
-            flexDirection: "column",
-            transition: "transform 0.2s, box-shadow 0.2s",
-            cursor: "grab",
-          }} draggable>
-            
-            {/* Header */}
-            <div style={{
-              background: "linear-gradient(135deg, #2980b9, #6dd5fa)",
-              padding: "18px",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: "17px",
-              textAlign: "center"
-            }}>
-              {vehicle.make} {vehicle.model}
-            </div>
-
-            {/* Body */}
-            <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
-              <div><strong>Mileage:</strong> {vehicle.mileage}</div>
-              <div><strong>Insurance:</strong> {vehicle.insurance || "N/A"}</div>
-              <div><strong>Disc:</strong> {vehicle.disc || "N/A"}</div>
-
-              {/* Issues */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <strong>Issues:</strong>
-                {vehicle.issues && vehicle.issues.length > 0 ? vehicle.issues.map((issue, index) => (
-                  <div key={index} style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                    <input 
-                      type="text"
-                      value={issue.note}
-                      onChange={e => handleSaveNotes(vehicle, index, e.target.value)}
-                      style={{
-                        flex: 1,
-                        padding: "6px 10px",
-                        borderRadius: "6px",
-                        border: "1px solid #ccc",
-                        background: darkMode ? "#2c2c2c" : "#fff",
-                        color: darkMode ? "#fff" : "#000"
-                      }}
-                    />
-                    <span style={{
-                      padding: "4px 10px",
-                      borderRadius: "6px",
-                      background: severityColors[issue.severity] || "#999",
-                      color: "#fff",
-                      fontWeight: "700"
-                    }}>{issue.severity}</span>
-                  </div>
-                )) : <span style={{ fontStyle: "italic", color: darkMode ? "#aaa" : "#555" }}>No issues reported</span>}
-              </div>
-
-              {/* Add New Issue */}
-              <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-                <input
-                  type="text"
-                  placeholder="New issue..."
-                  value={input.note}
-                  onChange={e => handleInputChange(vehicle.vin, "note", e.target.value)}
-                  style={{
-                    flex: 2,
-                    padding: "8px 10px",
-                    borderRadius: "6px",
-                    border: "1px solid #ccc",
-                    background: darkMode ? "#2c2c2c" : "#fff",
-                    color: darkMode ? "#fff" : "#000"
-                  }}
-                />
-                <select
-                  value={input.severity}
-                  onChange={e => handleInputChange(vehicle.vin, "severity", e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: "8px",
-                    borderRadius: "6px",
-                    border: "1px solid #ccc",
-                    background: darkMode ? "#2c2c2c" : "#fff",
-                    color: darkMode ? "#fff" : "#000"
-                  }}
-                >
-                  <option>Low</option>
-                  <option>Medium</option>
-                  <option>High</option>
-                </select>
-                <button
-                  onClick={() => handleAddIssue(vehicle)}
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "none",
-                    background: "#2980b9",
-                    color: "#fff",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "6px"
-                  }}
-                >
-                  <FaPlus /> Add
-                </button>
-              </div>
-
-              {/* Status Buttons */}
-              <div style={{ display: "flex", gap: "10px", marginTop: "12px" }}>
-                <button
-                  onClick={() => updateStatus(vehicle.vin, "Available")}
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "none",
-                    background: "#27ae60",
-                    color: "#fff",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                >
-                  <FaCheck /> Available
-                </button>
-                <button
-                  onClick={() => updateStatus(vehicle.vin, "In Use")}
-                  style={{
-                    flex: 1,
-                    padding: "10px",
-                    borderRadius: "8px",
-                    border: "none",
-                    background: "#f39c12",
-                    color: "#fff",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: "6px"
-                  }}
-                >
-                  <FaUndo /> In Use
-                </button>
-              </div>
-            </div>
+        <form className="form-grid" onSubmit={handleSubmit}>
+          {/* Vehicle Dropdown */}
+          <div className="form-group">
+            <label>Vehicle</label>
+            <select
+              name="vin"
+              value={form.vin}
+              onChange={handleChange}
+              required
+            >
+              <option value="">-- Select Vehicle --</option>
+              {vehicles.map((v) => (
+                <option key={v.vin} value={v.vin}>
+                  {v.vin} - {v.name}
+                </option>
+              ))}
+            </select>
           </div>
-        );
-      })}
+
+          {/* Severity */}
+          <div className="form-group">
+            <label>Severity</label>
+            <select
+              name="severity"
+              value={form.severity}
+              onChange={handleChange}
+              style={{
+                backgroundColor: severityColors[form.severity],
+                color: "#fff",
+              }}
+            >
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+              <option>Critical</option>
+            </select>
+          </div>
+
+          {/* Problem Details */}
+          <div className="form-group span-2">
+            <label>Problem Details</label>
+            <textarea
+              name="problem"
+              value={form.problem}
+              onChange={handleChange}
+              placeholder="Describe the issue..."
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Mileage (km)</label>
+            <input
+              type="number"
+              name="mileage"
+              value={form.mileage}
+              onChange={handleChange}
+              placeholder="e.g. 120000"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Mechanic</label>
+            <input
+              type="text"
+              name="mechanic"
+              value={form.mechanic}
+              onChange={handleChange}
+              placeholder="Mechanic Name"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Cost (R)</label>
+            <input
+              type="number"
+              name="cost"
+              value={form.cost}
+              onChange={handleChange}
+              placeholder="Enter cost"
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Date</label>
+            <input
+              type="date"
+              name="date"
+              value={form.date}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-actions span-2">
+            <button type="submit">💾 Save Maintenance</button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
