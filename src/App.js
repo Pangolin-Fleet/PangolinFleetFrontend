@@ -33,6 +33,9 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
+  // ✅ NEW: state for editing vehicle in InUsePage
+  const [editVehicleId, setEditVehicleId] = useState(null);
+
   // Fetch vehicles on load
   useEffect(() => {
     const fetchVehicles = async () => {
@@ -90,15 +93,18 @@ function App() {
   };
 
   // Update Vehicle
-  const updateVehicle = async (vin, updatedVehicle) => {
-    try {
-      const saved = await vehicleService.updateVehicle(vin, updatedVehicle);
-      setVehicles((prev) => prev.map((v) => (v.vin === vin ? saved : v)));
-    } catch (error) {
-      console.error("Failed to update vehicle:", error);
-      alert("Failed to update vehicle.");
-    }
-  };
+const updateVehicle = async (vin, updatedVehicle) => {
+  // Optimistic update
+  setVehicles(prev => prev.map(v => (v.vin === vin ? { ...v, ...updatedVehicle } : v)));
+  
+  try {
+    await vehicleService.updateVehicle(vin, updatedVehicle);
+  } catch (error) {
+    console.error("Failed to update vehicle:", error);
+    alert("Failed to update vehicle. Changes may not be saved.");
+  }
+};
+
 
   // Delete Vehicle
   const deleteVehicle = async (vin) => {
@@ -193,6 +199,8 @@ function App() {
             incrementMileage={incrementMileage}
             updateStatus={updateStatus}
             darkMode={darkMode}
+            editVehicleId={editVehicleId}
+            setEditVehicleId={setEditVehicleId}
           />
         )}
 
@@ -200,12 +208,15 @@ function App() {
           <MaintenancePage
             vehicles={vehicles.filter((v) => v.status === "In Maintenance")}
             updateStatus={updateStatus}
+            updateVehicle={updateVehicle} // ✅ needed for saving notes/issues
             incrementMileage={incrementMileage}
-            darkMode={darkMode}
+            theme={darkMode ? "dark" : "light"} // ✅ proper theme
           />
         )}
 
-        {currentPage === "Reports" && <ReportPage vehicles={vehicles} darkMode={darkMode} />}
+        {currentPage === "Reports" && (
+          <ReportPage vehicles={vehicles} darkMode={darkMode} />
+        )}
       </main>
 
       {showModal && (
