@@ -1,27 +1,31 @@
 import React, { useState, useEffect } from "react";
+import maintenanceService from "../service/MaintenanceService";
 import vehicleService from "../service/VehicleService";
-import maintenanceService from "../service/MaintenanceService"; // Axios service
 import "./MaintenancePage.css";
 
 export default function MaintenancePage() {
   const [vehicles, setVehicles] = useState([]);
+  const [maintenances, setMaintenances] = useState([]);
   const [form, setForm] = useState({
     vin: "",
+    vehicleName: "",
     severity: "Low",
     problem: "",
     mileage: "",
-    mechanic: "",
+    technician: "",
     cost: "",
     date: "",
   });
+  const [editingId, setEditingId] = useState(null);
 
   const severityColors = {
-    Low: "#2ecc71",      // Green
-    Medium: "#f1c40f",   // Yellow
-    High: "#e67e22",     // Orange
-    Critical: "#e74c3c", // Red
+    Low: "#2ecc71",
+    Medium: "#f1c40f",
+    High: "#e67e22",
+    Critical: "#e74c3c",
   };
 
+  // --- Fetch vehicles and maintenance records ---
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
@@ -31,80 +35,132 @@ export default function MaintenancePage() {
         console.error("Error fetching vehicles:", err);
       }
     };
-    fetchVehicles();
-  }, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!form.vin) return alert("Please select a vehicle.");
-
-    // Backend expects a Vehicle object
-    const vehicleObj = { vin: form.vin };
-
-    const payload = {
-      vehicle: vehicleObj,
-      severity: form.severity,
-      problem: form.problem,
-      mileage: Number(form.mileage),
-      mechanic: form.mechanic,
-      cost: Number(form.cost),
-      serviceDate: form.date, // maps frontend "date" to backend
+    const fetchMaintenances = async () => {
+      try {
+        const data = await maintenanceService.getAllMaintenance();
+        setMaintenances(data);
+      } catch (err) {
+        console.error("Error fetching maintenances:", err);
+      }
     };
 
-    try {
-      const response = await maintenanceService.addMaintenance(payload);
-      console.log("Maintenance saved:", response);
-      alert("Maintenance saved successfully!");
+    fetchVehicles();
+    fetchMaintenances();
+  }, []);
 
-      // Reset form
+  // --- Auto-update vehicleName when VIN changes ---
+  useEffect(() => {
+    const selectedVehicle = vehicles.find((v) => v.vin === form.vin);
+    if (selectedVehicle) {
+      setForm((prev) => ({
+        ...prev,
+        vehicleName: `${selectedVehicle.make} ${selectedVehicle.model}`,
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, vehicleName: "" }));
+    }
+  }, [form.vin, vehicles]);
+
+  // --- Handle form changes ---
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+  };
+
+  // --- Submit new or edited maintenance ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const vehicle = vehicles.find((v) => v.vin === form.vin);
+      if (!vehicle) return alert("Select a vehicle first!");
+
+      const maintenanceData = {
+        vehicle,
+        severity: form.severity,
+        problem: form.problem,
+        mileage: parseInt(form.mileage),
+        mechanic: form.technician,
+        cost: parseFloat(form.cost),
+        serviceDate: form.date,
+      };
+
+      if (editingId) {
+        await maintenanceService.updateMaintenance(editingId, maintenanceData);
+        setEditingId(null);
+      } else {
+        await maintenanceService.addMaintenance(maintenanceData);
+      }
+
+      const updatedList = await maintenanceService.getAllMaintenance();
+      setMaintenances(updatedList);
+
       setForm({
         vin: "",
+        vehicleName: "",
         severity: "Low",
         problem: "",
         mileage: "",
-        mechanic: "",
+        technician: "",
         cost: "",
         date: "",
       });
     } catch (err) {
-      console.error("Error saving maintenance:", err);
-      alert("Failed to save maintenance. Check console.");
+      console.error(err);
+    }
+  };
+
+  // --- Edit maintenance record ---
+  const handleEdit = (m) => {
+    setForm({
+      vin: m.vehicle?.vin || "",
+      vehicleName: m.vehicle ? `${m.vehicle.make} ${m.vehicle.model}` : "",
+      severity: m.severity || "Low",
+      problem: m.problem || "",
+      mileage: m.mileage || "",
+      technician: m.mechanic || "",
+      cost: m.cost || "",
+      date: m.serviceDate || "",
+    });
+    setEditingId(m.id);
+  };
+
+  // --- Delete maintenance ---
+  const handleDelete = async (id) => {
+    try {
+      await maintenanceService.deleteMaintenance(id);
+      setMaintenances(maintenances.filter((m) => m.id !== id));
+    } catch (err) {
+      console.error(err);
     }
   };
 
   return (
     <div className="maintenance-container">
+      {/* Form */}
       <div
         className="maintenance-card"
         style={{ borderTopColor: severityColors[form.severity] }}
       >
         <h2 className="card-header">⚙️ Log Vehicle Maintenance</h2>
-
         <form className="form-grid" onSubmit={handleSubmit}>
-          {/* Vehicle Dropdown */}
           <div className="form-group">
             <label>Vehicle</label>
-            <select
-              name="vin"
-              value={form.vin}
-              onChange={handleChange}
-              required
-            >
+            <select name="vin" value={form.vin} onChange={handleChange} required>
               <option value="">-- Select Vehicle --</option>
               {vehicles.map((v) => (
                 <option key={v.vin} value={v.vin}>
-                  {v.vin} - {v.name}
+                  {v.vin} - {v.make} {v.model}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Severity */}
+          <div className="form-group">
+            <label>Vehicle Name</label>
+            <input type="text" name="vehicleName" value={form.vehicleName} disabled />
+          </div>
+
           <div className="form-group">
             <label>Severity</label>
             <select
@@ -123,7 +179,6 @@ export default function MaintenancePage() {
             </select>
           </div>
 
-          {/* Problem Details */}
           <div className="form-group span-2">
             <label>Problem Details</label>
             <textarea
@@ -136,51 +191,70 @@ export default function MaintenancePage() {
 
           <div className="form-group">
             <label>Mileage (km)</label>
-            <input
-              type="number"
-              name="mileage"
-              value={form.mileage}
-              onChange={handleChange}
-              placeholder="e.g. 120000"
-            />
+            <input type="number" name="mileage" value={form.mileage} onChange={handleChange} />
           </div>
 
           <div className="form-group">
-            <label>Mechanic</label>
-            <input
-              type="text"
-              name="mechanic"
-              value={form.mechanic}
-              onChange={handleChange}
-              placeholder="Mechanic Name"
-            />
+            <label>Technician</label>
+            <input type="text" name="technician" value={form.technician} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Cost (R)</label>
-            <input
-              type="number"
-              name="cost"
-              value={form.cost}
-              onChange={handleChange}
-              placeholder="Enter cost"
-            />
+            <input type="number" name="cost" value={form.cost} onChange={handleChange} />
           </div>
 
           <div className="form-group">
             <label>Date</label>
-            <input
-              type="date"
-              name="date"
-              value={form.date}
-              onChange={handleChange}
-            />
+            <input type="date" name="date" value={form.date} onChange={handleChange} />
           </div>
 
           <div className="form-actions span-2">
-            <button type="submit">💾 Save Maintenance</button>
+            <button type="submit">
+              {editingId ? "💾 Update Maintenance" : "💾 Save Maintenance"}
+            </button>
           </div>
         </form>
+      </div>
+
+      {/* Maintenance Table */}
+      <div className="maintenance-card" style={{ marginTop: "30px" }}>
+        <h2 className="card-header">📜 Maintenance History</h2>
+        <table className="maintenance-table">
+          <thead>
+            <tr>
+              <th>VIN</th>
+              <th>Vehicle</th>
+              <th>Severity</th>
+              <th>Problem</th>
+              <th>Mileage</th>
+              <th>Technician</th>
+              <th>Cost (R)</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {maintenances.map((m) => (
+              <tr key={m.id}>
+                <td>{m.vehicle?.vin || "N/A"}</td>
+                <td>{m.vehicle ? `${m.vehicle.make} ${m.vehicle.model}` : "N/A"}</td>
+                <td style={{ color: severityColors[m.severity], fontWeight: "600" }}>
+                  {m.severity}
+                </td>
+                <td>{m.problem || "N/A"}</td>
+                <td>{m.mileage ?? "N/A"}</td>
+                <td>{m.mechanic || "N/A"}</td>
+                <td>{m.cost ?? "N/A"}</td>
+                <td>{m.serviceDate || "N/A"}</td>
+                <td>
+                  <button className="edit-btn" onClick={() => handleEdit(m)}>✏️</button>
+                  <button className="delete-btn" onClick={() => handleDelete(m.id)}>🗑️</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
