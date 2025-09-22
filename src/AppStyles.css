@@ -1,112 +1,279 @@
-/* AppStyles.css */
-
-/* Card Base */
-.card {
-  border-radius: 20px;
-  overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  cursor: pointer;
+/* =====================
+   Global Styles
+===================== */
+.report-page {
+  font-family: 'Arial', sans-serif;
+  padding: 24px;
+  background: #f4f6f8;
+  color: #222;
+  transition: all 0.3s;
 }
 
-.card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-}
-
-/* Dark mode cards */
-.dark .card {
-  background: #1f1f1f;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-}
-
-.dark .card:hover {
-  box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-}
-
-/* Card Header */
-.card-header {
-  padding: 20px;
-  font-weight: 700;
-  font-size: 16px;
-  color: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 12px 12px 0 0;
-}
-
-.status-available {
-  background: linear-gradient(135deg, #27ae60, #2ecc71);
-}
-
-.status-inuse {
-  background: linear-gradient(135deg, #2980b9, #6dd5fa);
-}
-
-.status-maintenance {
-  background: linear-gradient(135deg, #f39c12, #f1c40f);
-}
-
-/* Card Body */
-.card-body {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  background: #fff;
-}
-
-.dark .card-body {
-  background: #2b2b2b;
+.report-page.dark {
+  background: #121212;
   color: #eee;
 }
 
-/* Buttons */
-.button {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
+/* =====================
+   Summary Cards
+===================== */
+.summary-cards {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 32px;
 }
 
-.button-save {
+.summary-card {
+  flex: 1 1 220px;
+  min-width: 150px;
+  padding: 20px;
+  border-radius: 16px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  transition: all 0.3s;
+  cursor: default;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+}
+
+.summary-value {
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.summary-label {
+  font-size: 16px;
+  opacity: 0.9;
+  margin-bottom: 8px;
+}
+
+/* =====================
+   Charts
+===================== */
+.charts-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 32px;
+}
+
+.chart-box {
+  flex: 1 1 350px;
+  min-height: 300px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.report-page.dark .chart-box {
+  background: #1f1f1f;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.chart-box h3 {
+  margin-bottom: 12px;
+}
+
+/* =====================
+   Vehicle Cards
+===================== */
+.vehicle-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.vehicle-card {
+  border-radius: 16px;
+  background: #fff;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.report-page.dark .vehicle-card {
+  background: #222;
+  color: #fff;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.vehicle-card-header {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vehicle-status {
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 0 6px rgba(0,0,0,0.4);
+  text-transform: capitalize;
+}
+
+.vehicle-status.available { background: #27ae60; }
+.vehicle-status.inuse { background: #2980b9; }
+.vehicle-status.maintenance { background: #f39c12; }
+
+.vehicle-card-info div {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.small-text {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  background: #eee;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.report-page.dark .progress-bar {
+  background: #333;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1.5s ease-out;
+}
+
+/* =====================
+   Maintenance Table
+===================== */
+.maintenance-section {
+  margin-top: 32px;
+}
+
+.maintenance-section input {
+  padding: 8px 12px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  color: #222;
+}
+
+.report-page.dark .maintenance-section input {
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  padding: 12px;
+  border-bottom: 2px solid #ddd;
+  cursor: pointer;
+  text-transform: capitalize;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+}
+
+.report-page.dark thead th {
+  background: #222;
+  border-bottom: 2px solid #555;
+}
+
+tbody td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+.report-page.dark tbody td {
+  border-bottom: 1px solid #333;
+}
+
+tbody tr:hover {
+  background: #f0f0f0;
+}
+
+.report-page.dark tbody tr:hover {
+  background: #333;
+}
+
+.severity {
+  font-weight: 600;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: #fff;
+  display: inline-block;
+  min-width: 60px;
+  text-align: center;
+}
+
+.severity.Low { background: #2ecc71; }
+.severity.Medium { background: #f1c40f; color: #000; }
+.severity.High { background: #e67e22; }
+.severity.Critical { background: #e74c3c; }
+
+/* =====================
+   Pagination
+===================== */
+.pagination {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
   background: #3498db;
   color: #fff;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
 }
 
-.button-edit {
-  background: #f1c40f;
-  color: #000;
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.button-available {
-  background: #27ae60;
-  color: #fff;
-}
-
-.button-inuse {
-  background: #2980b9;
-  color: #fff;
-}
-
-.button-danger {
-  background: #e74c3c;
-  color: #fff;
-}
-
-/* Grid layout for cards */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 24px;
-  padding: 24px;
+.pagination select {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #222;
 }

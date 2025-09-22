@@ -1,38 +1,55 @@
-/* Container */
+/* -----------------------------
+   Container
+------------------------------ */
 .maintenance-container {
-  padding: 20px;
+  padding: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 30px;
+  gap: 40px;
+  background: #f4f6f8;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
 }
 
-/* Form & Table Cards */
+/* -----------------------------
+   Form & Table Cards
+------------------------------ */
 .maintenance-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-  width: 90%;
-  max-width: 1000px;
-  padding: 20px;
-  border-top: 8px solid #3498db;
-  transition: border-color 0.3s ease;
+  background: linear-gradient(145deg, #ffffff, #e6ebf2);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  width: 95%;
+  max-width: 1100px;
+  padding: 30px;
+  border-top: 6px solid #3498db;
+  transition: transform 0.35s, box-shadow 0.35s;
+}
+
+.maintenance-card:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
 }
 
 .card-header {
-  margin-bottom: 20px;
-  font-size: 1.4rem;
-  font-weight: 600;
+  font-size: 1.6rem;
+  font-weight: 700;
   color: #2c3e50;
-  border-bottom: 2px solid #f0f0f0;
-  padding-bottom: 10px;
+  margin-bottom: 25px;
+  border-bottom: 2px solid #e0e4e8;
+  padding-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-/* Form */
+/* -----------------------------
+   Form
+------------------------------ */
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
+  gap: 20px;
 }
 
 .form-group {
@@ -40,13 +57,13 @@
   flex-direction: column;
 }
 
-.form-group span-2,
+.form-group.span-2,
 .form-actions {
   grid-column: span 2;
 }
 
 label {
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 6px;
   color: #34495e;
 }
@@ -54,11 +71,13 @@ label {
 input,
 select,
 textarea {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid #d0d3d8;
+  border-radius: 10px;
   font-size: 0.95rem;
-  transition: 0.2s;
+  transition: all 0.3s ease;
+  background: #fff;
+  color: #2c3e50;
 }
 
 input:focus,
@@ -66,12 +85,12 @@ select:focus,
 textarea:focus {
   border-color: #3498db;
   outline: none;
-  box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
 }
 
 textarea {
   resize: none;
-  min-height: 80px;
+  min-height: 100px;
 }
 
 .form-actions {
@@ -79,114 +98,202 @@ textarea {
 }
 
 button {
-  background: #3498db;
-  color: white;
+  background: linear-gradient(90deg, #3498db, #2980b9);
+  color: #fff;
   font-size: 1rem;
   font-weight: 600;
-  padding: 12px 20px;
+  padding: 12px 28px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.35s ease;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
 }
 
 button:hover {
-  background: #2980b9;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  background: linear-gradient(90deg, #2980b9, #1c5980);
 }
 
-/* Maintenance Table */
+/* -----------------------------
+   Maintenance Table
+------------------------------ */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 16px;
+  padding-bottom: 10px;
+}
+
 .maintenance-table {
   width: 100%;
   border-collapse: collapse;
   font-family: "Arial", sans-serif;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-  table-layout: fixed; /* important for alignment */
+  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+  table-layout: fixed;
+  transition: all 0.3s ease;
 }
 
 .maintenance-table th,
 .maintenance-table td {
-  padding: 12px 10px;
+  padding: 14px 12px;
   text-align: left;
-  border-bottom: 1px solid #eee;
-  word-wrap: break-word; /* wrap long text */
+  border-bottom: 1px solid #ecf0f1;
+  word-wrap: break-word;
 }
 
 .maintenance-table th {
-  background: #3498db;
+  background: linear-gradient(90deg, #3498db, #2980b9);
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .maintenance-table tbody tr {
   background: #fff;
   transition: transform 0.2s, box-shadow 0.2s;
+  cursor: default;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.maintenance-table tbody tr:nth-child(even) {
+  background: #f7f9fc;
 }
 
 .maintenance-table tbody tr:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  background: linear-gradient(90deg, #dfe9f3, #ffffff);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 25px rgba(0,0,0,0.08);
 }
 
+/* -----------------------------
+   Edit/Delete Buttons
+------------------------------ */
 .edit-btn,
 .delete-btn {
-  padding: 4px 8px;
+  padding: 6px 12px;
   margin-right: 4px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  transition: all 0.35s ease;
 }
 
 .edit-btn {
-  background-color: #3498db;
+  background: linear-gradient(90deg, #3498db, #2980b9);
   color: #fff;
 }
 
 .edit-btn:hover {
-  background-color: #2980b9;
+  transform: translateY(-1px) scale(1.05);
+  background: linear-gradient(90deg, #2980b9, #1c5980);
 }
 
 .delete-btn {
-  background-color: #e74c3c;
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
   color: #fff;
 }
 
 .delete-btn:hover {
-  background-color: #c0392b;
+  transform: translateY(-1px) scale(1.05);
+  background: linear-gradient(90deg, #c0392b, #962d22);
 }
 
-/* Severity row background */
-.severity-low { background-color: #2ecc7120; }
-.severity-medium { background-color: #f1c40f20; }
-.severity-high { background-color: #e67e2220; }
-.severity-critical { background-color: #e74c3c20; }
-
-/* Ensure proper wrapping for Problem and Technician columns */
-.maintenance-table td:nth-child(4),
-.maintenance-table td:nth-child(6) {
-  white-space: normal;
-  max-width: 200px; /* wrap long text */
-  overflow-wrap: break-word;
+/* -----------------------------
+   Severity Badges
+------------------------------ */
+.severity-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  min-width: 75px;
+  text-align: center;
+  color: #fff;
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+.severity-low { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+.severity-medium { background: linear-gradient(135deg, #f1c40f, #d4ac0d); }
+.severity-high { background: linear-gradient(135deg, #e67e22, #d35400); }
+.severity-critical { background: linear-gradient(135deg, #e74c3c, #c0392b); }
+
+/* -----------------------------
+   Search/Filter Bar
+------------------------------ */
+.filter-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 8px 30px 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 12px rgba(52,152,219,0.35);
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  color: #999;
+}
+
+/* Table horizontal scroll for small screens */
+.maintenance-table th,
+.maintenance-table td {
+  min-width: 120px;
+}
+
+/* -----------------------------
+   Animations
+------------------------------ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* -----------------------------
+   Responsive
+------------------------------ */
+@media (max-width: 900px) {
   .form-grid {
     grid-template-columns: 1fr;
   }
-  .form-group span-2,
+
+  .form-group.span-2,
   .form-actions {
     grid-column: span 1;
   }
 
   .maintenance-table th, 
   .maintenance-table td {
-    padding: 8px;
+    padding: 10px;
     font-size: 0.85rem;
   }
 }

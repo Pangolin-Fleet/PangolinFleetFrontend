@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { FaEdit, FaTrash, FaSearch } from "react-icons/fa";
 import maintenanceService from "../service/MaintenanceService";
 import vehicleService from "../service/VehicleService";
 import "./MaintenancePage.css";
@@ -6,6 +7,7 @@ import "./MaintenancePage.css";
 export default function MaintenancePage() {
   const [vehicles, setVehicles] = useState([]);
   const [maintenances, setMaintenances] = useState([]);
+  const [filteredMaintenances, setFilteredMaintenances] = useState([]);
   const [form, setForm] = useState({
     vin: "",
     vehicleName: "",
@@ -17,9 +19,11 @@ export default function MaintenancePage() {
     date: "",
   });
   const [editingId, setEditingId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterSeverity, setFilterSeverity] = useState("");
 
   const severityColors = {
-    Low: "#2ecc71",
+    Low: "#27ae60",
     Medium: "#f1c40f",
     High: "#e67e22",
     Critical: "#e74c3c",
@@ -40,6 +44,7 @@ export default function MaintenancePage() {
       try {
         const data = await maintenanceService.getAllMaintenance();
         setMaintenances(data);
+        setFilteredMaintenances(data);
       } catch (err) {
         console.error("Error fetching maintenances:", err);
       }
@@ -49,26 +54,39 @@ export default function MaintenancePage() {
     fetchMaintenances();
   }, []);
 
-  // --- Auto-update vehicleName when VIN changes ---
+  // Auto-update vehicleName when VIN changes
   useEffect(() => {
     const selectedVehicle = vehicles.find((v) => v.vin === form.vin);
-    if (selectedVehicle) {
-      setForm((prev) => ({
-        ...prev,
-        vehicleName: `${selectedVehicle.make} ${selectedVehicle.model}`,
-      }));
-    } else {
-      setForm((prev) => ({ ...prev, vehicleName: "" }));
-    }
+    setForm((prev) => ({
+      ...prev,
+      vehicleName: selectedVehicle ? `${selectedVehicle.make} ${selectedVehicle.model}` : "",
+    }));
   }, [form.vin, vehicles]);
 
-  // --- Handle form changes ---
+  // Filter & search
+  useEffect(() => {
+    let data = [...maintenances];
+
+    if (searchTerm) {
+      data = data.filter((m) =>
+        (m.vehicle?.vin || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (m.vehicle ? `${m.vehicle.make} ${m.vehicle.model}`.toLowerCase() : "").includes(searchTerm.toLowerCase()) ||
+        (m.mechanic || "").toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (filterSeverity) {
+      data = data.filter((m) => m.severity === filterSeverity);
+    }
+
+    setFilteredMaintenances(data);
+  }, [searchTerm, filterSeverity, maintenances]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
   };
 
-  // --- Submit new or edited maintenance ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -110,7 +128,6 @@ export default function MaintenancePage() {
     }
   };
 
-  // --- Edit maintenance record ---
   const handleEdit = (m) => {
     setForm({
       vin: m.vehicle?.vin || "",
@@ -125,8 +142,8 @@ export default function MaintenancePage() {
     setEditingId(m.id);
   };
 
-  // --- Delete maintenance ---
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this record?")) return;
     try {
       await maintenanceService.deleteMaintenance(id);
       setMaintenances(maintenances.filter((m) => m.id !== id));
@@ -137,11 +154,8 @@ export default function MaintenancePage() {
 
   return (
     <div className="maintenance-container">
-      {/* Form */}
-      <div
-        className="maintenance-card"
-        style={{ borderTopColor: severityColors[form.severity] }}
-      >
+      {/* Maintenance Form */}
+      <div className="maintenance-card" style={{ borderTopColor: severityColors[form.severity] }}>
         <h2 className="card-header">⚙️ Log Vehicle Maintenance</h2>
         <form className="form-grid" onSubmit={handleSubmit}>
           <div className="form-group">
@@ -167,10 +181,7 @@ export default function MaintenancePage() {
               name="severity"
               value={form.severity}
               onChange={handleChange}
-              style={{
-                backgroundColor: severityColors[form.severity],
-                color: "#fff",
-              }}
+              style={{ backgroundColor: severityColors[form.severity], color: "#fff" }}
             >
               <option>Low</option>
               <option>Medium</option>
@@ -181,12 +192,7 @@ export default function MaintenancePage() {
 
           <div className="form-group span-2">
             <label>Problem Details</label>
-            <textarea
-              name="problem"
-              value={form.problem}
-              onChange={handleChange}
-              placeholder="Describe the issue..."
-            />
+            <textarea name="problem" value={form.problem} onChange={handleChange} placeholder="Describe the issue..." />
           </div>
 
           <div className="form-group">
@@ -217,8 +223,29 @@ export default function MaintenancePage() {
         </form>
       </div>
 
+      {/* Search + Filter */}
+      <div className="filter-bar">
+        <div className="search-box">
+          <FaSearch className="search-icon" />
+          <input
+            type="text"
+            placeholder="Search VIN, Vehicle, Technician..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <select value={filterSeverity} onChange={(e) => setFilterSeverity(e.target.value)}>
+          <option value="">All Severities</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          <option value="Critical">Critical</option>
+        </select>
+      </div>
+
       {/* Maintenance Table */}
-      <div className="maintenance-card" style={{ marginTop: "30px" }}>
+      <div className="maintenance-card table-responsive">
         <h2 className="card-header">📜 Maintenance History</h2>
         <table className="maintenance-table">
           <thead>
@@ -235,12 +262,17 @@ export default function MaintenancePage() {
             </tr>
           </thead>
           <tbody>
-            {maintenances.map((m) => (
+            {filteredMaintenances.map((m) => (
               <tr key={m.id}>
                 <td>{m.vehicle?.vin || "N/A"}</td>
                 <td>{m.vehicle ? `${m.vehicle.make} ${m.vehicle.model}` : "N/A"}</td>
-                <td style={{ color: severityColors[m.severity], fontWeight: "600" }}>
-                  {m.severity}
+                <td>
+                  <span
+                    className="severity-badge"
+                    style={{ backgroundColor: severityColors[m.severity], color: "#fff" }}
+                  >
+                    {m.severity}
+                  </span>
                 </td>
                 <td>{m.problem || "N/A"}</td>
                 <td>{m.mileage ?? "N/A"}</td>
@@ -248,14 +280,15 @@ export default function MaintenancePage() {
                 <td>{m.cost ?? "N/A"}</td>
                 <td>{m.serviceDate || "N/A"}</td>
                 <td>
-                  <button className="edit-btn" onClick={() => handleEdit(m)}>✏️</button>
-                  <button className="delete-btn" onClick={() => handleDelete(m.id)}>🗑️</button>
+                  <button className="edit-btn" onClick={() => handleEdit(m)}><FaEdit /></button>
+                  <button className="delete-btn" onClick={() => handleDelete(m.id)}><FaTrash /></button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
     </div>
   );
 }
