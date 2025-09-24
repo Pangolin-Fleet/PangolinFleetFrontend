@@ -9,11 +9,20 @@ const VehicleService = {
   },
 
   addVehicle: async (vehicle) => {
-    const res = await axios.post(`${API_URL}/add`, vehicle);
-    return res.data;
+    try {
+      const res = await axios.post(`${API_URL}/add`, vehicle);
+      return res.data;
+    } catch (err) {
+      if (err.response && err.response.status === 409) {
+        // VIN already exists
+        throw new Error(err.response.data);
+      } else {
+        throw new Error("Failed to add vehicle. Please try again.");
+      }
+    }
   },
 
-  updateVehicle: async (vin, vehicle) => {   // <-- make sure this exists
+  updateVehicle: async (vin, vehicle) => {
     const res = await axios.put(`${API_URL}/${vin}`, vehicle);
     return res.data;
   },
@@ -21,7 +30,7 @@ const VehicleService = {
   deleteVehicle: async (vin) => {
     const res = await axios.delete(`${API_URL}/delete/${vin}`);
     return res.data;
-  }
+  },
 };
 
-export default VehicleService;  // <-- must export an object, not anonymous
+export default VehicleService;

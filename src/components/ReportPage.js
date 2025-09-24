@@ -1,253 +1,329 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend, LineChart, Line
-} from "recharts";
-import vehicleService from "../service/VehicleService";
-import maintenanceService from "../service/MaintenanceService";
-import "../AppStyles.css";
+  FaFileAlt,
+  FaCalendar,
+  FaFilter,
+  FaDownload,
+  FaCar,
+  FaTools,
+  FaUser,
+  FaMapMarkerAlt,
+  FaRoad,
+  FaClock
+} from "react-icons/fa";
+import "./ReportPage.css";
 
-export default function ReportPage({ darkMode }) {
-  const [vehicles, setVehicles] = useState([]);
-  const [maintenances, setMaintenances] = useState([]);
-  const [filteredVehicles, setFilteredVehicles] = useState([]);
-  const [pieFilter, setPieFilter] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: "serviceDate", direction: "desc" });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+export default function ReportsPage({ vehicles = [], maintenances = [] }) {
+  const [dateRange, setDateRange] = useState("all");
+  const [reportType, setReportType] = useState("fleet");
 
-  const severityColors = {
-    Low: "#2ecc71",
-    Medium: "#f1c40f",
-    High: "#e67e22",
-    Critical: "#e74c3c"
-  };
-
-  // Fetch data
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const v = await vehicleService.getAllVehicles() || [];
-        const m = await maintenanceService.getAllMaintenance() || [];
-        setVehicles(v);
-        setFilteredVehicles(v);
-        setMaintenances(m);
-      } catch (err) {
-        console.error(err);
-      }
+  // Generate report data
+  const generateFleetReport = () => {
+    return {
+      title: "Fleet Status Report",
+      generated: new Date().toLocaleString(),
+      summary: {
+        totalVehicles: vehicles.length,
+        available: vehicles.filter(v => v.status === "Available").length,
+        inUse: vehicles.filter(v => v.status === "In Use").length,
+        maintenance: vehicles.filter(v => v.status === "In Maintenance").length,
+        totalMileage: vehicles.reduce((sum, v) => sum + (v.mileage || 0), 0),
+        avgMileage: vehicles.length ? Math.round(vehicles.reduce((sum, v) => sum + (v.mileage || 0), 0) / vehicles.length) : 0
+      },
+      vehicles: vehicles.map(vehicle => ({
+        vin: vehicle.vin,
+        make: vehicle.make,
+        model: vehicle.model,
+        year: vehicle.year,
+        mileage: vehicle.mileage || 0,
+        status: vehicle.status,
+        driver: vehicle.driver || "Unassigned",
+        lastUpdated: vehicle.updatedAt || "Unknown"
+      }))
     };
-    fetchData();
-  }, []);
-
-  // Filter vehicles based on pie chart selection
-  useEffect(() => {
-    setFilteredVehicles(
-      pieFilter
-        ? vehicles.filter(v => v.status?.toLowerCase() === pieFilter.toLowerCase())
-        : vehicles
-    );
-  }, [vehicles, pieFilter]);
-
-  const handlePieClick = (data) => setPieFilter(data.name === pieFilter ? null : data.name);
-
-  const statusCounts = {
-    Available: vehicles.filter(v => v.status?.toLowerCase() === "available").length,
-    "In Use": vehicles.filter(v => v.status?.toLowerCase() === "in use").length,
-    Maintenance: vehicles.filter(v => v.status?.toLowerCase() === "in maintenance").length
   };
 
-  const totalVehicles = vehicles.length;
-
-  const summaryCards = [
-    { label: "Total Vehicles", value: totalVehicles, color: "#34495e", trend: vehicles.map(v => v.mileage || 0) },
-    { label: "Available", value: statusCounts.Available, color: "#27ae60", trend: vehicles.filter(v => v.status?.toLowerCase() === "available").map(v => v.mileage || 0) },
-    { label: "In Use", value: statusCounts["In Use"], color: "#2980b9", trend: vehicles.filter(v => v.status?.toLowerCase() === "in use").map(v => v.mileage || 0) },
-    { label: "Maintenance", value: statusCounts.Maintenance, color: "#f39c12", trend: vehicles.filter(v => v.status?.toLowerCase() === "in maintenance").map(v => v.mileage || 0) }
-  ];
-
-  const pieData = [
-    { name: "Available", value: statusCounts.Available },
-    { name: "In Use", value: statusCounts["In Use"] },
-    { name: "Maintenance", value: statusCounts.Maintenance }
-  ];
-
-  const pieColors = ["#27ae60", "#2980b9", "#f39c12"];
-  const barData = vehicles.map(v => ({ name: v.name, mileage: v.mileage || 0 }));
-
-  const formatElapsed = (dateStr) => {
-    if (!dateStr) return "-";
-    const diff = Math.floor((new Date() - new Date(dateStr)) / 1000);
-    const hours = Math.floor(diff / 3600);
-    const minutes = Math.floor((diff % 3600) / 60);
-    const seconds = diff % 60;
-    return `${hours}h ${minutes}m ${seconds}s ago`;
+  const generateMaintenanceReport = () => {
+    return {
+      title: "Maintenance Log Report",
+      generated: new Date().toLocaleString(),
+      summary: {
+        totalRecords: maintenances.length,
+        totalCost: maintenances.reduce((sum, m) => sum + (m.cost || 0), 0),
+        avgCost: maintenances.length ? Math.round(maintenances.reduce((sum, m) => sum + (m.cost || 0), 0) / maintenances.length) : 0,
+        critical: maintenances.filter(m => m.severity === "Critical").length,
+        highPriority: maintenances.filter(m => m.severity === "High").length
+      },
+      records: maintenances.map(maintenance => ({
+        id: maintenance.id,
+        vehicle: maintenance.vehicle ? `${maintenance.vehicle.make} ${maintenance.vehicle.model}` : "Unknown Vehicle",
+        problem: maintenance.problem || "No description",
+        severity: maintenance.severity || "Not specified",
+        cost: maintenance.cost || 0,
+        technician: maintenance.mechanic || "Not assigned",
+        date: maintenance.serviceDate || "Unknown date",
+        mileage: maintenance.mileage || "Not recorded"
+      }))
+    };
   };
 
-  const sortedMaintenances = [...maintenances]
-    .filter(m => 
-      m.vehicle?.make?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m.vehicle?.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      m.problem?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (!sortConfig.key) return 0;
-      const aVal = a[sortConfig.key] ?? "";
-      const bVal = b[sortConfig.key] ?? "";
-      if (aVal < bVal) return sortConfig.direction === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
+  const generateActivityReport = () => {
+    // Combine vehicle status changes and maintenance activities
+    const activities = [];
+    
+    vehicles.forEach(vehicle => {
+      if (vehicle.updatedAt) {
+        activities.push({
+          type: "STATUS_UPDATE",
+          vehicle: `${vehicle.make} ${vehicle.model}`,
+          description: `Status changed to ${vehicle.status}`,
+          timestamp: vehicle.updatedAt,
+          icon: <FaCar />
+        });
+      }
     });
 
-  // Pagination logic
-  const indexOfLast = currentPage * rowsPerPage;
-  const indexOfFirst = indexOfLast - rowsPerPage;
-  const currentRows = sortedMaintenances.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(sortedMaintenances.length / rowsPerPage);
+    maintenances.forEach(maintenance => {
+      activities.push({
+        type: "MAINTENANCE",
+        vehicle: maintenance.vehicle ? `${maintenance.vehicle.make} ${maintenance.vehicle.model}` : "Unknown Vehicle",
+        description: `Maintenance: ${maintenance.problem || "No description"}`,
+        timestamp: maintenance.serviceDate,
+        severity: maintenance.severity,
+        icon: <FaTools />
+      });
+    });
 
-  const requestSort = key => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") direction = "desc";
-    setSortConfig({ key, direction });
+    // Sort by timestamp (newest first)
+    activities.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    return {
+      title: "Activity Log Report",
+      generated: new Date().toLocaleString(),
+      summary: {
+        totalActivities: activities.length,
+        statusChanges: activities.filter(a => a.type === "STATUS_UPDATE").length,
+        maintenanceActivities: activities.filter(a => a.type === "MAINTENANCE").length,
+        lastActivity: activities.length ? activities[0].timestamp : "No activities"
+      },
+      activities: activities.slice(0, 50) // Last 50 activities
+    };
   };
 
-  const getSortArrow = key => {
-    if (sortConfig.key === key) return sortConfig.direction === "asc" ? " ↑" : " ↓";
-    return "";
+  const reports = {
+    fleet: generateFleetReport(),
+    maintenance: generateMaintenanceReport(),
+    activity: generateActivityReport()
+  };
+
+  const currentReport = reports[reportType];
+
+  const exportToCSV = () => {
+    // Simple CSV export functionality
+    let csvContent = "";
+    
+    if (reportType === "fleet") {
+      csvContent = "VIN,Make,Model,Year,Mileage,Status,Driver,Last Updated\n";
+      currentReport.vehicles.forEach(vehicle => {
+        csvContent += `"${vehicle.vin}","${vehicle.make}","${vehicle.model}",${vehicle.year},${vehicle.mileage},"${vehicle.status}","${vehicle.driver}","${vehicle.lastUpdated}"\n`;
+      });
+    } else if (reportType === "maintenance") {
+      csvContent = "Vehicle,Problem,Severity,Cost,Technician,Date,Mileage\n";
+      currentReport.records.forEach(record => {
+        csvContent += `"${record.vehicle}","${record.problem}","${record.severity}",${record.cost},"${record.technician}","${record.date}",${record.mileage}\n`;
+      });
+    }
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pangolin-report-${reportType}-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   return (
-    <div className={`report-page ${darkMode ? "dark" : ""}`}>
-      {/* Summary Cards */}
-      <div className="summary-cards">
-        {summaryCards.map((card, idx) => (
-          <div key={idx} className="summary-card" style={{ background: card.color }}>
-            <div className="summary-value">{card.value}</div>
-            <div className="summary-label">{card.label}</div>
-            {card.trend.length > 0 && (
-              <ResponsiveContainer width="100%" height={40}>
-                <LineChart data={card.trend.map((m, i) => ({ idx: i, value: m }))}>
-                  <Line type="monotone" dataKey="value" stroke="#fff" strokeWidth={2} dot={false} />
-                </LineChart>
-              </ResponsiveContainer>
-            )}
+    <div className="reports-container">
+      {/* Header */}
+      <div className="reports-header">
+        <div className="header-content">
+          <FaFileAlt className="header-icon" />
+          <div>
+            <h1>Pangolin Fleet Reports</h1>
+            <p>System generated reports and activity logs</p>
           </div>
-        ))}
-      </div>
-
-      {/* Charts */}
-      <div className="charts-container">
-        <div className="chart-box">
-          <h3>Vehicle Status</h3>
-          <ResponsiveContainer width="100%" height="90%">
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                label
-                onClick={handlePieClick}
-                cursor="pointer"
-              >
-                {pieData.map((entry, index) => (
-                  <Cell key={index} fill={pieColors[index % pieColors.length]} opacity={pieFilter && pieFilter !== entry.name ? 0.4 : 1} />
-                ))}
-              </Pie>
-              <Legend />
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
         </div>
-
-        <div className="chart-box">
-          <h3>Mileage per Vehicle</h3>
-          <ResponsiveContainer width="100%" height="90%">
-            <BarChart data={barData}>
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="mileage" fill="#3498db" />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="header-actions">
+          <button className="btn-primary" onClick={exportToCSV}>
+            <FaDownload /> Export CSV
+          </button>
         </div>
       </div>
 
-      {/* Vehicle Cards */}
-      <div className="vehicle-cards">
-        {filteredVehicles.map(vehicle => {
-          const mileagePercent = vehicle.maxMileage ? (vehicle.mileage / vehicle.maxMileage) * 100 : 0;
-          const bgColor = mileagePercent > 90 ? "#e74c3c" : mileagePercent > 70 ? "#f39c12" : "#27ae60";
-
-          return (
-            <div key={vehicle.id} className="vehicle-card">
-              <div className="vehicle-card-header">
-                <span>{vehicle.name}</span>
-                <span className={`vehicle-status ${vehicle.status?.toLowerCase().replace(/\s/g,'')}`}>{vehicle.status}</span>
-              </div>
-              <div className="vehicle-card-info">
-                <div><strong>ID:</strong> {vehicle.id}</div>
-                <div><strong>Mileage:</strong> {vehicle.mileage}</div>
-                <div><strong>Destination / Issue:</strong> {vehicle.destination || vehicle.issue || "-"}</div>
-                <div className="small-text"><strong>Created:</strong> {vehicle.createdAt ? new Date(vehicle.createdAt).toLocaleString() : "-"}</div>
-                <div className="small-text"><strong>Updated:</strong> {vehicle.updatedAt ? new Date(vehicle.updatedAt).toLocaleString() : "-"} ({formatElapsed(vehicle.updatedAt)})</div>
-              </div>
-              {vehicle.maxMileage && (
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${Math.min(100, mileagePercent)}%`, background: bgColor }} />
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Maintenance Table */}
-      <div className="maintenance-section">
-        <h3>📜 Maintenance History</h3>
-        <input 
-          type="text"
-          placeholder="Search by vehicle or problem..."
-          value={searchTerm}
-          onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-        />
-        <div className="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                {["vehicle", "severity", "problem", "mileage", "mechanic", "cost", "serviceDate"].map(key => (
-                  <th key={key} onClick={() => requestSort(key)}>
-                    {key}{getSortArrow(key)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {currentRows.map(m => (
-                <tr key={m.id}>
-                  <td>{m.vehicle ? `${m.vehicle.make} ${m.vehicle.model}` : "N/A"}</td>
-                  <td><span className={`severity ${m.severity}`}>{m.severity || "-"}</span></td>
-                  <td>{m.problem || "-"}</td>
-                  <td>{m.mileage ?? "-"}</td>
-                  <td>{m.mechanic || "-"}</td>
-                  <td>{m.cost ?? "-"}</td>
-                  <td>{m.serviceDate || "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="pagination">
-          <button onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} disabled={currentPage === 1}>Prev</button>
-          <span>Page {currentPage} of {totalPages}</span>
-          <button onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>Next</button>
-          <select value={rowsPerPage} onChange={e => { setRowsPerPage(Number(e.target.value)); setCurrentPage(1); }}>
-            {[5, 10, 20, 50].map(n => <option key={n} value={n}>{n} rows</option>)}
+      {/* Report Controls */}
+      <div className="report-controls">
+        <div className="control-group">
+          <label><FaFilter /> Report Type</label>
+          <select value={reportType} onChange={(e) => setReportType(e.target.value)}>
+            <option value="fleet">Fleet Status Report</option>
+            <option value="maintenance">Maintenance Log</option>
+            <option value="activity">Activity Timeline</option>
           </select>
         </div>
+
+        <div className="control-group">
+          <label><FaCalendar /> Date Range</label>
+          <select value={dateRange} onChange={(e) => setDateRange(e.target.value)}>
+            <option value="all">All Time</option>
+            <option value="month">Last 30 Days</option>
+            <option value="week">Last 7 Days</option>
+            <option value="today">Today</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Report Summary */}
+      <div className="report-summary">
+        <div className="summary-card">
+          <h3>{currentReport.title}</h3>
+          <p>Generated: {currentReport.generated}</p>
+          <div className="summary-stats">
+            {Object.entries(currentReport.summary).map(([key, value]) => (
+              <div key={key} className="stat-item">
+                <span className="stat-label">{key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</span>
+                <span className="stat-value">{value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Report Content */}
+      <div className="report-content">
+        {reportType === "fleet" && (
+          <div className="data-table">
+            <div className="table-header">
+              <h4>Fleet Inventory</h4>
+              <span>{currentReport.vehicles.length} vehicles</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Vehicle</th>
+                  <th>VIN</th>
+                  <th>Year</th>
+                  <th>Mileage</th>
+                  <th>Status</th>
+                  <th>Driver</th>
+                  <th>Last Updated</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentReport.vehicles.map((vehicle, index) => (
+                  <tr key={vehicle.vin || index}>
+                    <td>
+                      <div className="vehicle-info">
+                        <FaCar className="vehicle-icon" />
+                        <span>{vehicle.make} {vehicle.model}</span>
+                      </div>
+                    </td>
+                    <td className="monospace">{vehicle.vin}</td>
+                    <td>{vehicle.year}</td>
+                    <td>{vehicle.mileage.toLocaleString()} km</td>
+                    <td>
+                      <span className={`status-badge status-${vehicle.status.toLowerCase().replace(' ', '-')}`}>
+                        {vehicle.status}
+                      </span>
+                    </td>
+                    <td>{vehicle.driver}</td>
+                    <td>{vehicle.lastUpdated}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {reportType === "maintenance" && (
+          <div className="data-table">
+            <div className="table-header">
+              <h4>Maintenance Records</h4>
+              <span>{currentReport.records.length} records</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Vehicle</th>
+                  <th>Problem Description</th>
+                  <th>Severity</th>
+                  <th>Cost (R)</th>
+                  <th>Technician</th>
+                  <th>Date</th>
+                  <th>Mileage</th>
+                </tr>
+              </thead>
+              <tbody>
+                {currentReport.records.map((record, index) => (
+                  <tr key={record.id || index}>
+                    <td>
+                      <div className="vehicle-info">
+                        <FaCar className="vehicle-icon" />
+                        <span>{record.vehicle}</span>
+                      </div>
+                    </td>
+                    <td className="problem-cell">{record.problem}</td>
+                    <td>
+                      <span className={`severity-badge severity-${record.severity.toLowerCase()}`}>
+                        {record.severity}
+                      </span>
+                    </td>
+                    <td className="cost-cell">R {record.cost.toLocaleString()}</td>
+                    <td>{record.technician}</td>
+                    <td>{record.date}</td>
+                    <td>{record.mileage}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {reportType === "activity" && (
+          <div className="activity-timeline">
+            <div className="table-header">
+              <h4>System Activity Timeline</h4>
+              <span>{currentReport.activities.length} activities</span>
+            </div>
+            <div className="timeline">
+              {currentReport.activities.map((activity, index) => (
+                <div key={index} className="timeline-item">
+                  <div className="timeline-icon">
+                    {activity.icon}
+                  </div>
+                  <div className="timeline-content">
+                    <div className="timeline-header">
+                      <span className="activity-vehicle">{activity.vehicle}</span>
+                      <span className="activity-time">{activity.timestamp}</span>
+                    </div>
+                    <p className="activity-description">{activity.description}</p>
+                    {activity.severity && (
+                      <span className={`severity-tag severity-${activity.severity.toLowerCase()}`}>
+                        {activity.severity}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Report Footer */}
+      <div className="report-footer">
+        <p>Report generated by Pangolin Fleet Management System</p>
+        <p>Confidential - For internal use only</p>
       </div>
     </div>
   );

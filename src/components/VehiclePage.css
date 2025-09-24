@@ -1,0 +1,167 @@
+:root {
+  --space-dark: #0f0f1f;
+  --space-blue: #1f4068;
+  --star-white: #f5f5f5;
+  --moon-gray: #ccc;
+  --planet-orange: #ff6d00;
+  --status-available: #28a745;
+  --status-in-use: #ffc107;
+  --status-maintenance: #dc3545;
+}
+
+.vehicle-page {
+  padding: 20px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--space-dark) 0%, #1a1a2e 50%, #16213e 100%);
+  color: var(--star-white);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+.page-header p {
+  margin: 0;
+  color: var(--moon-gray);
+}
+
+.summary-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.summary-card {
+  flex: 1 1 calc(25% - 16px);
+  min-width: 200px;
+  background: #1a1a2e;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.summary-card-header {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  gap: 12px;
+}
+
+.summary-icon { font-size: 28px; }
+.summary-value { font-size: 24px; font-weight: 700; }
+.summary-label { padding: 12px; text-align: center; font-size: 14px; }
+
+.toolbar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.toolbar input, .toolbar select {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  background: rgba(255,255,255,0.1);
+  color: var(--star-white);
+}
+
+.toolbar button.btn-add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--space-blue);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--star-white);
+}
+
+.vehicles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.vehicle-card {
+  background: #1a1a2e;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.vehicle-card-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  font-weight: 600;
+  color: var(--star-white);
+}
+
+.status-pill {
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #fff;
+}
+
+.vehicle-card-body {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vehicle-card-body input,
+.vehicle-card-body select,
+.vehicle-card-body textarea {
+  width: 100%;
+  padding: 6px 10px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  color: var(--star-white);
+}
+
+.card-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.btn-edit, .btn-save {
+  flex: 1;
+  background: var(--space-blue);
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  color: var(--star-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-delete, .btn-cancel {
+  flex: 1;
+  background: var(--planet-orange);
+  border: none;
+  padding: 6px;
+  border-radius: 6px;
+  color: var(--star-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.empty-state {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 16px;
+  color: var(--moon-gray);
+}

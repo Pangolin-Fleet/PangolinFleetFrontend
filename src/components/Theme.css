@@ -1,0 +1,238 @@
+/* Theme.css */
+:root {
+  /* Space Color Palette */
+  --space-dark: #0a0e17;
+  --space-blue: #1a237e;
+  --nebula-purple: #4a148c;
+  --cosmic-teal: #00bcd4;
+  --star-yellow: #ffd600;
+  --planet-orange: #ff6d00;
+  --moon-gray: #b0bec5;
+  --star-white: #ffffff;
+  
+  /* Status Colors */
+  --status-available: #00c853;
+  --status-in-use: #ff6d00;
+  --status-maintenance: #d50000;
+  
+  /* Card Styles */
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --card-radius: 16px;
+}
+
+/* Unified Card */
+.unified-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: var(--card-shadow);
+}
+
+.unified-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(0, 188, 212, 0.3);
+}
+
+/* Unified Header */
+.unified-header {
+  padding: 16px 20px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--space-blue) 0%, var(--nebula-purple) 100%);
+  border-bottom: 1px solid var(--card-border);
+}
+
+.status-pill {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Buttons */
+.btn-primary, .btn-success, .btn-warning, .btn-danger {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: center;
+}
+
+.btn-primary { background: linear-gradient(135deg, var(--cosmic-teal) 0%, var(--space-blue) 100%); }
+.btn-success { background: linear-gradient(135deg, var(--status-available) 0%, #64dd17 100%); }
+.btn-warning { background: linear-gradient(135deg, var(--planet-orange) 0%, #ffab00 100%); }
+.btn-danger { background: linear-gradient(135deg, var(--status-maintenance) 0%, #ff5252 100%); }
+
+.btn-primary:hover, .btn-success:hover, .btn-warning:hover, .btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 188, 212, 0.4);
+}
+
+/* Inputs */
+.unified-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--star-white);
+  transition: all 0.3s ease;
+}
+
+.unified-input:focus {
+  outline: none;
+  border-color: var(--cosmic-teal);
+  box-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+}
+
+/* Page Header */
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #00bcd4 0%, #ff6d00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+/* Vehicles Grid */
+.vehicles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+/* Card Info */
+.card-info p {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.card-info strong {
+  color: var(--moon-gray);
+  margin-right: 8px;
+}
+/* Add these button styles to Theme.css */
+
+/* Compact button styles */
+.btn-edit, .btn-delete, .btn-save, .btn-cancel, .btn-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 13px;
+  padding: 6px 12px;
+  min-height: 32px;
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+}
+
+.btn-edit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.btn-delete {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+.btn-delete:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+  color: white;
+}
+
+.btn-save:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--star-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-action {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--star-white);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn-action:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Make sure the vehicles grid has proper spacing */
+.vehicles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .vehicles-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .btn-edit, .btn-delete, .btn-save, .btn-cancel, .btn-action {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+}

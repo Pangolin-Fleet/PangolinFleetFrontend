@@ -1,184 +1,384 @@
-/* Container */
-.inuse-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 25px;
-  padding: 40px;
-  justify-content: center;
-  background: #f9f9f9;
-  min-height: 100vh;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+/* Pangolin Fleet - Space Theme with Grid Layout */
+:root {
+  /* Space Color Palette */
+  --space-dark: #0a0e17;
+  --space-blue: #1a237e;
+  --nebula-purple: #4a148c;
+  --cosmic-teal: #00bcd4;
+  --star-yellow: #ffd600;
+  --planet-orange: #ff6d00;
+  --moon-gray: #b0bec5;
+  --star-white: #ffffff;
 }
 
-/* Card */
+.inuse-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: 
+    linear-gradient(135deg, #0a0e17 0%, #1a1a2e 50%, #16213e 100%);
+  background-attachment: fixed;
+}
+
+/* PROPER Grid Layout for Cards */
+.vehicles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+  gap: 25px;
+  margin-top: 30px;
+}
+
+/* Space-themed Card Design */
 .inuse-card {
-  background: #fff;
-  color: #333;
-  border-radius: 16px;
-  width: 320px;
-  padding: 25px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.3s, box-shadow 0.3s;
-  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+  width: 100%; /* Ensure full width of grid cell */
 }
 
 .inuse-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.4),
+    0 0 20px rgba(0, 188, 212, 0.2);
+  border-color: rgba(0, 188, 212, 0.3);
 }
 
-/* Header */
-.inuse-card-header {
+/* Card Header - Space Gradient */
+.card-header {
+  padding: 20px;
+  color: white;
   display: flex;
   justify-content: space-between;
-  font-weight: 700;
-  font-size: 1.15rem;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #eee;
-  border-radius: 12px 12px 0 0;
-  padding-left: 15px;
-  padding-right: 15px;
-  padding-top: 8px;
-  padding-bottom: 12px;
-  box-shadow: inset 0 -1px 0 rgba(0,0,0,0.05);
+  align-items: center;
+  font-weight: 600;
+  background: linear-gradient(135deg, #1a237e 0%, #4a148c 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Body */
-.inuse-card-body {
-  margin-top: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.vehicle-title {
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
-/* Paragraphs */
-.inuse-card-body p {
-  margin: 0;
-  font-size: 0.95rem;
-  color: #555;
+.status-pill {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Card Body */
+.card-body {
+  padding: 20px;
+  color: var(--star-white);
+}
+
+/* Card Info - Compact Layout */
+.card-info {
+  margin-bottom: 20px;
+}
+
+.card-info p {
   display: flex;
   align-items: center;
-  gap: 6px;
+  margin-bottom: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
 }
 
-/* Inputs */
-.inuse-card-body input,
-.inuse-card-body textarea {
+.card-info .icon {
+  margin-right: 10px;
+  color: var(--cosmic-teal);
+  min-width: 16px;
+}
+
+.card-info .label {
+  color: var(--moon-gray);
+  margin-right: 8px;
+  min-width: 100px;
+  font-size: 0.85rem;
+}
+
+/* Timestamps */
+.timestamps {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  border-left: 3px solid var(--cosmic-teal);
+}
+
+.ts-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.8rem;
+}
+
+.ts-row:last-child {
+  margin-bottom: 0;
+}
+
+.ts-row .icon {
+  margin-right: 8px;
+  color: var(--planet-orange);
+}
+
+/* Form Elements */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--star-white);
+  font-size: 0.9rem;
+}
+
+.label .icon {
+  margin-right: 8px;
+  color: var(--cosmic-teal);
+}
+
+.input, .textarea {
   width: 100%;
   padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-  background: #f8f8f8;
-  color: #333;
-  font-size: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--star-white);
+  transition: all 0.3s ease;
+}
+
+.input:focus, .textarea:focus {
   outline: none;
-  transition: all 0.2s;
+  border-color: var(--cosmic-teal);
+  box-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
 }
 
-.inuse-card-body input:focus,
-.inuse-card-body textarea:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 8px rgba(52, 152, 219, 0.4);
+.textarea {
+  resize: vertical;
+  min-height: 80px;
 }
 
-/* Buttons */
-.inuse-card-buttons {
+/* Card Actions */
+.card-actions {
   display: flex;
   gap: 10px;
-  margin-top: 12px;
-  flex-wrap: wrap;
+  margin-top: 20px;
 }
 
-.save-btn,
-.edit-btn {
-  background: #3498db;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  color: #fff;
-  font-weight: 600;
+.card-actions button {
   display: flex;
   align-items: center;
   gap: 6px;
-  transition: background 0.3s, transform 0.2s;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+  flex: 1;
+  justify-content: center;
 }
 
-.save-btn:hover,
-.edit-btn:hover {
-  background: #2980b9;
+.card-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-yellow {
+  background: linear-gradient(135deg, #ff6d00 0%, #ffab00 100%);
+  color: white;
+}
+
+.btn-yellow:hover:not(:disabled) {
   transform: translateY(-2px);
 }
 
-.cancel-btn,
-.end-btn {
-  background: #e74c3c;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  color: #fff;
+.btn-green {
+  background: linear-gradient(135deg, #00c853 0%, #64dd17 100%);
+  color: white;
+}
+
+.btn-green:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.btn-red {
+  background: linear-gradient(135deg, #d50000 0%, #ff5252 100%);
+  color: white;
+}
+
+.btn-red:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+/* Status Messages */
+.status-msg {
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-top: 15px;
   font-weight: 600;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.status-msg.success {
+  background: rgba(0, 200, 83, 0.2);
+  color: #69f0ae;
+  border: 1px solid rgba(105, 240, 174, 0.3);
+}
+
+.status-msg.error {
+  background: rgba(213, 0, 0, 0.2);
+  color: #ff5252;
+  border: 1px solid rgba(255, 82, 82, 0.3);
+}
+
+/* Spinner */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Loading and Empty States */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.no-vehicles-message {
+  text-align: center;
+  padding: 60px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  margin: 20px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Page Header */
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+  color: white;
+}
+
+.page-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #00bcd4 0%, #ff6d00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.page-header p {
+  font-size: 1.1rem;
+  opacity: 0.8;
+}
+
+.loading-container .spin.large {
+  font-size: 3rem;
+  color: #00bcd4;
+  margin-bottom: 1rem;
+}
+
+.no-vehicles-message .icon-large {
+  font-size: 4rem;
+  color: #ff6d00;
+  margin-bottom: 1rem;
+}
+
+/* Responsive Grid */
+@media (max-width: 1200px) {
+  .vehicles-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 columns on medium screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .vehicles-grid {
+    grid-template-columns: 1fr; /* 1 column on small screens */
+    gap: 15px;
+  }
+  
+  .inuse-container {
+    padding: 15px;
+  }
+  
+  .card-actions {
+    flex-direction: column;
+  }
+  
+  .card-header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-info .label {
+    min-width: 80px;
+    font-size: 0.8rem;
+  }
+  
+  .ts-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+/* Add these styles to your existing CSS */
+
+/* Error Styling */
+.error-message {
+  color: #ff5252;
+  font-size: 0.8rem;
+  margin-top: 5px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: background 0.3s, transform 0.2s;
+  gap: 5px;
 }
 
-.cancel-btn:hover,
-.end-btn:hover {
-  background: #c0392b;
-  transform: translateY(-2px);
+.input.error, .textarea.error {
+  border-color: #ff5252;
+  box-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
 }
 
-/* Save status */
-.save-status.success {
-  color: #27ae60;
-  font-weight: 600;
+/* Required field indicator */
+.label span {
+  margin-left: 4px;
 }
 
-.save-status.fail {
-  color: #e74c3c;
-  font-weight: 600;
-}
-
-/* Mini Mileage Chart */
-.mileage-chart {
-  margin: 10px 0;
-  border-radius: 8px;
-  overflow: hidden;
-  background: #f0f0f0;
-  padding: 4px 0;
-}
-
-.mileage-chart small {
-  display: block;
-  text-align: right;
-  font-size: 11px;
-  color: #777;
-  margin-top: 2px;
-}
-
-/* Dark Mode */
-.dark .inuse-card {
-  background: #2b2b2b;
-  color: #eee;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.dark .inuse-card-body input,
-.dark .inuse-card-body textarea {
-  background: #3a3a3a;
-  color: #eee;
-  border: 1px solid #555;
-}
-
-.dark .mileage-chart {
-  background: #3a3a3a;
-}
-
-.dark .inuse-card-header {
-  color: #fff;
+/* Editing state for cards */
+.inuse-card.editing {
+  border: 2px solid rgba(0, 188, 212, 0.5);
+  box-shadow: 0 0 20px rgba(0, 188, 212, 0.3);
 }
