@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import { FaCar, FaCheckCircle, FaTools, FaPlus, FaSearch, FaEdit, FaTrash, FaSave, FaTimes } from "react-icons/fa";
+import { 
+  FaCar, FaCheckCircle, FaTools, FaPlus, FaSearch, 
+  FaEdit, FaTrash, FaSave, FaTimes 
+} from "react-icons/fa";
 import AddVehicleModal from "./AddVehicleModal";
 import "./VehiclePage.css";
 
-// SummaryCard Component
+// --- SummaryCard Component ---
 function SummaryCard({ label, value, icon, color }) {
   return (
     <div className="summary-card">
@@ -16,7 +19,7 @@ function SummaryCard({ label, value, icon, color }) {
   );
 }
 
-// VehicleCard Component
+// --- VehicleCard Component ---
 function VehicleCard({ vehicle, isEditing, editableVehicle, onEdit, onDelete, onSave, onCancel, onFieldEdit }) {
   const statusColors = {
     "Available": "var(--status-available)",
@@ -54,16 +57,21 @@ function VehicleCard({ vehicle, isEditing, editableVehicle, onEdit, onDelete, on
         ) : (
           <>
             {/* Editable Fields */}
-            <input type="text" placeholder="Make" value={editableVehicle.make} onChange={(e) => onFieldEdit(vehicle.vin, 'make', e.target.value)} />
-            <input type="text" placeholder="Model" value={editableVehicle.model} onChange={(e) => onFieldEdit(vehicle.vin, 'model', e.target.value)} />
-            <input type="number" placeholder="Year" value={editableVehicle.year} onChange={(e) => onFieldEdit(vehicle.vin, 'year', e.target.value)} />
-            <input type="number" placeholder="Mileage" value={editableVehicle.mileage} onChange={(e) => onFieldEdit(vehicle.vin, 'mileage', e.target.value)} />
-            <select value={editableVehicle.status} onChange={(e) => onFieldEdit(vehicle.vin, 'status', e.target.value)}>
+            <input type="text" placeholder="Make *" value={editableVehicle.make || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'make', e.target.value)} />
+            <input type="text" placeholder="Model *" value={editableVehicle.model || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'model', e.target.value)} />
+            <input type="number" placeholder="Year *" value={editableVehicle.year || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'year', e.target.value)} />
+            <input type="number" placeholder="Mileage *" value={editableVehicle.mileage || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'mileage', e.target.value)} />
+            <select value={editableVehicle.status || "Available"} onChange={(e) => onFieldEdit(vehicle.vin, 'status', e.target.value)}>
+              <option value="">Select Status *</option>
               <option value="Available">Available</option>
               <option value="In Use">In Use</option>
               <option value="In Maintenance">Maintenance</option>
             </select>
-            <textarea placeholder="Description" value={editableVehicle.description} onChange={(e) => onFieldEdit(vehicle.vin, 'description', e.target.value)} />
+            <textarea placeholder="Description" value={editableVehicle.description || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'description', e.target.value)} />
+            <input type="date" placeholder="Insurance Expiry" value={editableVehicle.insuranceExpiryDate || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'insuranceExpiryDate', e.target.value)} />
+            <input type="date" placeholder="Disc Expiry" value={editableVehicle.discExpiryDate || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'discExpiryDate', e.target.value)} />
+
+            {!isFormValid() && <div className="validation-msg">* Please fill in all required fields</div>}
 
             <div className="card-actions">
               <button className="btn-save" onClick={() => onSave(vehicle.vin)} disabled={!isFormValid()}><FaSave /> Save</button>
@@ -76,7 +84,7 @@ function VehicleCard({ vehicle, isEditing, editableVehicle, onEdit, onDelete, on
   );
 }
 
-// Main VehiclePage
+// --- Main VehiclePage ---
 export default function VehiclePage({ vehicles, deleteVehicle, editVehicle, setShowModal }) {
   const [editingVin, setEditingVin] = useState(null);
   const [editableVehicles, setEditableVehicles] = useState({});
@@ -85,10 +93,7 @@ export default function VehiclePage({ vehicles, deleteVehicle, editVehicle, setS
 
   const handleEditClick = (vehicle) => {
     setEditingVin(vehicle.vin);
-    setEditableVehicles(prev => ({
-      ...prev,
-      [vehicle.vin]: { ...vehicle }
-    }));
+    setEditableVehicles(prev => ({ ...prev, [vehicle.vin]: { ...vehicle } }));
   };
 
   const handleFieldEdit = (vin, field, value) => {
@@ -98,7 +103,7 @@ export default function VehiclePage({ vehicles, deleteVehicle, editVehicle, setS
   const handleSave = async (vin) => {
     const vehicleData = editableVehicles[vin];
     const requiredFields = ['make', 'model', 'year', 'mileage', 'status'];
-    if (requiredFields.some(f => !vehicleData[f])) {
+    if (requiredFields.some(f => !vehicleData[f] || vehicleData[f].toString().trim() === "")) {
       alert("Please fill all required fields");
       return;
     }
@@ -108,15 +113,13 @@ export default function VehiclePage({ vehicles, deleteVehicle, editVehicle, setS
 
   const handleCancel = (vin) => {
     setEditingVin(null);
-    setEditableVehicles(prev => {
-      const newState = { ...prev };
-      delete newState[vin];
-      return newState;
-    });
+    setEditableVehicles(prev => { const newState = { ...prev }; delete newState[vin]; return newState; });
   };
 
   const filteredVehicles = vehicles.filter(v => 
-    (v.make?.toLowerCase().includes(searchQuery.toLowerCase()) || v.model?.toLowerCase().includes(searchQuery.toLowerCase()) || v.vin?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+    (v.make?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     v.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+     v.vin?.toLowerCase().includes(searchQuery.toLowerCase())) &&
     (filterStatus ? v.status === filterStatus : true)
   );
 
@@ -139,7 +142,10 @@ export default function VehiclePage({ vehicles, deleteVehicle, editVehicle, setS
       </div>
 
       <div className="toolbar">
-        <input type="text" placeholder="Search vehicles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+        <div className="search-bar">
+          <FaSearch />
+          <input type="text" placeholder="Search vehicles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+        </div>
         <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
           <option value="">All Statuses</option>
           <option value="Available">Available</option>
