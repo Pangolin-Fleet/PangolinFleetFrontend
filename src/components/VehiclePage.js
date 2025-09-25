@@ -1,91 +1,249 @@
 import React, { useState } from "react";
 import { 
   FaCar, FaCheckCircle, FaTools, FaPlus, FaSearch, 
-  FaEdit, FaTrash, FaSave, FaTimes 
+  FaEdit, FaTrash, FaSave, FaTimes, FaRoad
 } from "react-icons/fa";
-import AddVehicleModal from "./AddVehicleModal";
 import "./VehiclePage.css";
 
-// --- SummaryCard Component ---
 function SummaryCard({ label, value, icon, color }) {
   return (
     <div className="summary-card">
-      <div className="summary-card-header" style={{ backgroundColor: color }}>
-        <div className="summary-icon">{icon}</div>
-        <div className="summary-value">{value}</div>
+      <div className="summary-value" style={{ color }}>
+        {value}
       </div>
-      <div className="summary-label">{label}</div>
+      <div className="summary-label">
+        {icon} {label}
+      </div>
     </div>
   );
 }
 
-// --- VehicleCard Component ---
-function VehicleCard({ vehicle, isEditing, editableVehicle, onEdit, onDelete, onSave, onCancel, onFieldEdit }) {
-  const statusColors = {
-    "Available": "var(--status-available)",
-    "In Use": "var(--status-in-use)",
-    "In Maintenance": "var(--status-maintenance)"
-  };
-
+function VehicleCard({ 
+  vehicle, 
+  isEditing, 
+  editableVehicle, 
+  onEdit, 
+  onDelete, 
+  onSave, 
+  onCancel, 
+  onFieldEdit,
+  onIncrementMileage,
+  onUpdateStatus 
+}) {
+  const statusClass = vehicle.status.toLowerCase().replace(' ', '-');
+  
   const isFormValid = () => {
     const requiredFields = ['make', 'model', 'year', 'mileage', 'status'];
-    return requiredFields.every(field => editableVehicle[field] && editableVehicle[field].toString().trim() !== '');
+    return requiredFields.every(field => editableVehicle[field]?.toString().trim());
   };
 
+  const handleStatusChange = (newStatus) => {
+    if (newStatus !== vehicle.status) {
+      onUpdateStatus(vehicle.vin, newStatus);
+    }
+  };
+
+  if (isEditing) {
+    return (
+      <div className={`vehicle-card ${statusClass}`}>
+        <div className="vehicle-card-header">
+          <div className="vehicle-title">Edit Vehicle</div>
+          <span className={`status-pill ${statusClass}`}>
+            {vehicle.status}
+          </span>
+        </div>
+
+        <div className="vehicle-card-body">
+          <div className="edit-form">
+            <div className="form-grid">
+              <div className="form-group">
+                <label>Make *</label>
+                <input 
+                  value={editableVehicle.make || ""} 
+                  onChange={(e) => onFieldEdit(vehicle.vin, 'make', e.target.value)} 
+                  placeholder="Vehicle make"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Model *</label>
+                <input 
+                  value={editableVehicle.model || ""} 
+                  onChange={(e) => onFieldEdit(vehicle.vin, 'model', e.target.value)} 
+                  placeholder="Vehicle model"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Year *</label>
+                <input 
+                  type="number"
+                  value={editableVehicle.year || ""} 
+                  onChange={(e) => onFieldEdit(vehicle.vin, 'year', e.target.value)} 
+                  placeholder="Manufacture year"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Mileage *</label>
+                <input 
+                  type="number"
+                  value={editableVehicle.mileage || ""} 
+                  onChange={(e) => onFieldEdit(vehicle.vin, 'mileage', e.target.value)} 
+                  placeholder="Current mileage"
+                />
+              </div>
+
+              <div className="form-group full-width">
+                <label>Status *</label>
+                <select 
+                  value={editableVehicle.status || "Available"} 
+                  onChange={(e) => onFieldEdit(vehicle.vin, 'status', e.target.value)}
+                >
+                  <option value="Available">Available</option>
+                  <option value="In Use">In Use</option>
+                  <option value="In Maintenance">Maintenance</option>
+                </select>
+              </div>
+
+              <div className="form-group full-width">
+                <label>Description</label>
+                <textarea 
+                  value={editableVehicle.description || ""} 
+                  onChange={(e) => onFieldEdit(vehicle.vin, 'description', e.target.value)} 
+                  placeholder="Vehicle description"
+                  rows="3"
+                />
+              </div>
+
+              {!isFormValid() && (
+                <div className="validation-msg">
+                  Please fill in all required fields
+                </div>
+              )}
+
+              <div className="form-group full-width">
+                <div className="form-actions">
+                  <button 
+                    className="btn-save" 
+                    onClick={() => onSave(vehicle.vin)} 
+                    disabled={!isFormValid()}
+                  >
+                    <FaSave /> Save Changes
+                  </button>
+                  <button className="btn-cancel" onClick={() => onCancel(vehicle.vin)}>
+                    <FaTimes /> Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="vehicle-card">
-      <div className="vehicle-card-header" style={{ backgroundColor: statusColors[vehicle.status] || "#666" }}>
-        <span>{vehicle.make} {vehicle.model}</span>
-        <span className="status-pill">{vehicle.status}</span>
+    <div className={`vehicle-card ${statusClass}`}>
+      <div className="vehicle-card-header">
+        <div className="vehicle-title">
+          {vehicle.make} {vehicle.model}
+        </div>
+        <span className={`status-pill ${statusClass}`}>
+          {vehicle.status}
+        </span>
       </div>
 
       <div className="vehicle-card-body">
-        {!isEditing ? (
-          <>
-            <p><strong>VIN:</strong> {vehicle.vin}</p>
-            <p><strong>Mileage:</strong> {vehicle.mileage} km</p>
-            <p><strong>Year:</strong> {vehicle.year}</p>
-            <p><strong>Description:</strong> {vehicle.description || "N/A"}</p>
-            {vehicle.insuranceExpiryDate && <p><strong>Insurance:</strong> {new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}</p>}
-            {vehicle.discExpiryDate && <p><strong>Disc Expiry:</strong> {new Date(vehicle.discExpiryDate).toLocaleDateString()}</p>}
-
-            <div className="card-actions">
-              <button className="btn-edit" onClick={() => onEdit(vehicle)}><FaEdit /> Edit</button>
-              <button className="btn-delete" onClick={() => onDelete(vehicle.vin)}><FaTrash /> Delete</button>
+        <div className="vehicle-info">
+          <div className="info-item">
+            <span className="info-label">VIN:</span>
+            <span className="info-value">{vehicle.vin}</span>
+          </div>
+          
+          <div className="info-item">
+            <span className="info-label">Year:</span>
+            <span className="info-value">{vehicle.year}</span>
+          </div>
+          
+          <div className="info-item">
+            <span className="info-label">Mileage:</span>
+            <span className="info-value">
+              <div className="mileage-section">
+                <span>{vehicle.mileage?.toLocaleString()} km</span>
+                <button 
+                  onClick={() => onIncrementMileage(vehicle.vin, 100)}
+                  className="mileage-btn"
+                  title="Add 100 km"
+                >
+                  <FaRoad /> +100
+                </button>
+              </div>
+            </span>
+          </div>
+          
+          <div className="info-item">
+            <span className="info-label">Status:</span>
+            <span className="info-value">
+              <select 
+                value={vehicle.status} 
+                onChange={(e) => handleStatusChange(e.target.value)}
+                className="status-select"
+              >
+                <option value="Available">Available</option>
+                <option value="In Use">In Use</option>
+                <option value="In Maintenance">Maintenance</option>
+              </select>
+            </span>
+          </div>
+          
+          {vehicle.description && (
+            <div className="info-item">
+              <span className="info-label">Description:</span>
+              <span className="info-value">{vehicle.description}</span>
             </div>
-          </>
-        ) : (
-          <>
-            {/* Editable Fields */}
-            <input type="text" placeholder="Make *" value={editableVehicle.make || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'make', e.target.value)} />
-            <input type="text" placeholder="Model *" value={editableVehicle.model || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'model', e.target.value)} />
-            <input type="number" placeholder="Year *" value={editableVehicle.year || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'year', e.target.value)} />
-            <input type="number" placeholder="Mileage *" value={editableVehicle.mileage || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'mileage', e.target.value)} />
-            <select value={editableVehicle.status || "Available"} onChange={(e) => onFieldEdit(vehicle.vin, 'status', e.target.value)}>
-              <option value="">Select Status *</option>
-              <option value="Available">Available</option>
-              <option value="In Use">In Use</option>
-              <option value="In Maintenance">Maintenance</option>
-            </select>
-            <textarea placeholder="Description" value={editableVehicle.description || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'description', e.target.value)} />
-            <input type="date" placeholder="Insurance Expiry" value={editableVehicle.insuranceExpiryDate || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'insuranceExpiryDate', e.target.value)} />
-            <input type="date" placeholder="Disc Expiry" value={editableVehicle.discExpiryDate || ""} onChange={(e) => onFieldEdit(vehicle.vin, 'discExpiryDate', e.target.value)} />
-
-            {!isFormValid() && <div className="validation-msg">* Please fill in all required fields</div>}
-
-            <div className="card-actions">
-              <button className="btn-save" onClick={() => onSave(vehicle.vin)} disabled={!isFormValid()}><FaSave /> Save</button>
-              <button className="btn-cancel" onClick={() => onCancel(vehicle.vin)}><FaTimes /> Cancel</button>
+          )}
+          
+          {vehicle.insuranceExpiryDate && (
+            <div className="info-item">
+              <span className="info-label">Insurance:</span>
+              <span className="info-value">
+                {new Date(vehicle.insuranceExpiryDate).toLocaleDateString()}
+              </span>
             </div>
-          </>
-        )}
+          )}
+          
+          {vehicle.discExpiryDate && (
+            <div className="info-item">
+              <span className="info-label">Disc Expiry:</span>
+              <span className="info-value">
+                {new Date(vehicle.discExpiryDate).toLocaleDateString()}
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="card-actions">
+          <button className="btn-edit" onClick={() => onEdit(vehicle)}>
+            <FaEdit /> Edit
+          </button>
+          <button className="btn-delete" onClick={() => onDelete(vehicle.vin)}>
+            <FaTrash /> Delete
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-// --- Main VehiclePage ---
-export default function VehiclePage({ vehicles, deleteVehicle, editVehicle, setShowModal }) {
+export default function VehiclePage({ 
+  vehicles, 
+  deleteVehicle, 
+  editVehicle, 
+  setShowModal,
+  incrementMileage,
+  updateStatus 
+}) {
   const [editingVin, setEditingVin] = useState(null);
   const [editableVehicles, setEditableVehicles] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
@@ -93,27 +251,39 @@ export default function VehiclePage({ vehicles, deleteVehicle, editVehicle, setS
 
   const handleEditClick = (vehicle) => {
     setEditingVin(vehicle.vin);
-    setEditableVehicles(prev => ({ ...prev, [vehicle.vin]: { ...vehicle } }));
+    setEditableVehicles(prev => ({ 
+      ...prev, 
+      [vehicle.vin]: { ...vehicle } 
+    }));
   };
 
   const handleFieldEdit = (vin, field, value) => {
-    setEditableVehicles(prev => ({ ...prev, [vin]: { ...prev[vin], [field]: value } }));
+    setEditableVehicles(prev => ({ 
+      ...prev, 
+      [vin]: { ...prev[vin], [field]: value } 
+    }));
   };
 
   const handleSave = async (vin) => {
     const vehicleData = editableVehicles[vin];
     const requiredFields = ['make', 'model', 'year', 'mileage', 'status'];
-    if (requiredFields.some(f => !vehicleData[f] || vehicleData[f].toString().trim() === "")) {
+    
+    if (requiredFields.some(f => !vehicleData[f]?.toString().trim())) {
       alert("Please fill all required fields");
       return;
     }
+    
     await editVehicle(vin, vehicleData);
     setEditingVin(null);
   };
 
   const handleCancel = (vin) => {
     setEditingVin(null);
-    setEditableVehicles(prev => { const newState = { ...prev }; delete newState[vin]; return newState; });
+    setEditableVehicles(prev => { 
+      const newState = { ...prev }; 
+      delete newState[vin]; 
+      return newState; 
+    });
   };
 
   const filteredVehicles = vehicles.filter(v => 
@@ -124,54 +294,84 @@ export default function VehiclePage({ vehicles, deleteVehicle, editVehicle, setS
   );
 
   const summaryCards = [
-    { label: "Total Vehicles", value: vehicles.length, icon: <FaCar />, color: "var(--space-blue)" },
-    { label: "Available", value: vehicles.filter(v => v.status === "Available").length, icon: <FaCheckCircle />, color: "var(--status-available)" },
-    { label: "In Use", value: vehicles.filter(v => v.status === "In Use").length, icon: <FaCar />, color: "var(--status-in-use)" },
-    { label: "Maintenance", value: vehicles.filter(v => v.status === "In Maintenance").length, icon: <FaTools />, color: "var(--status-maintenance)" }
+    { label: "Total Vehicles", value: vehicles.length, icon: "🚗", color: "#00d4ff" },
+    { label: "Available", value: vehicles.filter(v => v.status === "Available").length, icon: "✅", color: "#10b981" },
+    { label: "In Use", value: vehicles.filter(v => v.status === "In Use").length, icon: "🛣️", color: "#f59e0b" },
+    { label: "Maintenance", value: vehicles.filter(v => v.status === "In Maintenance").length, icon: "🔧", color: "#ef4444" }
   ];
 
   return (
     <div className="vehicle-page">
       <div className="page-header">
-        <h1>Pangolin Fleet</h1>
-        <p>Vehicle Management</p>
+        <h1>Vehicle Fleet</h1>
+        <p>Manage your vehicle inventory</p>
       </div>
 
-      <div className="summary-cards">
-        {summaryCards.map((card, idx) => <SummaryCard key={idx} {...card} />)}
-      </div>
-
-      <div className="toolbar">
-        <div className="search-bar">
-          <FaSearch />
-          <input type="text" placeholder="Search vehicles..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+      <div className="page-content">
+        <div className="summary-cards">
+          {summaryCards.map((card, idx) => (
+            <SummaryCard key={idx} {...card} />
+          ))}
         </div>
-        <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-          <option value="">All Statuses</option>
-          <option value="Available">Available</option>
-          <option value="In Use">In Use</option>
-          <option value="In Maintenance">Maintenance</option>
-        </select>
-        <button className="btn-add" onClick={() => setShowModal(true)}><FaPlus /> Add Vehicle</button>
-      </div>
 
-      <div className="vehicles-grid">
-        {filteredVehicles.map(vehicle => (
-          <VehicleCard 
-            key={vehicle.vin}
-            vehicle={vehicle}
-            isEditing={editingVin === vehicle.vin}
-            editableVehicle={editableVehicles[vehicle.vin] || {}}
-            onEdit={handleEditClick}
-            onDelete={deleteVehicle}
-            onSave={handleSave}
-            onCancel={handleCancel}
-            onFieldEdit={handleFieldEdit}
-          />
-        ))}
-      </div>
+        <div className="toolbar">
+          <div className="search-bar">
+            <FaSearch />
+            <input 
+              type="text" 
+              placeholder="Search vehicles..." 
+              value={searchQuery} 
+              onChange={(e) => setSearchQuery(e.target.value)} 
+            />
+          </div>
+          <select 
+            value={filterStatus} 
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="filter-select"
+          >
+            <option value="">All Statuses</option>
+            <option value="Available">Available</option>
+            <option value="In Use">In Use</option>
+            <option value="In Maintenance">Maintenance</option>
+          </select>
+          <button 
+            className="btn-add" 
+            onClick={() => setShowModal(true)}
+          >
+            <FaPlus /> Add Vehicle
+          </button>
+        </div>
 
-      {filteredVehicles.length === 0 && <div className="empty-state">No vehicles found</div>}
+        <div className="vehicles-grid">
+          {filteredVehicles.map(vehicle => (
+            <VehicleCard 
+              key={vehicle.vin}
+              vehicle={vehicle}
+              isEditing={editingVin === vehicle.vin}
+              editableVehicle={editableVehicles[vehicle.vin] || {}}
+              onEdit={handleEditClick}
+              onDelete={deleteVehicle}
+              onSave={handleSave}
+              onCancel={handleCancel}
+              onFieldEdit={handleFieldEdit}
+              onIncrementMileage={incrementMileage}
+              onUpdateStatus={updateStatus}
+            />
+          ))}
+        </div>
+
+        {filteredVehicles.length === 0 && (
+          <div className="empty-state">
+            <h3>No vehicles found</h3>
+            <p>
+              {searchQuery || filterStatus 
+                ? "Try adjusting your search criteria" 
+                : "Add your first vehicle to get started"
+              }
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

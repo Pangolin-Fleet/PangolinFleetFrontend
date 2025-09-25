@@ -125,12 +125,23 @@ const updateVehicle = async (vin, updatedVehicle) => {
     await updateVehicle(vin, updated);
   };
 
-  const updateStatus = async (vin, status, extra = {}) => {
-    const vehicle = vehicles.find((v) => v.vin === vin);
-    if (!vehicle) return;
-    const updated = { ...vehicle, status, ...extra };
-    await updateVehicle(vin, updated);
-  };
+const updateStatus = async (vin, status, extra = {}) => {
+  const vehicle = vehicles.find((v) => v.vin === vin);
+  if (!vehicle) return;
+  
+  const updated = { ...vehicle, status, ...extra };
+  
+  // Optimistic update
+  setVehicles(prev => prev.map(v => (v.vin === vin ? updated : v)));
+  
+  try {
+    await vehicleService.updateVehicle(vin, updated);
+  } catch (error) {
+    console.error("Failed to update vehicle status:", error);
+    // Revert on error
+    setVehicles(prev => prev.map(v => (v.vin === vin ? vehicle : v)));
+  }
+};
 
   const saveDestination = async (vin, destination) => {
     await updateStatus(vin, "In Use", { destination });
