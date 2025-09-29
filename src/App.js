@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { FaCar, FaTools, FaFileAlt } from "react-icons/fa";
 
+import LoginPage from "./LoginPage";
 import VehiclePage from "./components/VehiclePage";
 import MaintenancePage from "./components/MaintenancePage";
 import InUsePage from "./components/InUsePage";
 import ReportPage from "./components/ReportPage";
-import Header from "./components/Header";
+import Header from "./components/Header";  
 import AddVehicleModal from "./components/AddVehicleModal";
 
 import vehicleService from "./service/VehicleService";
 import { statusColors } from "./data";
-
 import "./App.css";
 
 function App() {
+  const [user, setUser] = useState(null);
   const [vehicles, setVehicles] = useState([]);
   const [currentPage, setCurrentPage] = useState("Vehicles");
   const [showModal, setShowModal] = useState(false);
@@ -32,11 +33,9 @@ function App() {
   const [statusCounts, setStatusCounts] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-
-  // ✅ NEW: state for editing vehicle in InUsePage
   const [editVehicleId, setEditVehicleId] = useState(null);
 
-  // Fetch vehicles on load
+  // Fetch vehicles once
   useEffect(() => {
     const fetchVehicles = async () => {
       try {
@@ -49,7 +48,7 @@ function App() {
     fetchVehicles();
   }, []);
 
-  // Update status counts
+  // Update status counts whenever vehicles change
   useEffect(() => {
     const counts = {};
     Object.keys(statusColors).forEach((status) => {
@@ -58,19 +57,21 @@ function App() {
     setStatusCounts(counts);
   }, [vehicles]);
 
-  // Add Vehicle
+  // Login handler
+  const handleLogin = (userData) => {
+    console.log("Logged in user:", userData);
+    // Normalize role to uppercase
+    setUser({ ...userData, role: userData.role.toUpperCase() });
+  };
+
+  // Vehicle helpers
   const addVehicle = async (vehicle) => {
     if (!vehicle.vin || !vehicle.make || !vehicle.model || !vehicle.year || !vehicle.mileage) {
       alert("Please fill all required fields");
       return;
     }
-
     try {
-      const payload = {
-        ...vehicle,
-        year: Number(vehicle.year),
-        mileage: Number(vehicle.mileage),
-      };
+      const payload = { ...vehicle, year: Number(vehicle.year), mileage: Number(vehicle.mileage) };
       const savedVehicle = await vehicleService.addVehicle(payload);
       setVehicles([...vehicles, savedVehicle]);
       setNewVehicle({
@@ -92,32 +93,24 @@ function App() {
     }
   };
 
-  // Update Vehicle
-const updateVehicle = async (vin, updatedVehicle) => {
-  // Optimistic update
-  setVehicles(prev => prev.map(v => (v.vin === vin ? { ...v, ...updatedVehicle } : v)));
-  
-  try {
-    await vehicleService.updateVehicle(vin, updatedVehicle);
-  } catch (error) {
-    console.error("Failed to update vehicle:", error);
-    alert("Failed to update vehicle. Changes may not be saved.");
-  }
-};
+  const updateVehicle = async (vin, updatedVehicle) => {
+    setVehicles((prev) => prev.map((v) => (v.vin === vin ? { ...v, ...updatedVehicle } : v)));
+    try {
+      await vehicleService.updateVehicle(vin, updatedVehicle);
+    } catch (error) {
+      console.error("Failed to update vehicle:", error);
+    }
+  };
 
-
-  // Delete Vehicle
   const deleteVehicle = async (vin) => {
     try {
       await vehicleService.deleteVehicle(vin);
       setVehicles((prev) => prev.filter((v) => v.vin !== vin));
     } catch (error) {
       console.error("Failed to delete vehicle:", error);
-      alert("Failed to delete vehicle.");
     }
   };
 
-  // Helper Methods
   const incrementMileage = async (vin, amount) => {
     const vehicle = vehicles.find((v) => v.vin === vin);
     if (!vehicle) return;
@@ -125,23 +118,18 @@ const updateVehicle = async (vin, updatedVehicle) => {
     await updateVehicle(vin, updated);
   };
 
-const updateStatus = async (vin, status, extra = {}) => {
-  const vehicle = vehicles.find((v) => v.vin === vin);
-  if (!vehicle) return;
-  
-  const updated = { ...vehicle, status, ...extra };
-  
-  // Optimistic update
-  setVehicles(prev => prev.map(v => (v.vin === vin ? updated : v)));
-  
-  try {
-    await vehicleService.updateVehicle(vin, updated);
-  } catch (error) {
-    console.error("Failed to update vehicle status:", error);
-    // Revert on error
-    setVehicles(prev => prev.map(v => (v.vin === vin ? vehicle : v)));
-  }
-};
+  const updateStatus = async (vin, status, extra = {}) => {
+    const vehicle = vehicles.find((v) => v.vin === vin);
+    if (!vehicle) return;
+    const updated = { ...vehicle, status, ...extra };
+    setVehicles((prev) => prev.map((v) => (v.vin === vin ? updated : v)));
+    try {
+      await vehicleService.updateVehicle(vin, updated);
+    } catch (error) {
+      console.error("Failed to update vehicle status:", error);
+      setVehicles((prev) => prev.map((v) => (v.vin === vin ? vehicle : v)));
+    }
+  };
 
   const saveDestination = async (vin, destination) => {
     await updateStatus(vin, "In Use", { destination });
@@ -155,27 +143,42 @@ const updateStatus = async (vin, status, extra = {}) => {
       (filterStatus ? v.status === filterStatus : true)
   );
 
+  if (!user) return <LoginPage onLogin={handleLogin} />;
+
+  // Define accessible pages dynamically based on role
+  const pages = [
+    { name: "Vehicles", icon: <FaCar /> },
+    { name: "In Use", icon: <FaCar /> },
+    { name: "Maintenance", icon: <FaTools />, roles: ["ADMIN"] },
+    { name: "Reports", icon: <FaFileAlt />, roles: ["ADMIN"] },
+  ];
+
+  const userRole = user.role.toUpperCase();
+
   return (
     <div className={`app-container ${darkMode ? "dark" : ""}`}>
       <aside className={`sidebar ${darkMode ? "dark" : ""}`}>
         <div className="logo">Pangolin Fleet</div>
         <nav>
-          {["Vehicles", "In Use", "Maintenance", "Reports"].map((page) => (
-            <button
-              key={page}
-              onClick={() => setCurrentPage(page)}
-              className={currentPage === page ? "active" : ""}
-            >
-              {page === "Vehicles" && <FaCar />}
-              {page === "Maintenance" && <FaTools />}
-              {page === "Reports" && <FaFileAlt />}
-              {page === "In Use" && <FaCar />}
-              {page}
-            </button>
-          ))}
+          {pages.map(({ name, icon, roles }) => {
+            if (roles && !roles.includes(userRole)) return null; // hide pages user can't access
+            return (
+              <button
+                key={name}
+                onClick={() => setCurrentPage(name)}
+                className={currentPage === name ? "active" : ""}
+              >
+                {icon} {name}
+              </button>
+            );
+          })}
         </nav>
+
         <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? "Light Mode" : "Dark Mode"}
+        </button>
+        <button className="logout-btn" onClick={() => setUser(null)}>
+          Logout
         </button>
       </aside>
 
@@ -200,6 +203,7 @@ const updateStatus = async (vin, status, extra = {}) => {
             filterStatus={filterStatus}
             setFilterStatus={setFilterStatus}
             darkMode={darkMode}
+            user={user}
           />
         )}
 
@@ -212,31 +216,34 @@ const updateStatus = async (vin, status, extra = {}) => {
             darkMode={darkMode}
             editVehicleId={editVehicleId}
             setEditVehicleId={setEditVehicleId}
+            user={user}
           />
         )}
 
-        {currentPage === "Maintenance" && (
+        {currentPage === "Maintenance" && userRole === "ADMIN" && (
           <MaintenancePage
             vehicles={vehicles.filter((v) => v.status === "In Maintenance")}
             updateStatus={updateStatus}
-            updateVehicle={updateVehicle} // ✅ needed for saving notes/issues
+            updateVehicle={updateVehicle}
             incrementMileage={incrementMileage}
-            theme={darkMode ? "dark" : "light"} // ✅ proper theme
+            theme={darkMode ? "dark" : "light"}
+            user={user}
           />
         )}
 
-        {currentPage === "Reports" && (
-          <ReportPage vehicles={vehicles} darkMode={darkMode} />
+        {currentPage === "Reports" && userRole === "ADMIN" && (
+          <ReportPage vehicles={vehicles} darkMode={darkMode} user={user} />
         )}
       </main>
 
-      {showModal && (
+      {showModal && userRole === "ADMIN" && (
         <AddVehicleModal
           newVehicle={newVehicle}
           setNewVehicle={setNewVehicle}
           setShowModal={setShowModal}
           addVehicle={addVehicle}
           darkMode={darkMode}
+          user={user}
         />
       )}
     </div>
