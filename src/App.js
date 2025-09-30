@@ -14,7 +14,12 @@ import { statusColors } from "./data";
 import "./App.css";
 
 function App() {
-  const [user, setUser] = useState(null);
+  // --- Initialize user from localStorage if exists ---
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem("fleetUser");
+    return saved ? JSON.parse(saved) : null;
+  });
+
   const [vehicles, setVehicles] = useState([]);
   const [currentPage, setCurrentPage] = useState("Vehicles");
   const [showModal, setShowModal] = useState(false);
@@ -57,11 +62,22 @@ function App() {
     setStatusCounts(counts);
   }, [vehicles]);
 
-  // Login handler
-  const handleLogin = (userData) => {
+  // --- Login handler with Remember Me ---
+  const handleLogin = (userData, rememberMe = false) => {
     console.log("Logged in user:", userData);
-    // Normalize role to uppercase
-    setUser({ ...userData, role: userData.role.toUpperCase() });
+    const normalizedUser = { ...userData, role: userData.role.toUpperCase() };
+    setUser(normalizedUser);
+
+    if (rememberMe) {
+      localStorage.setItem("fleetUser", JSON.stringify(normalizedUser));
+    } else {
+      localStorage.removeItem("fleetUser");
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("fleetUser");
   };
 
   // Vehicle helpers
@@ -177,7 +193,7 @@ function App() {
         <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
           {darkMode ? "Light Mode" : "Dark Mode"}
         </button>
-        <button className="logout-btn" onClick={() => setUser(null)}>
+        <button className="logout-btn" onClick={handleLogout}>
           Logout
         </button>
       </aside>

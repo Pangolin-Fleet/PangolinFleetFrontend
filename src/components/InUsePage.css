@@ -1,153 +1,228 @@
-/* InUsePage.css - Unified Full-Screen Styles */
+/* InUsePage.css - PANGO FLEET PREMIUM MATCH */
 .inuse-container {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a0e17 0%, #1a1a2e 50%, #16213e 100%);
+  background: 
+    radial-gradient(ellipse at top, #0a0e17 0%, #000000 100%),
+    radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.05) 0%, transparent 50%);
   color: #ffffff;
-  padding: 0;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  position: relative;
+  overflow-x: hidden;
 }
 
-/* Page Header */
+/* SPACE BACKGROUND EFFECTS */
+.inuse-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(1px 1px at 20% 30%, rgba(0, 242, 254, 0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 40% 70%, rgba(79, 172, 254, 0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 60% 20%, rgba(255, 255, 255, 0.8) 50%, transparent 50%),
+    radial-gradient(1px 1px at 80% 50%, rgba(0, 230, 118, 0.6) 50%, transparent 50%);
+  background-size: 400px 400px;
+  animation: stars 100s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes stars {
+  from { background-position: 0 0; }
+  to { background-position: 400px 400px; }
+}
+
+/* COMMAND CENTER HEADER */
 .inuse-container .page-header {
-  background: rgba(26, 35, 126, 0.95);
-  padding: 30px 40px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  width: 100%;
-  box-sizing: border-box;
-  text-align: center;
+  background: linear-gradient(135deg, 
+    rgba(10, 14, 23, 0.95) 0%, 
+    rgba(26, 35, 126, 0.8) 100%);
+  padding: 2rem 2.5rem;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
+}
+
+.inuse-container .page-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 212, 255, 0.6), 
+    transparent);
 }
 
 .inuse-container .page-header h1 {
-  font-size: 2.5rem;
-  margin: 0 0 10px 0;
-  background: linear-gradient(135deg, #00bcd4 0%, #ff6d00 100%);
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #00d4ff 0%, #4facfe 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
 }
 
 .inuse-container .page-header p {
   margin: 0;
   font-size: 1.1rem;
-  opacity: 0.9;
-  color: #b0bec5;
+  color: #94a3b8;
+  font-weight: 400;
 }
 
-/* Content Area */
-.inuse-container > div:not(.page-header) {
-  padding: 40px;
+/* COMMAND CENTER CONTENT */
+.inuse-container .page-content {
+  padding: 2rem 2.5rem;
   width: 100%;
   box-sizing: border-box;
-  min-height: calc(100vh - 140px);
+  position: relative;
+  z-index: 5;
 }
 
-/* Vehicles Grid */
+/* ACTIVE MISSIONS GRID */
 .inuse-container .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 25px;
-  width: 100%;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 1.5rem;
 }
 
-/* InUse Card */
+/* MISSION CARD - SPACECRAFT IN FLIGHT */
 .inuse-container .inuse-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 15px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.inuse-container .inuse-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 212, 255, 0.4), 
+    transparent);
 }
 
 .inuse-container .inuse-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-  border-color: rgba(0, 188, 212, 0.3);
+  transform: translateY(-3px);
+  border-color: #00d4ff;
+  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
 }
 
 .inuse-container .inuse-card.editing {
-  border: 2px solid rgba(0, 188, 212, 0.5);
-  box-shadow: 0 0 30px rgba(0, 188, 212, 0.3);
+  border: 2px solid rgba(0, 212, 255, 0.5);
+  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
 }
 
-/* Card Header */
+/* MISSION HEADER */
 .inuse-container .card-header {
-  padding: 20px;
-  color: white;
+  padding: 1.25rem;
+  background: rgba(30, 41, 59, 0.8);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: linear-gradient(135deg, #1a237e 0%, #4a148c 100%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(5px);
 }
 
 .inuse-container .vehicle-title {
   font-size: 1.2rem;
   font-weight: 600;
+  margin: 0;
+  color: white;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
 .inuse-container .status-pill {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 6px 15px;
+  padding: 0.4rem 0.8rem;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* Card Body */
-.inuse-container .card-body {
-  padding: 20px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
   color: white;
 }
 
-/* Card Info */
+/* MISSION DATA DISPLAY */
+.inuse-container .card-body {
+  padding: 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* MISSION INFO - LEFT-ALIGNED GRID */
 .inuse-container .card-info {
-  margin-bottom: 20px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 }
 
 .inuse-container .card-info p {
-  display: flex;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1rem;
   align-items: center;
-  margin-bottom: 10px;
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
   font-size: 0.9rem;
 }
 
+.inuse-container .card-info p:last-child {
+  border-bottom: none;
+}
+
 .inuse-container .card-info .icon {
-  margin-right: 10px;
-  color: #00bcd4;
-  min-width: 16px;
+  color: #00d4ff;
+  margin-right: 0.5rem;
 }
 
 .inuse-container .card-info .label {
-  color: #b0bec5;
-  margin-right: 8px;
-  min-width: 100px;
+  color: #94a3b8;
   font-size: 0.85rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.inuse-container .card-info strong {
-  color: white;
-  font-weight: 600;
-}
-
-/* Timestamps */
+/* MISSION TIMELINE */
 .inuse-container .timestamps {
   background: rgba(0, 0, 0, 0.3);
-  padding: 15px;
+  padding: 1rem;
   border-radius: 8px;
-  margin: 15px 0;
-  border-left: 3px solid #00bcd4;
+  margin: 1rem 0;
+  border-left: 3px solid #00d4ff;
 }
 
 .inuse-container .ts-row {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 0.5rem;
   font-size: 0.8rem;
   color: #b0bec5;
 }
@@ -157,47 +232,127 @@
 }
 
 .inuse-container .ts-row .icon {
-  margin-right: 8px;
   color: #ff6d00;
+  margin-right: 0.5rem;
 }
 
-/* Form Elements */
+/* MISSION CONTROLS */
+.inuse-container .card-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(51, 65, 85, 0.5);
+  width: 100%;
+}
+
+.inuse-container .card-actions button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.inuse-container .card-actions button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s;
+}
+
+.inuse-container .card-actions button:hover::before {
+  left: 100%;
+}
+
+.inuse-container .btn-yellow {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.inuse-container .btn-yellow:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e6900b 0%, #c46a05 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+}
+
+.inuse-container .btn-green {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.inuse-container .btn-green:hover:not(:disabled) {
+  background: linear-gradient(135deg, #0da271 0%, #047852 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
+
+.inuse-container .btn-red {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.inuse-container .btn-red:hover:not(:disabled) {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* MISSION FORM - EDIT MODE */
 .inuse-container .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .inuse-container .label {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
   font-weight: 600;
   color: white;
   font-size: 0.9rem;
 }
 
 .inuse-container .label .icon {
-  margin-right: 8px;
-  color: #00bcd4;
+  margin-right: 0.5rem;
+  color: #00d4ff;
 }
 
 .inuse-container .input,
 .inuse-container .textarea {
   width: 100%;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.6rem;
+  border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: 6px;
-  font-size: 0.9rem;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(30, 41, 59, 0.8);
   color: white;
-  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
 .inuse-container .input:focus,
 .inuse-container .textarea:focus {
   outline: none;
-  border-color: #00bcd4;
-  box-shadow: 0 0 10px rgba(0, 188, 212, 0.3);
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
 .inuse-container .textarea {
@@ -208,131 +363,107 @@
 
 .inuse-container .input.error,
 .inuse-container .textarea.error {
-  border-color: #ff5252;
-  box-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
 }
 
-/* Card Actions */
-.inuse-container .card-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.inuse-container .card-actions button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.85rem;
-  flex: 1;
-  justify-content: center;
-}
-
-.inuse-container .card-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.inuse-container .btn-yellow {
-  background: linear-gradient(135deg, #ff6d00 0%, #ffab00 100%);
-  color: white;
-}
-
-.inuse-container .btn-yellow:hover:not(:disabled) {
-  transform: translateY(-2px);
-}
-
-.inuse-container .btn-green {
-  background: linear-gradient(135deg, #00c853 0%, #64dd17 100%);
-  color: white;
-}
-
-.inuse-container .btn-green:hover:not(:disabled) {
-  transform: translateY(-2px);
-}
-
-.inuse-container .btn-red {
-  background: linear-gradient(135deg, #d50000 0%, #ff5252 100%);
-  color: white;
-}
-
-.inuse-container .btn-red:hover:not(:disabled) {
-  transform: translateY(-2px);
-}
-
-/* Status Messages */
+/* MISSION STATUS MESSAGES */
 .inuse-container .status-msg {
-  padding: 10px 15px;
+  padding: 0.75rem;
   border-radius: 6px;
-  margin-top: 15px;
+  margin-top: 1rem;
   font-weight: 600;
   text-align: center;
   font-size: 0.85rem;
 }
 
 .inuse-container .status-msg.success {
-  background: rgba(0, 200, 83, 0.2);
-  color: #69f0ae;
-  border: 1px solid rgba(105, 240, 174, 0.3);
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.3);
 }
 
 .inuse-container .status-msg.error {
-  background: rgba(213, 0, 0, 0.2);
-  color: #ff5252;
-  border: 1px solid rgba(255, 82, 82, 0.3);
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.3);
 }
 
-/* Error Messages */
+/* MISSION VALIDATION ERRORS */
 .inuse-container .error-message {
-  color: #ff5252;
+  color: #f87171;
   font-size: 0.8rem;
-  margin-top: 5px;
+  margin-top: 0.25rem;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 0.5rem;
 }
 
-/* Loading and Empty States */
+/* EMPTY DOCKING BAY */
+.inuse-container .no-vehicles-message {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+  background: rgba(30, 41, 59, 0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  position: relative;
+}
+
+.inuse-container .no-vehicles-message::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 212, 255, 0.4), 
+    transparent);
+}
+
+.inuse-container .no-vehicles-message .icon-large {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.inuse-container .no-vehicles-message h3 {
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.inuse-container .no-vehicles-message p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+}
+
+/* LOADING STATE */
 .inuse-container .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 100px 20px;
+  padding: 6rem 2rem;
   text-align: center;
   color: white;
 }
 
-.inuse-container .no-vehicles-message {
-  text-align: center;
-  padding: 80px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 15px;
-  margin: 20px 0;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #b0bec5;
-}
-
-.inuse-container .no-vehicles-message .icon-large {
-  font-size: 4rem;
-  color: #ff6d00;
-  margin-bottom: 1rem;
-}
-
 .inuse-container .loading-container .spin.large {
   font-size: 3rem;
-  color: #00bcd4;
+  color: #00d4ff;
   margin-bottom: 1rem;
-}
-
-/* Animations */
-.inuse-container .spin {
   animation: spin 1s linear infinite;
 }
 
@@ -341,21 +472,26 @@
   to { transform: rotate(360deg); }
 }
 
-/* Responsive */
+.inuse-container .spin {
+  animation: spin 1s linear infinite;
+}
+
+/* RESPONSIVE DESIGN */
 @media (max-width: 1200px) {
   .inuse-container .vehicles-grid {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .inuse-container > div:not(.page-header) {
-    padding: 20px;
+  .inuse-container .page-header,
+  .inuse-container .page-content {
+    padding: 1.5rem;
   }
   
   .inuse-container .vehicles-grid {
     grid-template-columns: 1fr;
-    gap: 15px;
+    gap: 1rem;
   }
   
   .inuse-container .card-actions {
@@ -364,32 +500,35 @@
   
   .inuse-container .card-header {
     flex-direction: column;
-    gap: 10px;
-    text-align: center;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .inuse-container .card-info p {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+  
+  .inuse-container .ts-row {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
   }
 }
 
 @media (max-width: 480px) {
-  .inuse-container > div:not(.page-header) {
-    padding: 15px;
+  .inuse-container .page-header {
+    padding: 1.25rem;
   }
   
-  .inuse-container .page-header {
-    padding: 20px;
+  .inuse-container .page-content {
+    padding: 1.25rem;
   }
   
   .inuse-container .page-header h1 {
-    font-size: 2rem;
+    font-size: 1.75rem;
   }
   
-  .inuse-container .card-info .label {
-    min-width: 80px;
-    font-size: 0.8rem;
-  }
-  
-  .inuse-container .ts-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+  .inuse-container .status-pill {
+    align-self: flex-start;
   }
 }
