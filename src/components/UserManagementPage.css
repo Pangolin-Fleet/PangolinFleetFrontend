@@ -1,0 +1,315 @@
+.user-management {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.page-header h1 {
+  color: #333;
+  margin: 0;
+}
+
+.alert {
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.alert.error {
+  background: #fee;
+  border: 1px solid #f5c6cb;
+  color: #721c24;
+}
+
+.alert.success {
+  background: #eff8ff;
+  border: 1px solid #b8daff;
+  color: #155724;
+}
+
+.admin-limit-notice {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  color: #856404;
+}
+
+.users-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.user-card.super-user {
+  border-left: 4px solid #FFD700;
+  background: linear-gradient(135deg, #fffaf0, #fff);
+}
+
+.user-avatar {
+  font-size: 28px;
+  margin-right: 15px;
+  color: #666;
+}
+
+.super-user-icon {
+  color: #FFD700;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-info h3 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.user-role {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-role.admin {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.user-role.driver {
+  background: #f3e5f5;
+  color: #7b1fa2;
+}
+
+.user-role.super {
+  background: linear-gradient(45deg, #FFD700, #FFA500);
+  color: #000;
+  font-weight: 800;
+}
+
+.user-actions {
+  margin-left: auto;
+}
+
+.btn-danger {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-danger:hover {
+  background: #c82333;
+}
+
+.btn-danger:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #555;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 16px;
+  box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+.warning-text {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  display: block;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 25px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.modal-actions button[type="button"] {
+  background: #6c757d;
+  color: white;
+}
+
+.modal-actions button[type="submit"] {
+  background: #007bff;
+  color: white;
+}
+
+.modal-actions button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.modal-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.no-users {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  grid-column: 1 / -1;
+}
+
+.no-users p {
+  font-size: 18px;
+  margin: 0;
+}
+
+/* Dark mode support */
+.app-container.dark .user-management {
+  color: #e0e0e0;
+}
+
+.app-container.dark .page-header h1 {
+  color: #e0e0e0;
+}
+
+.warning-text {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.info-text {
+  color: #28a745;
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.admin-limit-notice .warning {
+  color: #dc3545;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.user-count {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0 0 0;
+}
+
+.app-container.dark .user-card {
+  background: #2d3748;
+  border-color: #4a5568;
+  color: #e0e0e0;
+}
+
+.app-container.dark .user-info h3 {
+  color: #e0e0e0;
+}
+
+.app-container.dark .modal {
+  background: #2d3748;
+  color: #e0e0e0;
+}
+
+.app-container.dark .form-group input,
+.app-container.dark .form-group select {
+  background: #4a5568;
+  border-color: #718096;
+  color: #e0e0e0;
+}
+
+.app-container.dark .form-group label {
+  color: #e0e0e0;
+}

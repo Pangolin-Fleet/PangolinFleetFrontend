@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FaCar, FaTools, FaFileAlt } from "react-icons/fa";
+import { FaCar, FaTools, FaFileAlt, FaUserShield, FaUsers } from "react-icons/fa";
 
 import LoginPage from "./LoginPage";
 import VehiclePage from "./components/VehiclePage";
@@ -8,50 +8,86 @@ import InUsePage from "./components/InUsePage";
 import ReportPage from "./components/ReportPage";
 import Header from "./components/Header";  
 import AddVehicleModal from "./components/AddVehicleModal";
+import UserManagementPage from "./components/UserManagementPage";
 
 import vehicleService from "./service/VehicleService";
+import userService from "./service/UserService";
 import { statusColors } from "./data";
 import "./App.css";
 
 function App() {
-  // --- Initialize user from localStorage if exists ---
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("fleetUser");
     return saved ? JSON.parse(saved) : null;
   });
 
   const [vehicles, setVehicles] = useState([]);
+  const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState("Vehicles");
   const [showModal, setShowModal] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [newVehicle, setNewVehicle] = useState({
-    vin: "",
-    make: "",
-    model: "",
-    year: "",
-    mileage: "",
-    status: "Available",
-    description: "",
-    discExpiryDate: "",
-    insuranceExpiryDate: "",
+    vin: "", make: "", model: "", year: "", mileage: "", status: "Available",
+    description: "", discExpiryDate: "", insuranceExpiryDate: "",
   });
   const [statusCounts, setStatusCounts] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [editVehicleId, setEditVehicleId] = useState(null);
 
-  // Fetch vehicles once
+  // Debug useEffect to monitor state changes
   useEffect(() => {
-    const fetchVehicles = async () => {
+    console.log("🔍 USERS STATE CHANGED - Count:", users.length);
+    if (users.length > 0) {
+      const adminCount = users.filter(u => u.role === "ADMIN").length;
+      console.log("🔍 Admin count in state:", adminCount);
+    }
+  }, [users]);
+
+  useEffect(() => {
+    console.log("🔍 USER CHANGED:", user ? user.username : "No user");
+  }, [user]);
+
+  // Fetch vehicles and users - IMPROVED VERSION
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
+      
       try {
-        const response = await vehicleService.getAllVehicles();
-        setVehicles(response);
+        console.log("🔄 Fetching data for user:", user.username);
+        
+        // Fetch vehicles first
+        let vehiclesResponse = [];
+        try {
+          vehiclesResponse = await vehicleService.getAllVehicles();
+          console.log("✅ Vehicles fetched:", vehiclesResponse?.length || 0);
+        } catch (vehicleError) {
+          console.error("❌ Vehicles fetch failed:", vehicleError);
+          vehiclesResponse = [];
+        }
+        
+        // Then fetch users separately with better error handling
+        let usersResponse = [];
+        try {
+          usersResponse = await userService.getAllUsers(user.username);
+          console.log("✅ Users fetched:", usersResponse?.length || 0);
+        } catch (userError) {
+          console.error("❌ Users fetch failed:", userError);
+          usersResponse = [];
+        }
+        
+        setVehicles(vehiclesResponse || []);
+        setUsers(usersResponse || []);
+        
       } catch (error) {
-        console.error("Failed to fetch vehicles:", error);
+        console.error("❌ Failed to fetch data:", error);
+        setVehicles([]);
+        setUsers([]);
       }
     };
-    fetchVehicles();
-  }, []);
+    
+    fetchData();
+  }, [user]);
 
   // Update status counts whenever vehicles change
   useEffect(() => {
@@ -62,25 +98,54 @@ function App() {
     setStatusCounts(counts);
   }, [vehicles]);
 
-  // --- Login handler with Remember Me ---
-  const handleLogin = (userData, rememberMe = false) => {
-    console.log("Logged in user:", userData);
-    const normalizedUser = { ...userData, role: userData.role.toUpperCase() };
-    setUser(normalizedUser);
+  // Login handler
+  const handleLogin = async (username, password) => {
+    try {
+      console.log("🔐 Attempting login for:", username);
+      
+      const userData = await userService.login(username, password);
+      
+      // SAFE: Check if we have valid user data
+      if (!userData || typeof userData !== 'object') {
+        throw new Error("Invalid response from server");
+      }
 
-    if (rememberMe) {
+      console.log("📋 User data received:", userData);
+
+      const normalizedUser = { 
+        ...userData,
+        role: (userData.role || "DRIVER").toUpperCase(),
+        isSuperUser: userData.isSuperUser || false,
+        username: userData.username || username
+      };
+
+      console.log("👤 Normalized user:", normalizedUser);
+
+      setUser(normalizedUser);
       localStorage.setItem("fleetUser", JSON.stringify(normalizedUser));
-    } else {
-      localStorage.removeItem("fleetUser");
+      return { success: true, user: normalizedUser };
+      
+    } catch (error) {
+      console.error("❌ Login error:", error);
+      return { success: false, error: error.message };
     }
   };
 
   const handleLogout = () => {
+    console.log("🚪 Logging out");
     setUser(null);
+    setVehicles([]);
+    setUsers([]);
     localStorage.removeItem("fleetUser");
   };
 
-  // Vehicle helpers
+  // Check if user can access admin features
+  const isAdmin = () => {
+    if (!user) return false;
+    return user.role === "ADMIN" || user.isSuperUser;
+  };
+
+  // Vehicle operations
   const addVehicle = async (vehicle) => {
     if (!vehicle.vin || !vehicle.make || !vehicle.model || !vehicle.year || !vehicle.mileage) {
       alert("Please fill all required fields");
@@ -91,15 +156,8 @@ function App() {
       const savedVehicle = await vehicleService.addVehicle(payload);
       setVehicles([...vehicles, savedVehicle]);
       setNewVehicle({
-        vin: "",
-        make: "",
-        model: "",
-        year: "",
-        mileage: "",
-        status: "Available",
-        description: "",
-        discExpiryDate: "",
-        insuranceExpiryDate: "",
+        vin: "", make: "", model: "", year: "", mileage: "", status: "Available",
+        description: "", discExpiryDate: "", insuranceExpiryDate: "",
       });
       setShowModal(false);
       alert("Vehicle added successfully!");
@@ -151,6 +209,31 @@ function App() {
     await updateStatus(vin, "In Use", { destination });
   };
 
+  // User management handlers
+  const handleUserCreated = (newUser) => {
+    console.log("👤 New user created:", newUser);
+    setUsers(prev => [...prev, newUser]);
+  };
+
+  const handleUserDeleted = (deletedUser) => {
+    console.log("🗑️ User deleted:", deletedUser);
+    setUsers(prev => prev.filter(u => u.username !== deletedUser.username));
+  };
+
+  // Add refresh function for users
+  const refreshUsers = async () => {
+    if (!user) return;
+    
+    try {
+      console.log("🔄 Manually refreshing users...");
+      const usersResponse = await userService.getAllUsers(user.username);
+      setUsers(usersResponse || []);
+      console.log("✅ Users refreshed:", usersResponse?.length || 0);
+    } catch (error) {
+      console.error("❌ Refresh users failed:", error);
+    }
+  };
+
   const filteredVehicles = vehicles.filter(
     (v) =>
       (v.make?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -159,25 +242,36 @@ function App() {
       (filterStatus ? v.status === filterStatus : true)
   );
 
-  if (!user) return <LoginPage onLogin={handleLogin} />;
+  if (!user) {
+    console.log("👤 No user, showing login page");
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
-  // Define accessible pages dynamically based on role
+  console.log("🏠 User logged in:", user.username, "Role:", user.role);
+
+  // Define accessible pages based on role
   const pages = [
     { name: "Vehicles", icon: <FaCar /> },
     { name: "In Use", icon: <FaCar /> },
     { name: "Maintenance", icon: <FaTools />, roles: ["ADMIN"] },
     { name: "Reports", icon: <FaFileAlt />, roles: ["ADMIN"] },
+    { name: "User Management", icon: <FaUsers />, roles: ["ADMIN"] },
   ];
-
-  const userRole = user.role.toUpperCase();
 
   return (
     <div className={`app-container ${darkMode ? "dark" : ""}`}>
       <aside className={`sidebar ${darkMode ? "dark" : ""}`}>
         <div className="logo">Pangolin Fleet</div>
+        <div className="user-info">
+          <span>{user.username}</span>
+          <span className={`role-badge ${user.role.toLowerCase()}`}>
+            {user.role} {user.isSuperUser && "⭐"}
+          </span>
+        </div>
+        
         <nav>
           {pages.map(({ name, icon, roles }) => {
-            if (roles && !roles.includes(userRole)) return null; // hide pages user can't access
+            if (roles && !isAdmin()) return null;
             return (
               <button
                 key={name}
@@ -190,16 +284,18 @@ function App() {
           })}
         </nav>
 
-        <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
+        <div className="sidebar-footer">
+          <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
+            {darkMode ? "Light Mode" : "Dark Mode"}
+          </button>
+          <button className="logout-btn" onClick={handleLogout}>
+            Logout
+          </button>
+        </div>
       </aside>
 
       <main>
-        <Header currentPage={currentPage} />
+        <Header currentPage={currentPage} user={user} />
 
         {currentPage === "Vehicles" && (
           <VehiclePage
@@ -220,6 +316,7 @@ function App() {
             setFilterStatus={setFilterStatus}
             darkMode={darkMode}
             user={user}
+            canEdit={isAdmin()}
           />
         )}
 
@@ -236,7 +333,7 @@ function App() {
           />
         )}
 
-        {currentPage === "Maintenance" && userRole === "ADMIN" && (
+        {currentPage === "Maintenance" && isAdmin() && (
           <MaintenancePage
             vehicles={vehicles.filter((v) => v.status === "In Maintenance")}
             updateStatus={updateStatus}
@@ -247,12 +344,22 @@ function App() {
           />
         )}
 
-        {currentPage === "Reports" && userRole === "ADMIN" && (
+        {currentPage === "Reports" && isAdmin() && (
           <ReportPage vehicles={vehicles} darkMode={darkMode} user={user} />
+        )}
+
+        {currentPage === "User Management" && isAdmin() && (
+          <UserManagementPage 
+            users={users} 
+            currentUser={user}
+            onUserCreated={handleUserCreated}
+            onUserDeleted={handleUserDeleted}
+            onRefreshUsers={refreshUsers}
+          />
         )}
       </main>
 
-      {showModal && userRole === "ADMIN" && (
+      {showModal && isAdmin() && (
         <AddVehicleModal
           newVehicle={newVehicle}
           setNewVehicle={setNewVehicle}
