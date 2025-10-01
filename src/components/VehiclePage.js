@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { FaEdit, FaTrash, FaSave, FaTimes, FaRoad, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSave, FaTimes, FaRoad, FaPlus, FaCar, FaCheck, FaWrench, FaClock } from "react-icons/fa";
 import "./VehiclePage.css";
 
 function SummaryCard({ label, value, icon, color }) {
   return (
     <div className="summary-card">
       <div className="summary-card-content">
-        <div className="summary-icon">{icon}</div>
+        <div className="summary-icon" style={{ color }}>
+          {icon}
+        </div>
         <div className="summary-text">
           <div className="summary-value" style={{ color }}>
             {value}
@@ -29,7 +31,8 @@ function VehicleCard({
   onFieldEdit,
   onIncrementMileage,
   onUpdateStatus,
-  userRole
+  userRole,
+  onStatusChange
 }) {
   const statusClass = vehicle.status.toLowerCase().replace(' ', '-');
 
@@ -40,7 +43,16 @@ function VehicleCard({
 
   const handleStatusChange = (newStatus) => {
     if (newStatus !== vehicle.status) {
-      onUpdateStatus(vehicle.vin, newStatus);
+      onStatusChange(vehicle.vin, newStatus);
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'Available': return <FaCheck className="status-icon" />;
+      case 'In Use': return <FaCar className="status-icon" />;
+      case 'In Maintenance': return <FaWrench className="status-icon" />;
+      default: return <FaClock className="status-icon" />;
     }
   };
 
@@ -49,7 +61,10 @@ function VehicleCard({
       <div className={`vehicle-card editing ${statusClass}`}>
         <div className="card-header">
           <div className="card-title">Edit Vehicle</div>
-          <span className={`status-pill ${statusClass}`}>{vehicle.status}</span>
+          <span className={`status-pill ${statusClass}`}>
+            {getStatusIcon(vehicle.status)}
+            {vehicle.status}
+          </span>
         </div>
         <div className="card-body">
           <div className="edit-form">
@@ -111,10 +126,10 @@ function VehicleCard({
                   value={editableVehicle.description || ""}
                   onChange={(e) => onFieldEdit(vehicle.vin, 'description', e.target.value)}
                   placeholder="Vehicle description"
-                  rows="3"
+                  rows="2"
                 />
               </div>
-              <div className="form-group full-width">
+              <div className="form-group">
                 <label className="form-label">Disc Expiry</label>
                 <input
                   className="form-input"
@@ -123,7 +138,7 @@ function VehicleCard({
                   onChange={(e) => onFieldEdit(vehicle.vin, 'discExpiryDate', e.target.value)}
                 />
               </div>
-              <div className="form-group full-width">
+              <div className="form-group">
                 <label className="form-label">License Expiry</label>
                 <input
                   className="form-input"
@@ -132,7 +147,7 @@ function VehicleCard({
                   onChange={(e) => onFieldEdit(vehicle.vin, 'licenseExpiryDate', e.target.value)}
                 />
               </div>
-              <div className="form-group full-width">
+              <div className="form-group">
                 <label className="form-label">Insurance Expiry</label>
                 <input
                   className="form-input"
@@ -154,7 +169,7 @@ function VehicleCard({
                   onClick={() => onSave(vehicle.vin)}
                   disabled={!isFormValid()}
                 >
-                  <FaSave /> Save Changes
+                  <FaSave /> Save
                 </button>
                 <button className="btn btn-cancel" onClick={() => onCancel(vehicle.vin)}>
                   <FaTimes /> Cancel
@@ -170,64 +185,85 @@ function VehicleCard({
   return (
     <div className={`vehicle-card ${statusClass}`}>
       <div className="card-header">
-        <div className="card-title">{vehicle.make} {vehicle.model}</div>
-        <span className={`status-pill ${statusClass}`}>{vehicle.status}</span>
+        <div className="vehicle-title">
+          <h3>{vehicle.make} {vehicle.model}</h3>
+          <span className="vehicle-year">{vehicle.year}</span>
+        </div>
+        <span className={`status-pill ${statusClass}`}>
+          {getStatusIcon(vehicle.status)}
+          {vehicle.status}
+        </span>
       </div>
       <div className="card-body">
         <div className="vehicle-info">
-          <div className="info-row">
-            <span className="info-label">VIN:</span>
-            <span className="info-value">{vehicle.vin}</span>
+          <div className="info-section">
+            <div className="info-row">
+              <span className="info-label">VIN:</span>
+              <span className="info-value">{vehicle.vin}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Mileage:</span>
+              <span className="info-value">
+                <div className="mileage-content">
+                  <span>{vehicle.mileage?.toLocaleString()} km</span>
+                  <button
+                    onClick={() => onIncrementMileage(vehicle.vin, 100)}
+                    className="btn-mileage"
+                    title="Add 100 km"
+                  >
+                    <FaRoad /> +100
+                  </button>
+                </div>
+              </span>
+            </div>
           </div>
-          <div className="info-row">
-            <span className="info-label">Year:</span>
-            <span className="info-value">{vehicle.year}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Mileage:</span>
-            <span className="info-value">
-              <div className="mileage-section">
-                <span>{vehicle.mileage?.toLocaleString()} km</span>
-                <button
-                  onClick={() => onIncrementMileage(vehicle.vin, 100)}
-                  className="btn-mileage"
-                  title="Add 100 km"
+
+          <div className="info-section">
+            <div className="info-row">
+              <span className="info-label">Status:</span>
+              <span className="info-value">
+                <select
+                  value={vehicle.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className="status-select"
+                  disabled={userRole !== "ADMIN"}
                 >
-                  <FaRoad /> +100
-                </button>
+                  <option value="Available">Available</option>
+                  <option value="In Use">In Use</option>
+                  <option value="In Maintenance">Maintenance</option>
+                </select>
+              </span>
+            </div>
+            {vehicle.description && (
+              <div className="info-row">
+                <span className="info-label">Description:</span>
+                <span className="info-value description-text">{vehicle.description}</span>
               </div>
-            </span>
+            )}
           </div>
-          <div className="info-row">
-            <span className="info-label">Status:</span>
-            <span className="info-value">
-              <select
-                value={vehicle.status}
-                onChange={(e) => handleStatusChange(e.target.value)}
-                className="status-select"
-                disabled={userRole !== "ADMIN"}
-              >
-                <option value="Available">Available</option>
-                <option value="In Use">In Use</option>
-                <option value="In Maintenance">Maintenance</option>
-              </select>
-            </span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Description:</span>
-            <span className="info-value">{vehicle.description || "N/A"}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Disc Expiry:</span>
-            <span className="info-value">{vehicle.discExpiryDate || "N/A"}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">License Expiry:</span>
-            <span className="info-value">{vehicle.licenseExpiryDate || "N/A"}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Insurance Expiry:</span>
-            <span className="info-value">{vehicle.insuranceExpiryDate || "N/A"}</span>
+
+          <div className="expiry-section">
+            <h4 className="expiry-title">Expiry Dates</h4>
+            <div className="expiry-grid">
+              <div className="expiry-item">
+                <span className="expiry-label">Disc:</span>
+                <span className={`expiry-value ${!vehicle.discExpiryDate || new Date(vehicle.discExpiryDate) < new Date() ? 'expired' : ''}`}>
+                  {vehicle.discExpiryDate || "Not set"}
+                </span>
+              </div>
+              <div className="expiry-item">
+                <span className="expiry-label">License:</span>
+                <span className={`expiry-value ${!vehicle.licenseExpiryDate || new Date(vehicle.licenseExpiryDate) < new Date() ? 'expired' : ''}`}>
+                  {vehicle.licenseExpiryDate || "Not set"}
+                </span>
+              </div>
+              <div className="expiry-item">
+                <span className="expiry-label">Insurance:</span>
+                <span className={`expiry-value ${!vehicle.insuranceExpiryDate || new Date(vehicle.insuranceExpiryDate) < new Date() ? 'expired' : ''}`}>
+                  {vehicle.insuranceExpiryDate || "Not set"}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -253,7 +289,8 @@ export default function VehiclePage({
   setShowModal,
   incrementMileage,
   updateStatus,
-  user
+  user,
+  onMaintenanceStatusChange
 }) {
   const [editingVin, setEditingVin] = useState(null);
   const [editableVehicles, setEditableVehicles] = useState({});
@@ -283,18 +320,49 @@ export default function VehiclePage({
     setEditableVehicles(prev => { const newState = { ...prev }; delete newState[vin]; return newState; });
   };
 
+  // Enhanced status change handler
+  const handleStatusChange = async (vin, newStatus) => {
+    const vehicle = vehicles.find(v => v.vin === vin);
+    
+    if (newStatus === "In Maintenance" && vehicle.status !== "In Maintenance") {
+      // Vehicle is being moved to maintenance
+      if (onMaintenanceStatusChange) {
+        await onMaintenanceStatusChange(vehicle, "add");
+      }
+    } else if (vehicle.status === "In Maintenance" && newStatus !== "In Maintenance") {
+      // Vehicle is being removed from maintenance
+      if (onMaintenanceStatusChange) {
+        await onMaintenanceStatusChange(vehicle, "remove");
+      }
+    }
+    
+    // Update the vehicle status
+    await updateStatus(vin, newStatus);
+  };
+
   const summaryCards = [
-    { label: "Total Vehicles", value: vehicles.length, icon: "🚗", color: "#00d4ff" },
-    { label: "Available", value: vehicles.filter(v => v.status === "Available").length, icon: "✅", color: "#10b981" },
-    { label: "In Use", value: vehicles.filter(v => v.status === "In Use").length, icon: "🛣️", color: "#f59e0b" },
-    { label: "Maintenance", value: vehicles.filter(v => v.status === "In Maintenance").length, icon: "🔧", color: "#ef4444" }
+    { label: "Total Vehicles", value: vehicles.length, icon: <FaCar />, color: "#6366f1" },
+    { label: "Available", value: vehicles.filter(v => v.status === "Available").length, icon: <FaCheck />, color: "#10b981" },
+    { label: "In Use", value: vehicles.filter(v => v.status === "In Use").length, icon: <FaCar />, color: "#f59e0b" },
+    { label: "Maintenance", value: vehicles.filter(v => v.status === "In Maintenance").length, icon: <FaWrench />, color: "#ef4444" }
   ];
 
   return (
-    <div className="unified-page vehicle-page">
+    <div className="vehicle-page">
       <div className="page-header">
-        <h1>Vehicle Fleet</h1>
-        <p>Manage your vehicle inventory</p>
+        <div className="header-content">
+          <div className="header-main">
+            <h1>Vehicle Fleet</h1>
+            <p>Manage your vehicle inventory efficiently</p>
+          </div>
+          <div className="header-actions">
+            <div className="user-info">
+              <span className="user-name">Welcome, {user?.name || user?.username || 'User'}</span>
+              <span className="user-role">({user?.role || 'User'})</span>
+            </div>
+            {/* Logout button removed from here */}
+          </div>
+        </div>
       </div>
 
       <div className="page-content">
@@ -314,7 +382,7 @@ export default function VehiclePage({
           </div>
         )}
 
-        <div className="content-grid">
+        <div className="content-section">
           {vehicles.length > 0 ? (
             <div className="vehicles-grid">
               {vehicles.map(vehicle => (
@@ -329,7 +397,7 @@ export default function VehiclePage({
                   onCancel={handleCancel}
                   onFieldEdit={handleFieldEdit}
                   onIncrementMileage={incrementMileage}
-                  onUpdateStatus={updateStatus}
+                  onStatusChange={handleStatusChange}
                   userRole={user.role}
                 />
               ))}

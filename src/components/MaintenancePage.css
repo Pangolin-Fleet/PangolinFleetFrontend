@@ -1,443 +1,7 @@
-/* MaintenancePage.css - PANGO FLEET PREMIUM MATCH */
-.maintenance-container {
-  width: 100%;
-  min-height: 100vh;
-  background: 
-    radial-gradient(ellipse at top, #0a0e17 0%, #000000 100%),
-    radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.05) 0%, transparent 50%);
-  color: #ffffff;
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  position: relative;
-  overflow-x: hidden;
-}
-
-/* SPACE BACKGROUND EFFECTS */
-.maintenance-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(1px 1px at 20% 30%, rgba(0, 242, 254, 0.6) 50%, transparent 50%),
-    radial-gradient(1px 1px at 40% 70%, rgba(79, 172, 254, 0.6) 50%, transparent 50%),
-    radial-gradient(1px 1px at 60% 20%, rgba(255, 255, 255, 0.8) 50%, transparent 50%),
-    radial-gradient(1px 1px at 80% 50%, rgba(0, 230, 118, 0.6) 50%, transparent 50%);
-  background-size: 400px 400px;
-  animation: stars 100s linear infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes stars {
-  from { background-position: 0 0; }
-  to { background-position: 400px 400px; }
-}
-
-/* COMMAND CENTER HEADER */
-.maintenance-container .page-header {
-  background: linear-gradient(135deg, 
-    rgba(10, 14, 23, 0.95) 0%, 
-    rgba(26, 35, 126, 0.8) 100%);
-  padding: 2rem 2.5rem;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
-  backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 10;
-  box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
-}
-
-.maintenance-container .page-header::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.6), 
-    transparent);
-}
-
-.maintenance-container .page-header h1 {
-  font-size: 2rem;
-  margin: 0 0 0.5rem 0;
-  background: linear-gradient(135deg, #00d4ff 0%, #4facfe 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
-}
-
-.maintenance-container .page-header p {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #94a3b8;
-  font-weight: 400;
-}
-
-/* COMMAND CENTER CONTENT */
-.maintenance-container .page-content {
-  padding: 2rem 2.5rem;
-  width: 100%;
-  box-sizing: border-box;
-  position: relative;
-  z-index: 5;
-}
-
-/* MAINTENANCE CONTROL PANEL */
-.maintenance-container .filter-section {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.maintenance-container .search-box {
-  flex: 1;
-  min-width: 300px;
-  position: relative;
-}
-
-.maintenance-container .search-input {
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
-  backdrop-filter: blur(5px);
-}
-
-.maintenance-container .search-input:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-}
-
-.maintenance-container .search-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #00d4ff;
-}
-
-.maintenance-container .filter-select {
-  padding: 0.75rem 1rem;
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-  min-width: 150px;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-}
-
-.maintenance-container .filter-select:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-}
-
-/* MAINTENANCE FORM - SERVICE BAY */
-.maintenance-container .maintenance-form-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-  position: relative;
-}
-
-.maintenance-container .maintenance-form-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.4), 
-    transparent);
-}
-
-.maintenance-container .maintenance-form-card:hover {
-  transform: translateY(-3px);
-  border-color: #00d4ff;
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
-}
-
-/* SERVICE FORM HEADER */
-.maintenance-container .card-header {
-  padding: 1.25rem;
-  background: rgba(30, 41, 59, 0.8);
-  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  backdrop-filter: blur(5px);
-}
-
-.maintenance-container .vehicle-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0;
-  color: white;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.maintenance-container .status-pill {
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-/* SERVICE FORM BODY */
-.maintenance-container .card-body {
-  padding: 1.25rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* SERVICE FORM GRID */
-.maintenance-container .form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-.maintenance-container .span-full {
-  grid-column: 1 / -1;
-}
-
-/* SERVICE FORM CONTROLS */
-.maintenance-container .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.maintenance-container .label {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  color: white;
-  font-size: 0.9rem;
-  gap: 0.5rem;
-}
-
-.maintenance-container .label .icon {
-  color: #00d4ff;
-}
-
-.maintenance-container .input,
-.maintenance-container .textarea,
-.maintenance-container select {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid rgba(71, 85, 105, 0.5);
-  border-radius: 6px;
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-  backdrop-filter: blur(5px);
-}
-
-.maintenance-container .input:focus,
-.maintenance-container .textarea:focus,
-.maintenance-container select:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.maintenance-container .textarea {
-  resize: vertical;
-  min-height: 100px;
-  font-family: inherit;
-}
-
-/* SERVICE FORM ACTIONS */
-.maintenance-container .card-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(51, 65, 85, 0.5);
-  width: 100%;
-}
-
-.maintenance-container .card-actions button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  flex: 1;
-  justify-content: center;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.maintenance-container .card-actions button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.2), 
-    transparent);
-  transition: left 0.5s;
-}
-
-.maintenance-container .card-actions button:hover::before {
-  left: 100%;
-}
-
-.maintenance-container .btn-green {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.maintenance-container .btn-green:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0da271 0%, #047852 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-}
-
-.maintenance-container .btn-red {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-}
-
-.maintenance-container .btn-red:hover:not(:disabled) {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-}
-
-/* MAINTENANCE RECORDS GRID */
-.maintenance-container .vehicles-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 1.5rem;
-  width: 100%;
-}
-
-/* MAINTENANCE RECORD CARD */
-.maintenance-container .inuse-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 12px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.maintenance-container .inuse-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.4), 
-    transparent);
-}
-
-.maintenance-container .inuse-card:hover {
-  transform: translateY(-3px);
-  border-color: #00d4ff;
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
-}
-
-/* MAINTENANCE RECORD INFO */
-.maintenance-container .card-info {
-  margin-bottom: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.maintenance-container .card-info p {
-  display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 1rem;
-  align-items: center;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-  font-size: 0.9rem;
-}
-
-.maintenance-container .card-info p:last-child {
-  border-bottom: none;
-}
-
-.maintenance-container .card-info .icon {
-  color: #00d4ff;
-  margin-right: 0.5rem;
-}
-
-.maintenance-container .card-info .label {
-  color: #94a3b8;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-/* MAINTENANCE RECORD ACTIONS */
-.maintenance-container .btn-yellow {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
-}
-
-.maintenance-container .btn-yellow:hover:not(:disabled) {
-  background: linear-gradient(135deg, #e6900b 0%, #c46a05 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
-}
-
-/* MAINTENANCE HISTORY HEADER */
+/* ENHANCED MAINTENANCE HISTORY CARDS */
 .maintenance-container .maintenance-records {
-  margin-top: 2rem;
+  margin-top: 3rem;
+  position: relative;
 }
 
 .maintenance-container .maintenance-records h2 {
@@ -448,21 +12,55 @@
   gap: 0.75rem;
   color: white;
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-/* EMPTY SERVICE BAY */
-.maintenance-container .no-vehicles-message {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #64748b;
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  border: 1px solid rgba(0, 212, 255, 0.2);
+  font-weight: 600;
   position: relative;
+  padding-bottom: 0.75rem;
 }
 
-.maintenance-container .no-vehicles-message::before {
+.maintenance-container .maintenance-records h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4ff, transparent);
+  border-radius: 2px;
+}
+
+.maintenance-container .records-count {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* MAINTENANCE HISTORY GRID */
+.maintenance-container .history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* ENHANCED MAINTENANCE CARD */
+.maintenance-container .maintenance-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.maintenance-container .maintenance-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -471,122 +69,395 @@
   height: 1px;
   background: linear-gradient(90deg, 
     transparent, 
-    rgba(0, 212, 255, 0.4), 
+    rgba(0, 212, 255, 0.6), 
     transparent);
+  z-index: 1;
 }
 
-.maintenance-container .no-vehicles-message .icon-large {
-  font-size: 4rem;
-  margin-bottom: 1rem;
-  opacity: 0.7;
-  filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
-  animation: float 3s ease-in-out infinite;
+.maintenance-container .maintenance-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, 
+    rgba(0, 212, 255, 0.03) 0%, 
+    transparent 30%, 
+    transparent 70%, 
+    rgba(120, 119, 198, 0.03) 100%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+.maintenance-container .maintenance-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 
+    0 15px 35px rgba(0, 212, 255, 0.2),
+    0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-.maintenance-container .no-vehicles-message h3 {
+/* Status border with glow effect */
+.maintenance-container .maintenance-card.low { 
+  border-left: 4px solid #10b981;
+  background: linear-gradient(90deg, 
+    rgba(16, 185, 129, 0.08) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+.maintenance-container .maintenance-card.medium { 
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(90deg, 
+    rgba(245, 158, 11, 0.08) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+.maintenance-container .maintenance-card.high { 
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(90deg, 
+    rgba(239, 68, 68, 0.08) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+.maintenance-container .maintenance-card.critical { 
+  border-left: 4px solid #dc2626;
+  background: linear-gradient(90deg, 
+    rgba(220, 38, 38, 0.1) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+/* Add glow effect based on status */
+.maintenance-container .maintenance-card.low:hover {
+  box-shadow: 
+    0 15px 35px rgba(16, 185, 129, 0.15),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.maintenance-container .maintenance-card.medium:hover {
+  box-shadow: 
+    0 15px 35px rgba(245, 158, 11, 0.15),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.maintenance-container .maintenance-card.high:hover {
+  box-shadow: 
+    0 15px 35px rgba(239, 68, 68, 0.15),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.maintenance-container .maintenance-card.critical:hover {
+  box-shadow: 
+    0 15px 35px rgba(220, 38, 38, 0.2),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ENHANCED CARD HEADER */
+.maintenance-container .maintenance-card .card-header {
+  padding: 1.5rem;
+  background: rgba(30, 41, 59, 0.6);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  backdrop-filter: blur(5px);
+  position: relative;
+  z-index: 2;
+}
+
+.maintenance-container .maintenance-card .vehicle-info {
+  flex: 1;
+}
+
+.maintenance-container .maintenance-card .vehicle-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+  color: white;
+  line-height: 1.3;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.maintenance-container .vehicle-vin {
   color: #94a3b8;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-family: 'Monaco', 'Consolas', monospace;
+  letter-spacing: 0.5px;
 }
 
-.maintenance-container .no-vehicles-message p {
-  margin-bottom: 1.5rem;
+/* ENHANCED STATUS PILL */
+.maintenance-container .status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.maintenance-container .status-pill.high {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.maintenance-container .status-pill.medium {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.1));
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.3);
+}
+
+.maintenance-container .status-pill.low {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.maintenance-container .status-pill.critical {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.3), rgba(220, 38, 38, 0.15));
+  color: #fecaca;
+  border-color: rgba(220, 38, 38, 0.4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* ENHANCED CARD BODY */
+.maintenance-container .maintenance-card .card-body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* ENHANCED MAINTENANCE INFO SECTIONS */
+.maintenance-container .maintenance-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.maintenance-container .info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.maintenance-container .info-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid rgba(51, 65, 85, 0.3);
+  transition: all 0.2s ease;
+}
+
+.maintenance-container .info-row:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin: -0.75rem;
+}
+
+.maintenance-container .info-row:last-child {
+  border-bottom: none;
+}
+
+.maintenance-container .info-label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.maintenance-container .info-label::before {
+  content: '';
+  display: block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #00d4ff;
+  opacity: 0.7;
+}
+
+.maintenance-container .info-value {
+  font-size: 0.9rem;
+  color: white;
+  font-weight: 500;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* Special styling for specific fields */
+.maintenance-container .info-row.problem .info-value {
+  color: #f8fafc;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border-left: 2px solid rgba(0, 212, 255, 0.5);
+}
+
+.maintenance-container .info-row.cost .info-value {
+  color: #10b981;
+  font-weight: 700;
   font-size: 1rem;
 }
 
-/* LOADING STATE */
-.maintenance-container .loading-container {
+.maintenance-container .info-row.technician .info-value {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.maintenance-container .info-row.date .info-value {
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+/* ENHANCED CARD ACTIONS */
+.maintenance-container .maintenance-card .card-actions {
   display: flex;
-  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(51, 65, 85, 0.3);
+  position: relative;
+  z-index: 2;
+}
+
+.maintenance-container .maintenance-card .card-actions::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 212, 255, 0.3), 
+    transparent);
+}
+
+.maintenance-container .maintenance-card .card-actions button {
+  display: flex;
   align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 1;
   justify-content: center;
-  padding: 6rem 2rem;
-  text-align: center;
-  color: white;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(5px);
+  position: relative;
+  overflow: hidden;
 }
 
-.maintenance-container .loading-container .spin.large {
-  font-size: 3rem;
-  color: #00d4ff;
-  margin-bottom: 1rem;
-  animation: spin 1s linear infinite;
+.maintenance-container .maintenance-card .card-actions button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.1), 
+    transparent);
+  transition: left 0.5s ease;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.maintenance-container .maintenance-card .card-actions button:hover::before {
+  left: 100%;
 }
 
-.maintenance-container .spin {
-  animation: spin 1s linear infinite;
+.maintenance-container .btn-edit {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.15), 
+    rgba(59, 130, 246, 0.1));
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
 }
 
-/* RESPONSIVE DESIGN */
-@media (max-width: 1200px) {
-  .maintenance-container .vehicles-grid {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  }
+.maintenance-container .btn-edit:hover {
+  background: linear-gradient(135deg, 
+    rgba(59, 130, 246, 0.25), 
+    rgba(59, 130, 246, 0.2));
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.2);
 }
 
+.maintenance-container .btn-delete {
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.15), 
+    rgba(239, 68, 68, 0.1));
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.maintenance-container .btn-delete:hover {
+  background: linear-gradient(135deg, 
+    rgba(239, 68, 68, 0.25), 
+    rgba(239, 68, 68, 0.2));
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(239, 68, 68, 0.2);
+}
+
+/* RESPONSIVE ENHANCEMENTS */
 @media (max-width: 768px) {
-  .maintenance-container .page-header,
-  .maintenance-container .page-content {
-    padding: 1.5rem;
-  }
-  
-  .maintenance-container .vehicles-grid {
+  .maintenance-container .history-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   
-  .maintenance-container .filter-section {
-    flex-direction: column;
-  }
-  
-  .maintenance-container .search-box {
-    min-width: auto;
-  }
-  
-  .maintenance-container .form-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .maintenance-container .card-actions {
-    flex-direction: column;
-  }
-  
-  .maintenance-container .card-header {
+  .maintenance-container .maintenance-card .card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
   }
   
-  .maintenance-container .card-info p {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
+  .maintenance-container .info-row {
+    grid-template-columns: 80px 1fr;
+  }
+  
+  .maintenance-container .maintenance-card .card-actions {
+    flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
-  .maintenance-container .page-header {
-    padding: 1.25rem;
+  .maintenance-container .maintenance-card .card-body {
+    padding: 1rem;
   }
   
-  .maintenance-container .page-content {
-    padding: 1.25rem;
-  }
-  
-  .maintenance-container .page-header h1 {
-    font-size: 1.75rem;
-  }
-  
-  .maintenance-container .status-pill {
-    align-self: flex-start;
+  .maintenance-container .info-row {
+    grid-template-columns: 70px 1fr;
+    gap: 0.75rem;
   }
 }

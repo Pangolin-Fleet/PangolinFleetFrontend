@@ -320,18 +320,20 @@ function App() {
           />
         )}
 
-        {currentPage === "In Use" && (
-          <InUsePage
-            vehicles={vehicles.filter((v) => v.status === "In Use")}
-            saveDestination={saveDestination}
-            incrementMileage={incrementMileage}
-            updateStatus={updateStatus}
-            darkMode={darkMode}
-            editVehicleId={editVehicleId}
-            setEditVehicleId={setEditVehicleId}
-            user={user}
-          />
-        )}
+        
+{currentPage === "In Use" && (
+  <InUsePage
+    vehicles={vehicles.filter((v) => v.status === "In Use")}
+    saveDestination={saveDestination}
+    incrementMileage={incrementMileage}
+    updateStatus={updateStatus}
+    darkMode={darkMode}
+    editVehicleId={editVehicleId}
+    setEditVehicleId={setEditVehicleId}
+    user={user}
+    users={users} // ADD THIS LINE - pass the users array
+  />
+)}
 
         {currentPage === "Maintenance" && isAdmin() && (
           <MaintenancePage

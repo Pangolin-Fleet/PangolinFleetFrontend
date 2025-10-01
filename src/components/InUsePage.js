@@ -3,7 +3,7 @@ import {
   FaMapMarkerAlt, FaSave, FaTimes, FaUndo, FaRoad, 
   FaTachometerAlt, FaUser, FaEdit, FaStickyNote, 
   FaCalendarAlt, FaSpinner, FaCalendarPlus, FaHistory,
-  FaExclamationCircle, FaCar
+  FaExclamationCircle, FaCar, FaPlus, FaTrash
 } from "react-icons/fa";
 import InUseService from "../service/InUseService";
 import "./InUsePage.css";
@@ -14,6 +14,8 @@ export default function InUsePage({
   editVehicleId,
   setEditVehicleId,
   darkMode,
+  user,
+  users = [] // Add users prop for driver dropdown
 }) {
   const [inputs, setInputs] = useState({});
   const [saveStatus, setSaveStatus] = useState({});
@@ -22,10 +24,28 @@ export default function InUsePage({
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [validationErrors, setValidationErrors] = useState({});
+  const [pitstops, setPitstops] = useState({}); // Track pitstops by vehicle VIN
 
   useEffect(() => {
     loadExistingInUseRecords();
   }, [refreshTrigger]);
+
+  // Filter users to only show drivers
+  const drivers = users ? users.filter(u => u.role === "DRIVER") : [];
+
+  // Debug useEffect to see what's happening with users
+  useEffect(() => {
+    console.log("🔍 InUsePage - Users prop:", users);
+    console.log("🔍 InUsePage - Drivers filtered:", drivers);
+    if (drivers.length > 0) {
+      console.log("🔍 InUsePage - Driver details:", drivers.map(d => ({
+        username: d.username,
+        name: d.name,
+        role: d.role,
+        email: d.email
+      })));
+    }
+  }, [users]);
 
   const loadExistingInUseRecords = async () => {
     try {
@@ -70,7 +90,7 @@ export default function InUsePage({
     if (!existingInUseRecords[vin]) {
       if (!data.currentLocation?.trim()) errors.currentLocation = "Current location is required";
       if (!data.destination?.trim()) errors.destination = "Destination is required";
-      if (!data.driver?.trim()) errors.driver = "Driver name is required";
+      if (!data.driver?.trim()) errors.driver = "Driver is required";
       if (!data.kmOut || data.kmOut === "" || parseInt(data.kmOut) <= 0) errors.kmOut = "Valid distance is required";
     }
     
@@ -93,8 +113,40 @@ export default function InUsePage({
         startTime: existingRecord?.startTime ? new Date(existingRecord.startTime).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16),
       },
     }));
+
+    // Initialize pitstops for this vehicle
+    if (existingRecord?.pitstops) {
+      setPitstops(prev => ({ ...prev, [vin]: existingRecord.pitstops }));
+    } else {
+      setPitstops(prev => ({ ...prev, [vin]: [] }));
+    }
+
     setEditVehicleId(vin);
     setValidationErrors(prev => ({ ...prev, [vin]: {} }));
+  };
+
+  // Pitstop functions
+  const addPitstop = (vin) => {
+    setPitstops(prev => ({
+      ...prev,
+      [vin]: [...(prev[vin] || []), { location: "", notes: "" }]
+    }));
+  };
+
+  const updatePitstop = (vin, index, field, value) => {
+    setPitstops(prev => ({
+      ...prev,
+      [vin]: prev[vin].map((stop, i) => 
+        i === index ? { ...stop, [field]: value } : stop
+      )
+    }));
+  };
+
+  const removePitstop = (vin, index) => {
+    setPitstops(prev => ({
+      ...prev,
+      [vin]: prev[vin].filter((_, i) => i !== index)
+    }));
   };
 
   const handleSave = async (vehicle) => {
@@ -111,6 +163,7 @@ export default function InUsePage({
 
     const data = inputs[vin] || {};
     const existingRecord = existingInUseRecords[vin];
+    const vehiclePitstops = pitstops[vin] || [];
 
     setLoadingStates((prev) => ({ ...prev, [vin]: true }));
 
@@ -123,6 +176,7 @@ export default function InUsePage({
         driver: data.driver?.trim() || "",
         notes: data.notes?.trim() || "",
         startTime: data.startTime ? new Date(data.startTime).toISOString() : new Date().toISOString(),
+        pitstops: vehiclePitstops.filter(stop => stop.location.trim() !== "") // Only save pitstops with locations
       };
 
       if (existingRecord) {
@@ -153,6 +207,7 @@ export default function InUsePage({
   const handleCancel = (vin) => {
     setEditVehicleId(null);
     setInputs((prev) => ({ ...prev, [vin]: {} }));
+    setPitstops(prev => ({ ...prev, [vin]: [] }));
     setValidationErrors(prev => ({ ...prev, [vin]: {} }));
   };
 
@@ -168,9 +223,11 @@ export default function InUsePage({
         kmOut: null,
         driver: "",
         notes: "",
+        pitstops: []
       });
       await loadExistingInUseRecords();
       setEditVehicleId(null);
+      setPitstops(prev => ({ ...prev, [vin]: [] }));
       setSaveStatus((prev) => ({
         ...prev,
         [vin]: { msg: "Trip ended successfully!", success: true },
@@ -194,8 +251,18 @@ export default function InUsePage({
     return (
       <div className="inuse-container">
         <div className="page-header">
-          <h1>Pangolin Fleet</h1>
-          <p>Active Missions</p>
+          <div className="header-content">
+            <div className="header-main">
+              <h1>Active Missions</h1>
+              <p>Track and manage vehicle trips</p>
+            </div>
+            <div className="header-actions">
+              <div className="user-info">
+                <span className="user-name">Welcome, {user?.username || 'User'}</span>
+                <span className="user-role">({user?.role || 'User'})</span>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="loading-container">
           <FaSpinner className="spin large" />
@@ -208,14 +275,24 @@ export default function InUsePage({
   return (
     <div className="inuse-container">
       <div className="page-header">
-        <h1>Pangolin Fleet</h1>
-        <p>Active Missions & Vehicle Tracking</p>
+        <div className="header-content">
+          <div className="header-main">
+            <h1>Active Missions</h1>
+            <p>Track and manage vehicle trips</p>
+          </div>
+          <div className="header-actions">
+            <div className="user-info">
+              <span className="user-name">Welcome, {user?.username || 'User'}</span>
+              <span className="user-role">({user?.role || 'User'})</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="page-content">
         {inUseVehicles.length === 0 ? (
-          <div className="no-vehicles-message">
-            <FaCar className="icon-large" />
+          <div className="empty-state">
+            <div className="empty-icon">🚗</div>
             <h3>No Active Missions</h3>
             <p>All vehicles are currently available or in maintenance.</p>
           </div>
@@ -229,48 +306,97 @@ export default function InUsePage({
               const loading = loadingStates[vin];
               const existingRecord = existingInUseRecords[vin];
               const errors = validationErrors[vin] || {};
+              const vehiclePitstops = pitstops[vin] || [];
 
               return (
                 <div key={vin} className={`inuse-card ${editing ? "editing" : ""}`}>
                   <div className="card-header">
-                    <span className="vehicle-title">{vehicle.make} {vehicle.model}</span>
-                    <span className="status-pill">{vehicle.status}</span>
+                    <div className="vehicle-title">
+                      <h3>{vehicle.make} {vehicle.model}</h3>
+                      <span className="vehicle-year">{vehicle.year}</span>
+                    </div>
+                    <span className="status-pill in-use">
+                      <FaCar className="status-icon" />
+                      {vehicle.status}
+                    </span>
                   </div>
 
                   <div className="card-body">
                     {!editing ? (
                       <>
-                        <div className="card-info">
-                          <p><FaMapMarkerAlt className="icon" /> <span className="label">Location:</span> {existingRecord?.currentLocation || "Not set"}</p>
-                          <p><FaMapMarkerAlt className="icon" /> <span className="label">Destination:</span> {existingRecord?.destination || "Not set"}</p>
-                          <p><FaRoad className="icon" /> <span className="label">Distance:</span> {existingRecord?.kmOut != null ? `${existingRecord.kmOut} km` : "N/A"}</p>
-                          <p><FaTachometerAlt className="icon" /> <span className="label">Vehicle Mileage:</span> {vehicle.mileage} km</p>
-                          {existingRecord?.driver && <p><FaUser className="icon" /> <span className="label">Driver:</span> {existingRecord.driver}</p>}
-                          {existingRecord?.notes && <p><FaStickyNote className="icon" /> <span className="label">Notes:</span> {existingRecord.notes}</p>}
-                        </div>
-
-                        {existingRecord && (
-                          <div className="timestamps">
-                            <div className="ts-row">
-                              <span><FaCalendarPlus className="icon" /> Started:</span>
-                              <span>{formatDateTime(existingRecord.createdAt)}</span>
+                        <div className="vehicle-info">
+                          <div className="info-section">
+                            <div className="info-row">
+                              <span className="info-label">VIN:</span>
+                              <span className="info-value">{vehicle.vin}</span>
                             </div>
-                            {existingRecord.updatedAt && (
-                              <div className="ts-row">
-                                <span><FaHistory className="icon" /> Updated:</span>
-                                <span>{formatDateTime(existingRecord.updatedAt)}</span>
+                            <div className="info-row">
+                              <span className="info-label">Mileage:</span>
+                              <span className="info-value">{vehicle.mileage?.toLocaleString()} km</span>
+                            </div>
+                          </div>
+
+                          <div className="info-section">
+                            <div className="info-row">
+                              <span className="info-label">Location:</span>
+                              <span className="info-value">{existingRecord?.currentLocation || "Not set"}</span>
+                            </div>
+                            <div className="info-row">
+                              <span className="info-label">Destination:</span>
+                              <span className="info-value">{existingRecord?.destination || "Not set"}</span>
+                            </div>
+                            <div className="info-row">
+                              <span className="info-label">Distance:</span>
+                              <span className="info-value">{existingRecord?.kmOut != null ? `${existingRecord.kmOut} km` : "N/A"}</span>
+                            </div>
+                            {existingRecord?.driver && (
+                              <div className="info-row">
+                                <span className="info-label">Driver:</span>
+                                <span className="info-value">{existingRecord.driver}</span>
                               </div>
                             )}
                           </div>
-                        )}
+
+                          {existingRecord?.pitstops && existingRecord.pitstops.length > 0 && (
+                            <div className="pitstops-section">
+                              <h4 className="pitstops-title">Pitstops</h4>
+                              <div className="pitstops-list">
+                                {existingRecord.pitstops.map((stop, index) => (
+                                  <div key={index} className="pitstop-item">
+                                    <span className="pitstop-location">{stop.location}</span>
+                                    {stop.notes && <span className="pitstop-notes"> - {stop.notes}</span>}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {existingRecord && (
+                            <div className="timestamps-section">
+                              <h4 className="timestamps-title">Trip Timeline</h4>
+                              <div className="timestamps-grid">
+                                <div className="timestamp-item">
+                                  <span className="timestamp-label">Started:</span>
+                                  <span className="timestamp-value">{formatDateTime(existingRecord.createdAt)}</span>
+                                </div>
+                                {existingRecord.updatedAt && (
+                                  <div className="timestamp-item">
+                                    <span className="timestamp-label">Updated:</span>
+                                    <span className="timestamp-value">{formatDateTime(existingRecord.updatedAt)}</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                        </div>
 
                         <div className="card-actions">
-                          <button onClick={() => openEditor(vehicle)} disabled={loading} className="btn-yellow">
+                          <button onClick={() => openEditor(vehicle)} disabled={loading} className="btn btn-edit">
                             {loading ? <FaSpinner className="spin" /> : <FaEdit />} 
                             {existingRecord ? "Edit Trip" : "Start Trip"}
                           </button>
                           {existingRecord && (
-                            <button onClick={() => endTrip(vehicle)} disabled={loading} className="btn-red">
+                            <button onClick={() => endTrip(vehicle)} disabled={loading} className="btn btn-delete">
                               {loading ? <FaSpinner className="spin" /> : <FaUndo />} 
                               End Trip
                             </button>
@@ -278,7 +404,7 @@ export default function InUsePage({
                         </div>
 
                         {status && (
-                          <div className={`status-msg ${status.success ? "success" : "error"}`}>
+                          <div className={`status-message ${status.success ? 'success' : 'error'}`}>
                             {status.msg}
                           </div>
                         )}
@@ -286,53 +412,149 @@ export default function InUsePage({
                     ) : (
                       <>
                         {!existingRecord && (
-                          <div className="status-msg error">
+                          <div className="validation-message error">
                             <FaExclamationCircle /> Please fill in all required fields to start the trip
                           </div>
                         )}
 
-                        <div className="form-group">
-                          <label className="label"><FaMapMarkerAlt className="icon" /> Current Location *</label>
-                          <input type="text" value={data.currentLocation || ""} onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], currentLocation: e.target.value } }))} className={`input ${errors.currentLocation ? 'error' : ''}`} placeholder="Enter current location" />
-                          {errors.currentLocation && <div className="error-message"><FaExclamationCircle /> {errors.currentLocation}</div>}
-                        </div>
+                        <div className="edit-form">
+                          <div className="form-grid">
+                            <div className="form-group">
+                              <label className="form-label">Current Location *</label>
+                              <input 
+                                type="text" 
+                                value={data.currentLocation || ""} 
+                                onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], currentLocation: e.target.value } }))} 
+                                className={`form-input ${errors.currentLocation ? 'error' : ''}`} 
+                                placeholder="Enter current location" 
+                              />
+                              {errors.currentLocation && <div className="error-message">{errors.currentLocation}</div>}
+                            </div>
 
-                        <div className="form-group">
-                          <label className="label"><FaMapMarkerAlt className="icon" /> Destination *</label>
-                          <input type="text" value={data.destination || ""} onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], destination: e.target.value } }))} className={`input ${errors.destination ? 'error' : ''}`} placeholder="Enter destination" />
-                          {errors.destination && <div className="error-message"><FaExclamationCircle /> {errors.destination}</div>}
-                        </div>
+                            <div className="form-group">
+                              <label className="form-label">Destination *</label>
+                              <input 
+                                type="text" 
+                                value={data.destination || ""} 
+                                onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], destination: e.target.value } }))} 
+                                className={`form-input ${errors.destination ? 'error' : ''}`} 
+                                placeholder="Enter destination" 
+                              />
+                              {errors.destination && <div className="error-message">{errors.destination}</div>}
+                            </div>
 
-                        <div className="form-group">
-                          <label className="label"><FaRoad className="icon" /> Distance (km) *</label>
-                          <input type="number" min="0" value={data.kmOut || ""} onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], kmOut: e.target.value } }))} className={`input ${errors.kmOut ? 'error' : ''}`} placeholder="Enter distance" />
-                          {errors.kmOut && <div className="error-message"><FaExclamationCircle /> {errors.kmOut}</div>}
-                        </div>
+                            <div className="form-group">
+                              <label className="form-label">Distance (km) *</label>
+                              <input 
+                                type="number" 
+                                min="0" 
+                                value={data.kmOut || ""} 
+                                onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], kmOut: e.target.value } }))} 
+                                className={`form-input ${errors.kmOut ? 'error' : ''}`} 
+                                placeholder="Enter distance" 
+                              />
+                              {errors.kmOut && <div className="error-message">{errors.kmOut}</div>}
+                            </div>
 
-                        <div className="form-group">
-                          <label className="label"><FaUser className="icon" /> Driver *</label>
-                          <input type="text" value={data.driver || ""} onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], driver: e.target.value } }))} className={`input ${errors.driver ? 'error' : ''}`} placeholder="Enter driver name" />
-                          {errors.driver && <div className="error-message"><FaExclamationCircle /> {errors.driver}</div>}
-                        </div>
+                            <div className="form-group">
+                              <label className="form-label">Driver *</label>
+                              <select
+                                value={data.driver || ""}
+                                onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], driver: e.target.value } }))}
+                                className={`form-select ${errors.driver ? 'error' : ''}`}
+                              >
+                                <option value="">-- Select Driver --</option>
+                                {drivers.length > 0 ? (
+                                  drivers.map(driver => (
+                                    <option key={driver.username} value={driver.username}>
+                                      {driver.name || driver.username} {driver.email ? `(${driver.email})` : ''}
+                                    </option>
+                                  ))
+                                ) : (
+                                  <option value="" disabled>No drivers available</option>
+                                )}
+                              </select>
+                              {errors.driver && <div className="error-message">{errors.driver}</div>}
+                              {drivers.length === 0 && (
+                                <div style={{ color: '#ff6b6b', fontSize: '0.8rem', marginTop: '5px' }}>
+                                  No drivers found. Please add drivers in the User Management page.
+                                </div>
+                              )}
+                            </div>
 
-                        <div className="form-group">
-                          <label className="label"><FaStickyNote className="icon" /> Notes</label>
-                          <textarea value={data.notes || ""} onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], notes: e.target.value } }))} className="textarea" rows="3" placeholder="Optional notes" />
-                        </div>
+                            <div className="form-group full-width">
+                              <label className="form-label">Notes</label>
+                              <textarea 
+                                value={data.notes || ""} 
+                                onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], notes: e.target.value } }))} 
+                                className="form-textarea" 
+                                rows="2" 
+                                placeholder="Optional notes" 
+                              />
+                            </div>
 
-                        <div className="form-group">
-                          <label className="label"><FaCalendarAlt className="icon" /> Start Time</label>
-                          <input type="datetime-local" value={data.startTime || ""} onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], startTime: e.target.value } }))} className="input" />
-                        </div>
+                            <div className="form-group">
+                              <label className="form-label">Start Time</label>
+                              <input 
+                                type="datetime-local" 
+                                value={data.startTime || ""} 
+                                onChange={(e) => setInputs(prev => ({ ...prev, [vin]: { ...prev[vin], startTime: e.target.value } }))} 
+                                className="form-input" 
+                              />
+                            </div>
 
-                        <div className="card-actions">
-                          <button onClick={() => handleSave(vehicle)} disabled={loading} className="btn-green">
-                            {loading ? <FaSpinner className="spin" /> : <FaSave />} 
-                            {existingRecord ? "Update Trip" : "Start Trip"}
-                          </button>
-                          <button onClick={() => handleCancel(vin)} disabled={loading} className="btn-red">
-                            <FaTimes /> Cancel
-                          </button>
+                            {/* Pitstops Section */}
+                            <div className="form-group full-width">
+                              <div className="pitstops-header">
+                                <label className="form-label">Pitstops</label>
+                                <button 
+                                  type="button" 
+                                  onClick={() => addPitstop(vin)} 
+                                  className="btn btn-mileage"
+                                >
+                                  <FaPlus /> Add Pitstop
+                                </button>
+                              </div>
+                              
+                              {vehiclePitstops.map((stop, index) => (
+                                <div key={index} className="pitstop-form">
+                                  <div className="pitstop-inputs">
+                                    <input
+                                      type="text"
+                                      value={stop.location}
+                                      onChange={(e) => updatePitstop(vin, index, 'location', e.target.value)}
+                                      className="form-input"
+                                      placeholder="Pitstop location"
+                                    />
+                                    <input
+                                      type="text"
+                                      value={stop.notes}
+                                      onChange={(e) => updatePitstop(vin, index, 'notes', e.target.value)}
+                                      className="form-input"
+                                      placeholder="Notes (optional)"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => removePitstop(vin, index)}
+                                      className="btn btn-delete"
+                                    >
+                                      <FaTrash />
+                                    </button>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+
+                            <div className="form-actions full-width">
+                              <button onClick={() => handleSave(vehicle)} disabled={loading} className="btn btn-save">
+                                {loading ? <FaSpinner className="spin" /> : <FaSave />} 
+                                {existingRecord ? "Update Trip" : "Start Trip"}
+                              </button>
+                              <button onClick={() => handleCancel(vin)} disabled={loading} className="btn btn-cancel">
+                                <FaTimes /> Cancel
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </>
                     )}
