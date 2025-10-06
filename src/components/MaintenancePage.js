@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   FaEdit, FaTrash, FaSearch, FaTools, FaCar, FaExclamationTriangle,
   FaUserCog, FaMoneyBillWave, FaCalendarAlt, FaTachometerAlt, 
-  FaSave, FaTimes, FaSpinner, FaPlus
+  FaSave, FaTimes, FaSpinner, FaPlus, FaWrench, FaFilter, FaTimesCircle
 } from "react-icons/fa";
 import maintenanceService from "../service/MaintenanceService";
 import vehicleService from "../service/VehicleService";
@@ -93,15 +93,10 @@ export default function MaintenancePage({ vehicles, updateStatus, updateVehicle,
         serviceDate: form.date
       };
 
-      console.log("Submitting maintenance data:", maintenanceData);
-      console.log("Editing ID:", editingId);
-
       if (editingId) {
         await maintenanceService.updateMaintenance(editingId, maintenanceData);
-        console.log("Update completed");
       } else {
         await maintenanceService.addMaintenance(maintenanceData);
-        console.log("Add completed");
       }
 
       await fetchMaintenanceData();
@@ -113,8 +108,6 @@ export default function MaintenancePage({ vehicles, updateStatus, updateVehicle,
   };
 
   const handleEdit = (record) => {
-    console.log("Editing record:", record);
-    
     setForm({
       vin: record.vehicle?.vin || "",
       vehicleName: record.vehicle ? `${record.vehicle.make} ${record.vehicle.model}` : "",
@@ -157,12 +150,53 @@ export default function MaintenancePage({ vehicles, updateStatus, updateVehicle,
     resetForm();
   };
 
+  const clearFilters = () => {
+    setSearchTerm("");
+    setFilterSeverity("");
+  };
+
+  // Summary statistics
+  const summaryCards = [
+    { 
+      label: "Total Records", 
+      value: maintenances.length, 
+      icon: <FaTools />, 
+      color: "#6366f1" 
+    },
+    { 
+      label: "Low Severity", 
+      value: maintenances.filter(m => m.severity === "Low").length, 
+      icon: <FaExclamationTriangle />, 
+      color: "#10b981" 
+    },
+    { 
+      label: "Medium Severity", 
+      value: maintenances.filter(m => m.severity === "Medium").length, 
+      icon: <FaExclamationTriangle />, 
+      color: "#f59e0b" 
+    },
+    { 
+      label: "High Severity", 
+      value: maintenances.filter(m => m.severity === "High" || m.severity === "Critical").length, 
+      icon: <FaExclamationTriangle />, 
+      color: "#ef4444" 
+    }
+  ];
+
   if (isLoading) {
     return (
-      <div className="maintenance-container">
+      <div className="maintenance-page">
         <div className="page-header">
-          <h1>Pangolin Fleet</h1>
-          <p>Maintenance Management</p>
+          <div className="header-content">
+            <div className="header-main">
+              <h1>Pangolin Fleet</h1>
+              <p>Maintenance Management</p>
+            </div>
+            <div className="user-info">
+              <div className="user-name">{user?.name || "Admin"}</div>
+              <div className="user-role">{user?.role || "Administrator"}</div>
+            </div>
+          </div>
         </div>
         <div className="loading-container">
           <FaSpinner className="spin large" />
@@ -173,7 +207,7 @@ export default function MaintenancePage({ vehicles, updateStatus, updateVehicle,
   }
 
   return (
-    <div className="maintenance-container">
+    <div className="maintenance-page">
       <div className="page-header">
         <div className="header-content">
           <div className="header-main">
@@ -188,38 +222,82 @@ export default function MaintenancePage({ vehicles, updateStatus, updateVehicle,
       </div>
 
       <div className="page-content">
-        <div className="filter-section">
-          <div className="search-box">
-            <FaSearch className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Search VIN, vehicle, technician, or problem..." 
-              value={searchTerm} 
-              onChange={(e) => setSearchTerm(e.target.value)} 
-              className="search-input" 
-            />
+        {/* Summary Cards */}
+        <div className="summary-section">
+          <div className="summary-cards">
+            {summaryCards.map((card, idx) => (
+              <div key={idx} className="summary-card">
+                <div className="summary-card-content">
+                  <div className="summary-icon" style={{ color: card.color }}>
+                    {card.icon}
+                  </div>
+                  <div className="summary-text">
+                    <div className="summary-value" style={{ color: card.color }}>
+                      {card.value}
+                    </div>
+                    <div className="summary-label">{card.label}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-          <select 
-            value={filterSeverity} 
-            onChange={(e) => setFilterSeverity(e.target.value)} 
-            className="filter-select"
-          >
-            <option value="">All Severities</option>
-            <option value="Low">Low</option>
-            <option value="Medium">Medium</option>
-            <option value="High">High</option>
-            <option value="Critical">Critical</option>
-          </select>
+        </div>
+
+        {/* Toolbar with Search and Filters */}
+        <div className="page-toolbar">
+          <div className="search-filters">
+            <div className="search-bar">
+              <input 
+                type="text" 
+                placeholder="Search VIN, vehicle, technician, or problem..." 
+                value={searchTerm} 
+                onChange={(e) => setSearchTerm(e.target.value)} 
+                className="search-input" 
+              />
+            </div>
+            
+            <select 
+              value={filterSeverity} 
+              onChange={(e) => setFilterSeverity(e.target.value)} 
+              className="filter-select"
+            >
+              <option value="">All Severities</option>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
+
+            {(searchTerm || filterSeverity) && (
+              <button 
+                onClick={clearFilters}
+                className="btn-compact btn-cancel-compact"
+              >
+                <FaTimesCircle /> Clear
+              </button>
+            )}
+          </div>
+
+          <div className="action-buttons">
+            <button 
+              onClick={resetForm}
+              className="btn-compact btn-mileage-compact"
+            >
+              <FaTimes /> Reset Form
+            </button>
+          </div>
         </div>
 
         {/* Maintenance Form Card */}
-        <div className="maintenance-form-card">
+        <div className="maintenance-form-card vehicle-card">
           <div className="card-header">
             <div className="vehicle-title">
-              <FaTools style={{ marginRight: '10px' }} />
-              {editingId ? `Editing Maintenance Record` : "Create New Maintenance Record"}
+              <h3>
+                <FaTools style={{ marginRight: '10px' }} />
+                {editingId ? `Editing Maintenance Record` : "Create New Maintenance Record"}
+              </h3>
             </div>
-            <span className={`status-pill ${form.severity.toLowerCase()}`}>
+            <span className={`status-pill ${form.severity.toLowerCase().replace(' ', '-')}`}>
               {form.severity} {editingId ? "(Editing)" : ""}
             </span>
           </div>
@@ -392,27 +470,32 @@ export default function MaintenancePage({ vehicles, updateStatus, updateVehicle,
                   ? "Try adjusting your search criteria" 
                   : "No maintenance records found. Create your first maintenance record above."}
               </p>
+              {(searchTerm || filterSeverity) && (
+                <button className="btn btn-primary" onClick={clearFilters}>
+                  <FaTimesCircle /> Clear Filters
+                </button>
+              )}
             </div>
           ) : (
-            <div className="history-grid">
+            <div className="vehicles-grid">
               {filteredMaintenances.map(record => (
-                <div key={record.id} className={`maintenance-card ${record.severity?.toLowerCase()}`}>
+                <div key={record.id} className={`vehicle-card ${record.severity?.toLowerCase().replace(' ', '-')}`}>
                   <div className="card-header">
-                    <div className="vehicle-info">
-                      <div className="vehicle-title">
+                    <div className="vehicle-title">
+                      <h3>
                         {record.vehicle ? `${record.vehicle.make} ${record.vehicle.model}` : 'Unknown Vehicle'}
-                      </div>
-                      <div className="vehicle-vin">
+                      </h3>
+                      <span className="vehicle-year">
                         {record.vehicle?.vin || 'N/A'}
-                      </div>
+                      </span>
                     </div>
-                    <span className={`status-pill ${record.severity?.toLowerCase()}`}>
+                    <span className={`status-pill ${record.severity?.toLowerCase().replace(' ', '-')}`}>
                       {record.severity}
                     </span>
                   </div>
 
                   <div className="card-body">
-                    <div className="maintenance-info">
+                    <div className="vehicle-info">
                       <div className="info-section">
                         <div className="info-row problem">
                           <span className="info-label">Problem</span>
@@ -440,10 +523,10 @@ export default function MaintenancePage({ vehicles, updateStatus, updateVehicle,
                     </div>
 
                     <div className="card-actions">
-                      <button onClick={() => handleEdit(record)} className="btn-edit">
+                      <button onClick={() => handleEdit(record)} className="btn btn-edit">
                         <FaEdit /> Edit
                       </button>
-                      <button onClick={() => handleDelete(record.id)} className="btn-delete">
+                      <button onClick={() => handleDelete(record.id)} className="btn btn-delete">
                         <FaTrash /> Delete
                       </button>
                     </div>

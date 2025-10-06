@@ -1,4 +1,4 @@
-/* InUsePage.css - MATCHING VEHICLE PAGE STYLING */
+/* InUsePage.css - PROFESSIONAL FULL-WIDTH LAYOUT */
 .inuse-container {
   width: 100%;
   min-height: 100vh;
@@ -47,29 +47,18 @@
   position: relative;
   z-index: 10;
   box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
-}
-
-.inuse-container .page-header::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.6), 
-    transparent);
+  width: 100%;
 }
 
 .inuse-container .header-content {
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 2rem;
+  box-sizing: border-box;
 }
 
 .inuse-container .header-main {
@@ -121,13 +110,21 @@
   letter-spacing: 0.5px;
 }
 
-/* CONTENT */
+/* MAIN CONTENT */
 .inuse-container .page-content {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   padding: 2rem;
   position: relative;
   z-index: 5;
+  box-sizing: border-box;
+}
+
+/* CONTENT SECTION */
+.inuse-container .content-section {
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 /* VEHICLE GRID */
@@ -135,6 +132,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 1.5rem;
+  width: 100%;
+  align-items: stretch;
 }
 
 /* VEHICLE CARD */
@@ -148,6 +147,8 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  height: fit-content;
+  min-height: 450px;
 }
 
 .inuse-container .inuse-card::before {
@@ -283,6 +284,37 @@
   line-height: 1.4;
 }
 
+/* MILEAGE SECTION */
+.inuse-container .mileage-content {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.inuse-container .btn-mileage {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 6px;
+  color: #00d4ff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.inuse-container .btn-mileage:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
 /* PITSTOPS SECTION */
 .inuse-container .pitstops-section {
   background: rgba(255, 255, 255, 0.02);
@@ -394,28 +426,48 @@
   justify-content: center;
   font-size: 0.8rem;
   transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.inuse-container .card-actions button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s;
+}
+
+.inuse-container .card-actions button:hover::before {
+  left: 100%;
 }
 
 .inuse-container .btn-edit {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
 }
 
 .inuse-container .btn-edit:hover {
-  background: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
 .inuse-container .btn-delete {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
 }
 
 .inuse-container .btn-delete:hover {
-  background: rgba(239, 68, 68, 0.2);
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
 }
 
 .inuse-container .btn-save {
@@ -427,6 +479,7 @@
 .inuse-container .btn-save:hover:not(:disabled) {
   background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
   transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
 }
 
 .inuse-container .btn-save:disabled {
@@ -446,157 +499,6 @@
   transform: translateY(-1px);
 }
 
-.inuse-container .btn-mileage {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.375rem 0.75rem;
-  background: rgba(0, 212, 255, 0.1);
-  border: 1px solid rgba(0, 212, 255, 0.3);
-  border-radius: 6px;
-  color: #00d4ff;
-  font-size: 0.75rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.inuse-container .btn-mileage:hover {
-  background: rgba(0, 212, 255, 0.2);
-  border-color: #00d4ff;
-  transform: translateY(-1px);
-}
-
-/* EDIT FORM STYLES */
-.inuse-container .edit-form {
-  width: 100%;
-}
-
-.inuse-container .form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-}
-
-.inuse-container .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.inuse-container .form-group.full-width {
-  grid-column: 1 / -1;
-}
-
-.inuse-container .form-label {
-  color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.inuse-container .form-input,
-.inuse-container .form-select,
-.inuse-container .form-textarea {
-  padding: 0.75rem;
-  border: 1px solid rgba(71, 85, 105, 0.5);
-  border-radius: 6px;
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.inuse-container .form-input:focus,
-.inuse-container .form-select:focus,
-.inuse-container .form-textarea:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.inuse-container .form-textarea {
-  resize: vertical;
-  min-height: 60px;
-  font-family: inherit;
-}
-
-.inuse-container .form-actions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-/* PITSTOP FORM */
-.inuse-container .pitstops-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.inuse-container .pitstop-form {
-  margin-bottom: 1rem;
-}
-
-.inuse-container .pitstop-inputs {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 0.5rem;
-  align-items: start;
-}
-
-/* VALIDATION */
-.inuse-container .validation-message {
-  padding: 0.75rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-align: center;
-}
-
-.inuse-container .validation-message.error {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.inuse-container .error-message {
-  color: #ef4444;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.inuse-container .form-input.error,
-.inuse-container .form-select.error {
-  border-color: #ef4444;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
-}
-
-.inuse-container .status-message {
-  padding: 0.75rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  text-align: center;
-}
-
-.inuse-container .status-message.success {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.inuse-container .status-message.error {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
 /* EMPTY STATE */
 .inuse-container .empty-state {
   text-align: center;
@@ -607,6 +509,8 @@
   border: 1px solid rgba(0, 212, 255, 0.2);
   margin: 2rem 0;
   position: relative;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .inuse-container .empty-state::before {
@@ -630,11 +534,6 @@
   animation: float 3s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
 .inuse-container .empty-state h3 {
   color: #94a3b8;
   margin-bottom: 0.5rem;
@@ -647,34 +546,13 @@
   font-size: 0.9rem;
 }
 
-/* LOADING */
-.inuse-container .loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 6rem 2rem;
-  text-align: center;
-  color: white;
-}
-
-.inuse-container .loading-container .spin.large {
-  font-size: 3rem;
-  color: #00d4ff;
-  margin-bottom: 1rem;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.inuse-container .spin {
-  animation: spin 1s linear infinite;
-}
-
 /* RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+  .inuse-container .vehicles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .inuse-container .page-content {
     padding: 1rem;
@@ -683,10 +561,6 @@
   .inuse-container .vehicles-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
-  }
-  
-  .inuse-container .form-grid {
-    grid-template-columns: 1fr;
   }
   
   .inuse-container .card-header {
@@ -699,17 +573,20 @@
     grid-template-columns: 70px 1fr;
   }
   
-  .inuse-container .pitstop-inputs {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
+  .inuse-container .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .inuse-container .user-info {
+    align-items: center;
   }
 }
 
 @media (max-width: 480px) {
   .inuse-container .header-content {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
+    padding: 0 1rem;
   }
   
   .inuse-container .header-actions {
@@ -717,7 +594,7 @@
     justify-content: center;
   }
   
-  .inuse-container .user-info {
-    align-items: center;
+  .inuse-container .card-actions {
+    flex-direction: column;
   }
 }

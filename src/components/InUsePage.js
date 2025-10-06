@@ -15,7 +15,7 @@ export default function InUsePage({
   setEditVehicleId,
   darkMode,
   user,
-  users = [] // Add users prop for driver dropdown
+  users = []
 }) {
   const [inputs, setInputs] = useState({});
   const [saveStatus, setSaveStatus] = useState({});
@@ -24,28 +24,13 @@ export default function InUsePage({
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [validationErrors, setValidationErrors] = useState({});
-  const [pitstops, setPitstops] = useState({}); // Track pitstops by vehicle VIN
+  const [pitstops, setPitstops] = useState({});
 
   useEffect(() => {
     loadExistingInUseRecords();
   }, [refreshTrigger]);
 
-  // Filter users to only show drivers
   const drivers = users ? users.filter(u => u.role === "DRIVER") : [];
-
-  // Debug useEffect to see what's happening with users
-  useEffect(() => {
-    console.log("🔍 InUsePage - Users prop:", users);
-    console.log("🔍 InUsePage - Drivers filtered:", drivers);
-    if (drivers.length > 0) {
-      console.log("🔍 InUsePage - Driver details:", drivers.map(d => ({
-        username: d.username,
-        name: d.name,
-        role: d.role,
-        email: d.email
-      })));
-    }
-  }, [users]);
 
   const loadExistingInUseRecords = async () => {
     try {
@@ -114,7 +99,6 @@ export default function InUsePage({
       },
     }));
 
-    // Initialize pitstops for this vehicle
     if (existingRecord?.pitstops) {
       setPitstops(prev => ({ ...prev, [vin]: existingRecord.pitstops }));
     } else {
@@ -125,7 +109,6 @@ export default function InUsePage({
     setValidationErrors(prev => ({ ...prev, [vin]: {} }));
   };
 
-  // Pitstop functions
   const addPitstop = (vin) => {
     setPitstops(prev => ({
       ...prev,
@@ -164,10 +147,13 @@ export default function InUsePage({
     const data = inputs[vin] || {};
     const existingRecord = existingInUseRecords[vin];
     const vehiclePitstops = pitstops[vin] || [];
+    const currentTime = new Date().toISOString();
 
     setLoadingStates((prev) => ({ ...prev, [vin]: true }));
 
     try {
+      const validPitstops = vehiclePitstops.filter(stop => stop.location && stop.location.trim() !== "");
+      
       const payload = {
         vehicle: vehicle,
         currentLocation: data.currentLocation?.trim() || "",
@@ -175,8 +161,10 @@ export default function InUsePage({
         kmOut: data.kmOut ? parseInt(data.kmOut) : 0,
         driver: data.driver?.trim() || "",
         notes: data.notes?.trim() || "",
-        startTime: data.startTime ? new Date(data.startTime).toISOString() : new Date().toISOString(),
-        pitstops: vehiclePitstops.filter(stop => stop.location.trim() !== "") // Only save pitstops with locations
+        startTime: data.startTime ? new Date(data.startTime).toISOString() : currentTime,
+        pitstops: validPitstops,
+        createdAt: existingRecord ? existingRecord.createdAt : currentTime,
+        updatedAt: currentTime
       };
 
       if (existingRecord) {
@@ -217,7 +205,13 @@ export default function InUsePage({
 
     setLoadingStates((prev) => ({ ...prev, [vin]: true }));
     try {
-      updateStatus(vin, "Available", {
+      // Clear all state for this vehicle
+      setInputs((prev) => ({ ...prev, [vin]: {} }));
+      setPitstops(prev => ({ ...prev, [vin]: [] }));
+      setValidationErrors(prev => ({ ...prev, [vin]: {} }));
+      
+      // Update the vehicle status to "Available" - this is the key fix
+      await updateStatus(vin, "Available", {
         currentLocation: "",
         destination: "",
         kmOut: null,
@@ -225,9 +219,20 @@ export default function InUsePage({
         notes: "",
         pitstops: []
       });
+      
+      // Force reload the in-use records to clear the existing record
       await loadExistingInUseRecords();
+      
+      // Remove the record from existingInUseRecords immediately
+      setExistingInUseRecords(prev => {
+        const newRecords = { ...prev };
+        delete newRecords[vin];
+        return newRecords;
+      });
+      
+      // Clear edit state
       setEditVehicleId(null);
-      setPitstops(prev => ({ ...prev, [vin]: [] }));
+      
       setSaveStatus((prev) => ({
         ...prev,
         [vin]: { msg: "Trip ended successfully!", success: true },
@@ -308,6 +313,8 @@ export default function InUsePage({
               const errors = validationErrors[vin] || {};
               const vehiclePitstops = pitstops[vin] || [];
 
+              const displayPitstops = existingRecord?.pitstops || vehiclePitstops;
+
               return (
                 <div key={vin} className={`inuse-card ${editing ? "editing" : ""}`}>
                   <div className="card-header">
@@ -357,14 +364,20 @@ export default function InUsePage({
                             )}
                           </div>
 
-                          {existingRecord?.pitstops && existingRecord.pitstops.length > 0 && (
+                          {displayPitstops && displayPitstops.length > 0 && (
                             <div className="pitstops-section">
-                              <h4 className="pitstops-title">Pitstops</h4>
+                              <h4 className="pitstops-title">
+                                <FaMapMarkerAlt className="pitstop-icon" /> 
+                                Pitstops ({displayPitstops.length})
+                              </h4>
                               <div className="pitstops-list">
-                                {existingRecord.pitstops.map((stop, index) => (
+                                {displayPitstops.map((stop, index) => (
                                   <div key={index} className="pitstop-item">
+                                    <span className="pitstop-number">{index + 1}.</span>
                                     <span className="pitstop-location">{stop.location}</span>
-                                    {stop.notes && <span className="pitstop-notes"> - {stop.notes}</span>}
+                                    {stop.notes && (
+                                      <span className="pitstop-notes"> - {stop.notes}</span>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -376,13 +389,19 @@ export default function InUsePage({
                               <h4 className="timestamps-title">Trip Timeline</h4>
                               <div className="timestamps-grid">
                                 <div className="timestamp-item">
-                                  <span className="timestamp-label">Started:</span>
+                                  <span className="timestamp-label">Trip Started:</span>
                                   <span className="timestamp-value">{formatDateTime(existingRecord.createdAt)}</span>
                                 </div>
-                                {existingRecord.updatedAt && (
+                                {existingRecord.updatedAt && existingRecord.updatedAt !== existingRecord.createdAt && (
                                   <div className="timestamp-item">
-                                    <span className="timestamp-label">Updated:</span>
+                                    <span className="timestamp-label">Last Updated:</span>
                                     <span className="timestamp-value">{formatDateTime(existingRecord.updatedAt)}</span>
+                                  </div>
+                                )}
+                                {existingRecord.startTime && (
+                                  <div className="timestamp-item">
+                                    <span className="timestamp-label">Mission Start:</span>
+                                    <span className="timestamp-value">{formatDateTime(existingRecord.startTime)}</span>
                                   </div>
                                 )}
                               </div>
@@ -503,7 +522,6 @@ export default function InUsePage({
                               />
                             </div>
 
-                            {/* Pitstops Section */}
                             <div className="form-group full-width">
                               <div className="pitstops-header">
                                 <label className="form-label">Pitstops</label>
@@ -516,33 +534,39 @@ export default function InUsePage({
                                 </button>
                               </div>
                               
-                              {vehiclePitstops.map((stop, index) => (
-                                <div key={index} className="pitstop-form">
-                                  <div className="pitstop-inputs">
-                                    <input
-                                      type="text"
-                                      value={stop.location}
-                                      onChange={(e) => updatePitstop(vin, index, 'location', e.target.value)}
-                                      className="form-input"
-                                      placeholder="Pitstop location"
-                                    />
-                                    <input
-                                      type="text"
-                                      value={stop.notes}
-                                      onChange={(e) => updatePitstop(vin, index, 'notes', e.target.value)}
-                                      className="form-input"
-                                      placeholder="Notes (optional)"
-                                    />
-                                    <button
-                                      type="button"
-                                      onClick={() => removePitstop(vin, index)}
-                                      className="btn btn-delete"
-                                    >
-                                      <FaTrash />
-                                    </button>
+                              {vehiclePitstops.length > 0 ? (
+                                vehiclePitstops.map((stop, index) => (
+                                  <div key={index} className="pitstop-form">
+                                    <div className="pitstop-inputs">
+                                      <input
+                                        type="text"
+                                        value={stop.location}
+                                        onChange={(e) => updatePitstop(vin, index, 'location', e.target.value)}
+                                        className="form-input"
+                                        placeholder="Pitstop location"
+                                      />
+                                      <input
+                                        type="text"
+                                        value={stop.notes}
+                                        onChange={(e) => updatePitstop(vin, index, 'notes', e.target.value)}
+                                        className="form-input"
+                                        placeholder="Notes (optional)"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => removePitstop(vin, index)}
+                                        className="btn btn-delete"
+                                      >
+                                        <FaTrash />
+                                      </button>
+                                    </div>
                                   </div>
+                                ))
+                              ) : (
+                                <div className="no-pitstops">
+                                  <p>No pitstops added yet. Click "Add Pitstop" to add one.</p>
                                 </div>
-                              ))}
+                              )}
                             </div>
 
                             <div className="form-actions full-width">

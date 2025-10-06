@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { FaCar, FaTools, FaFileAlt, FaUserShield, FaUsers } from "react-icons/fa";
+import { FaCar, FaTools, FaFileAlt, FaUserShield, FaUsers, FaTachometerAlt, FaBell } from "react-icons/fa";
 
 import LoginPage from "./LoginPage";
 import VehiclePage from "./components/VehiclePage";
 import MaintenancePage from "./components/MaintenancePage";
 import InUsePage from "./components/InUsePage";
 import ReportPage from "./components/ReportPage";
+import DashboardPage from "./components/DashboardPage";
 import Header from "./components/Header";  
 import AddVehicleModal from "./components/AddVehicleModal";
 import UserManagementPage from "./components/UserManagementPage";
+import Notifications from "./components/Notifications";
 
 import vehicleService from "./service/VehicleService";
 import userService from "./service/UserService";
@@ -23,7 +25,7 @@ function App() {
 
   const [vehicles, setVehicles] = useState([]);
   const [users, setUsers] = useState([]);
-  const [currentPage, setCurrentPage] = useState("Vehicles");
+  const [currentPage, setCurrentPage] = useState("Dashboard");
   const [showModal, setShowModal] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [newVehicle, setNewVehicle] = useState({
@@ -34,6 +36,18 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [editVehicleId, setEditVehicleId] = useState(null);
+  
+  // Enhanced state management
+  const [notifications, setNotifications] = useState([]);
+  const [selectedVehicles, setSelectedVehicles] = useState(new Set());
+  const [advancedFilters, setAdvancedFilters] = useState({
+    make: '',
+    model: '',
+    yearFrom: '',
+    yearTo: '',
+    mileageFrom: '',
+    mileageTo: ''
+  });
 
   // Debug useEffect to monitor state changes
   useEffect(() => {
@@ -98,6 +112,23 @@ function App() {
     setStatusCounts(counts);
   }, [vehicles]);
 
+  // Notification system
+  const addNotification = (message, type = 'info') => {
+    const notification = {
+      id: Date.now(),
+      message,
+      type,
+      timestamp: new Date()
+    };
+    
+    setNotifications(prev => [notification, ...prev.slice(0, 4)]); // Keep last 5
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 5000);
+  };
+
   // Login handler
   const handleLogin = async (username, password) => {
     try {
@@ -123,16 +154,19 @@ function App() {
 
       setUser(normalizedUser);
       localStorage.setItem("fleetUser", JSON.stringify(normalizedUser));
+      addNotification(`Welcome back, ${normalizedUser.username}!`, 'success');
       return { success: true, user: normalizedUser };
       
     } catch (error) {
       console.error("❌ Login error:", error);
+      addNotification('Login failed. Please check your credentials.', 'error');
       return { success: false, error: error.message };
     }
   };
 
   const handleLogout = () => {
     console.log("🚪 Logging out");
+    addNotification('You have been logged out', 'info');
     setUser(null);
     setVehicles([]);
     setUsers([]);
@@ -145,10 +179,10 @@ function App() {
     return user.role === "ADMIN" || user.isSuperUser;
   };
 
-  // Vehicle operations
+  // Enhanced vehicle operations with notifications
   const addVehicle = async (vehicle) => {
     if (!vehicle.vin || !vehicle.make || !vehicle.model || !vehicle.year || !vehicle.mileage) {
-      alert("Please fill all required fields");
+      addNotification("Please fill all required fields", 'error');
       return;
     }
     try {
@@ -160,29 +194,69 @@ function App() {
         description: "", discExpiryDate: "", insuranceExpiryDate: "",
       });
       setShowModal(false);
-      alert("Vehicle added successfully!");
+      addNotification(`Vehicle ${vehicle.make} ${vehicle.model} added successfully!`, 'success');
     } catch (error) {
       console.error("Failed to add vehicle:", error);
-      alert("Failed to add vehicle. Check backend connection.");
+      addNotification("Failed to add vehicle. Check backend connection.", 'error');
     }
   };
 
   const updateVehicle = async (vin, updatedVehicle) => {
+    const oldVehicle = vehicles.find(v => v.vin === vin);
     setVehicles((prev) => prev.map((v) => (v.vin === vin ? { ...v, ...updatedVehicle } : v)));
     try {
       await vehicleService.updateVehicle(vin, updatedVehicle);
+      addNotification(`Vehicle ${updatedVehicle.make || oldVehicle.make} ${updatedVehicle.model || oldVehicle.model} updated!`, 'success');
     } catch (error) {
       console.error("Failed to update vehicle:", error);
+      addNotification("Failed to update vehicle", 'error');
+      setVehicles((prev) => prev.map((v) => (v.vin === vin ? oldVehicle : v)));
     }
   };
 
   const deleteVehicle = async (vin) => {
+    const vehicle = vehicles.find(v => v.vin === vin);
     try {
       await vehicleService.deleteVehicle(vin);
       setVehicles((prev) => prev.filter((v) => v.vin !== vin));
+      addNotification(`Vehicle ${vehicle.make} ${vehicle.model} deleted`, 'success');
     } catch (error) {
       console.error("Failed to delete vehicle:", error);
+      addNotification("Failed to delete vehicle", 'error');
     }
+  };
+
+  // Bulk operations
+  const handleBulkStatusChange = async (newStatus) => {
+    if (selectedVehicles.size === 0) {
+      addNotification("Please select vehicles first", 'warning');
+      return;
+    }
+    
+    const updates = Array.from(selectedVehicles).map(vin => 
+      updateStatus(vin, newStatus)
+    );
+    
+    await Promise.all(updates);
+    setSelectedVehicles(new Set());
+    addNotification(`Updated ${selectedVehicles.size} vehicles to ${newStatus}`, 'success');
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedVehicles.size === 0) {
+      addNotification("Please select vehicles first", 'warning');
+      return;
+    }
+    
+    if (!window.confirm(`Are you sure you want to delete ${selectedVehicles.size} vehicles?`)) return;
+    
+    const deletions = Array.from(selectedVehicles).map(vin => 
+      deleteVehicle(vin)
+    );
+    
+    await Promise.all(deletions);
+    setSelectedVehicles(new Set());
+    addNotification(`Deleted ${selectedVehicles.size} vehicles`, 'success');
   };
 
   const incrementMileage = async (vin, amount) => {
@@ -190,6 +264,7 @@ function App() {
     if (!vehicle) return;
     const updated = { ...vehicle, mileage: vehicle.mileage + amount };
     await updateVehicle(vin, updated);
+    addNotification(`Mileage updated for ${vehicle.make} ${vehicle.model}`, 'info');
   };
 
   const updateStatus = async (vin, status, extra = {}) => {
@@ -199,8 +274,10 @@ function App() {
     setVehicles((prev) => prev.map((v) => (v.vin === vin ? updated : v)));
     try {
       await vehicleService.updateVehicle(vin, updated);
+      addNotification(`Vehicle ${vehicle.make} ${vehicle.model} status changed to ${status}`, 'success');
     } catch (error) {
       console.error("Failed to update vehicle status:", error);
+      addNotification(`Failed to update vehicle status`, 'error');
       setVehicles((prev) => prev.map((v) => (v.vin === vin ? vehicle : v)));
     }
   };
@@ -209,15 +286,32 @@ function App() {
     await updateStatus(vin, "In Use", { destination });
   };
 
+  // Enhanced filtering
+  const filteredVehicles = vehicles.filter(
+    (v) =>
+      (v.make?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        v.vin?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (filterStatus ? v.status === filterStatus : true) &&
+      (!advancedFilters.make || v.make?.toLowerCase().includes(advancedFilters.make.toLowerCase())) &&
+      (!advancedFilters.model || v.model?.toLowerCase().includes(advancedFilters.model.toLowerCase())) &&
+      (!advancedFilters.yearFrom || v.year >= parseInt(advancedFilters.yearFrom)) &&
+      (!advancedFilters.yearTo || v.year <= parseInt(advancedFilters.yearTo)) &&
+      (!advancedFilters.mileageFrom || v.mileage >= parseInt(advancedFilters.mileageFrom)) &&
+      (!advancedFilters.mileageTo || v.mileage <= parseInt(advancedFilters.mileageTo))
+  );
+
   // User management handlers
   const handleUserCreated = (newUser) => {
     console.log("👤 New user created:", newUser);
     setUsers(prev => [...prev, newUser]);
+    addNotification(`User ${newUser.username} created successfully`, 'success');
   };
 
   const handleUserDeleted = (deletedUser) => {
     console.log("🗑️ User deleted:", deletedUser);
     setUsers(prev => prev.filter(u => u.username !== deletedUser.username));
+    addNotification(`User ${deletedUser.username} deleted`, 'success');
   };
 
   // Add refresh function for users
@@ -229,18 +323,27 @@ function App() {
       const usersResponse = await userService.getAllUsers(user.username);
       setUsers(usersResponse || []);
       console.log("✅ Users refreshed:", usersResponse?.length || 0);
+      addNotification('Users list refreshed', 'info');
     } catch (error) {
       console.error("❌ Refresh users failed:", error);
+      addNotification('Failed to refresh users', 'error');
     }
   };
 
-  const filteredVehicles = vehicles.filter(
-    (v) =>
-      (v.make?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        v.model?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        v.vin?.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (filterStatus ? v.status === filterStatus : true)
-  );
+  // Clear all filters
+  const clearAllFilters = () => {
+    setSearchQuery("");
+    setFilterStatus("");
+    setAdvancedFilters({
+      make: '',
+      model: '',
+      yearFrom: '',
+      yearTo: '',
+      mileageFrom: '',
+      mileageTo: ''
+    });
+    addNotification('All filters cleared', 'info');
+  };
 
   if (!user) {
     console.log("👤 No user, showing login page");
@@ -251,6 +354,7 @@ function App() {
 
   // Define accessible pages based on role
   const pages = [
+    { name: "Dashboard", icon: <FaTachometerAlt /> },
     { name: "Vehicles", icon: <FaCar /> },
     { name: "In Use", icon: <FaCar /> },
     { name: "Maintenance", icon: <FaTools />, roles: ["ADMIN"] },
@@ -297,9 +401,20 @@ function App() {
       <main>
         <Header currentPage={currentPage} user={user} />
 
+        {/* Notifications Component */}
+        <Notifications notifications={notifications} />
+
+        {currentPage === "Dashboard" && (
+          <DashboardPage 
+            vehicles={vehicles} 
+            user={user}
+          />
+        )}
+
         {currentPage === "Vehicles" && (
           <VehiclePage
             vehicles={filteredVehicles}
+            allVehicles={vehicles}
             incrementMileage={incrementMileage}
             updateStatus={updateStatus}
             deleteVehicle={deleteVehicle}
@@ -317,23 +432,30 @@ function App() {
             darkMode={darkMode}
             user={user}
             canEdit={isAdmin()}
+            // Enhanced props
+            selectedVehicles={selectedVehicles}
+            setSelectedVehicles={setSelectedVehicles}
+            handleBulkStatusChange={handleBulkStatusChange}
+            handleBulkDelete={handleBulkDelete}
+            advancedFilters={advancedFilters}
+            setAdvancedFilters={setAdvancedFilters}
+            clearAllFilters={clearAllFilters}
           />
         )}
 
-        
-{currentPage === "In Use" && (
-  <InUsePage
-    vehicles={vehicles.filter((v) => v.status === "In Use")}
-    saveDestination={saveDestination}
-    incrementMileage={incrementMileage}
-    updateStatus={updateStatus}
-    darkMode={darkMode}
-    editVehicleId={editVehicleId}
-    setEditVehicleId={setEditVehicleId}
-    user={user}
-    users={users} // ADD THIS LINE - pass the users array
-  />
-)}
+        {currentPage === "In Use" && (
+          <InUsePage
+            vehicles={vehicles.filter((v) => v.status === "In Use")}
+            saveDestination={saveDestination}
+            incrementMileage={incrementMileage}
+            updateStatus={updateStatus}
+            darkMode={darkMode}
+            editVehicleId={editVehicleId}
+            setEditVehicleId={setEditVehicleId}
+            user={user}
+            users={users}
+          />
+        )}
 
         {currentPage === "Maintenance" && isAdmin() && (
           <MaintenancePage

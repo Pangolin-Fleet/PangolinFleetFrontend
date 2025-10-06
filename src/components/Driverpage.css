@@ -1,0 +1,801 @@
+/* DriverPage.css - SPACE THEME */
+.driver-page {
+  width: 100%;
+  min-height: 100vh;
+  background: 
+    radial-gradient(ellipse at top, #0a0e17 0%, #000000 100%),
+    radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.05) 0%, transparent 50%);
+  color: #ffffff;
+  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Space Background Effects */
+.driver-page .space-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(1px 1px at 20% 30%, rgba(0, 242, 254, 0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 40% 70%, rgba(79, 172, 254, 0.6) 50%, transparent 50%),
+    radial-gradient(1px 1px at 60% 20%, rgba(255, 255, 255, 0.8) 50%, transparent 50%),
+    radial-gradient(1px 1px at 80% 50%, rgba(0, 230, 118, 0.6) 50%, transparent 50%);
+  background-size: 400px 400px;
+  animation: stars 100s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes stars {
+  from { background-position: 0 0; }
+  to { background-position: 400px 400px; }
+}
+
+/* Header */
+.driver-page .page-header {
+  background: linear-gradient(135deg, 
+    rgba(10, 14, 23, 0.95) 0%, 
+    rgba(26, 35, 126, 0.8) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  padding: 2rem 0;
+  position: relative;
+  z-index: 10;
+  box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
+  width: 100%;
+}
+
+.driver-page .header-content {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  box-sizing: border-box;
+}
+
+.driver-page .header-main {
+  flex: 1;
+}
+
+.driver-page .page-header h1 {
+  font-size: 2rem;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #00d4ff 0%, #4facfe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+}
+
+.driver-page .page-header p {
+  margin: 0;
+  font-size: 1rem;
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.driver-page .driver-welcome {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.driver-page .welcome-text {
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.driver-page .mission-count {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+.driver-page .user-info {
+  text-align: right;
+}
+
+.driver-page .user-name {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.driver-page .user-role {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+/* Main Content */
+.driver-page .page-content {
+  width: 100%;
+  margin: 0;
+  padding: 2rem;
+  position: relative;
+  z-index: 5;
+  box-sizing: border-box;
+}
+
+/* Summary Cards */
+.driver-page .summary-section {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.driver-page .summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.driver-page .summary-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.driver-page .summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 212, 255, 0.1), 
+    transparent);
+  transition: left 0.5s;
+}
+
+.driver-page .summary-card:hover::before {
+  left: 100%;
+}
+
+.driver-page .summary-card:hover {
+  transform: translateY(-2px);
+  border-color: #00d4ff;
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+}
+
+.driver-page .summary-card-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.driver-page .summary-icon {
+  font-size: 1.5rem;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
+}
+
+.driver-page .summary-text {
+  flex: 1;
+}
+
+.driver-page .summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.driver-page .summary-label {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Missions Grid */
+.driver-page .missions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Mission Card */
+.driver-page .mission-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.driver-page .mission-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 212, 255, 0.6), 
+    transparent);
+  z-index: 1;
+}
+
+.driver-page .mission-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 
+    0 15px 35px rgba(0, 212, 255, 0.2),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.driver-page .mission-header {
+  padding: 1.5rem;
+  background: rgba(30, 41, 59, 0.8);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.driver-page .vehicle-info h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.3;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.driver-page .vehicle-details {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+.driver-page .mission-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.driver-page .mission-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Route Section */
+.driver-page .route-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.driver-page .route-point {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.driver-page .point-icon {
+  font-size: 1.25rem;
+  color: #00d4ff;
+}
+
+.driver-page .point-icon.destination {
+  color: #10b981;
+}
+
+.driver-page .point-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.driver-page .point-label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.driver-page .point-value {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.driver-page .route-arrow {
+  color: #f59e0b;
+  font-size: 1.25rem;
+  opacity: 0.7;
+}
+
+.driver-page .btn-location-update {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  color: #00d4ff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.driver-page .btn-location-update:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+  transform: translateY(-1px);
+}
+
+/* Vehicle Stats */
+.driver-page .vehicle-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+}
+
+.driver-page .stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.driver-page .stat-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.driver-page .stat-icon {
+  font-size: 1.25rem;
+  color: #00d4ff;
+  opacity: 0.8;
+}
+
+.driver-page .stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.driver-page .stat-value {
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.driver-page .stat-label {
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Expiry Info */
+.driver-page .expiry-info {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.driver-page .expiry-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.driver-page .expiry-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.driver-page .expiry-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.driver-page .expiry-item:last-child {
+  border-bottom: none;
+}
+
+.driver-page .expiry-label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.driver-page .expiry-value {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #cbd5e1;
+}
+
+.driver-page .expiry-value.expired {
+  color: #ef4444;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+/* Mission Actions */
+.driver-page .mission-actions {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid rgba(51, 65, 85, 0.5);
+  background: rgba(30, 41, 59, 0.5);
+}
+
+.driver-page .mission-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.driver-page .mission-actions .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s;
+}
+
+.driver-page .mission-actions .btn:hover::before {
+  left: 100%;
+}
+
+.driver-page .btn-primary {
+  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
+  color: #0a0e17;
+}
+
+.driver-page .btn-primary:hover {
+  background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+}
+
+.driver-page .btn-secondary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+}
+
+.driver-page .btn-secondary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+.driver-page .btn-danger {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.driver-page .btn-danger:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* Empty State */
+.driver-page .empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  margin: 2rem 0;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  grid-column: 1 / -1;
+}
+
+.driver-page .empty-state::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 212, 255, 0.4), 
+    transparent);
+}
+
+.driver-page .empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+  filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.driver-page .empty-state h3 {
+  color: #94a3b8;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.driver-page .empty-state p {
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.driver-page .empty-tips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.driver-page .tip-card {
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 212, 255, 0.1);
+  text-align: left;
+}
+
+.driver-page .tip-icon {
+  font-size: 1.5rem;
+  color: #00d4ff;
+  margin-bottom: 0.75rem;
+}
+
+.driver-page .tip-card h4 {
+  color: white;
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.driver-page .tip-card p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  line-height: 1.5;
+}
+
+/* Other Missions Section */
+.driver-page .other-missions-section {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.driver-page .section-header {
+  margin-bottom: 1.5rem;
+}
+
+.driver-page .section-header h3 {
+  color: white;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.driver-page .section-header p {
+  color: #94a3b8;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.driver-page .other-missions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.driver-page .other-mission-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.driver-page .other-mission-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(0, 212, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.driver-page .other-vehicle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.driver-page .vehicle-name {
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.driver-page .assigned-driver {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.driver-page .other-vehicle-location {
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+/* Loading */
+.driver-page .loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  text-align: center;
+}
+
+.driver-page .spin {
+  animation: spin 1s linear infinite;
+}
+
+.driver-page .spin.large {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #00d4ff;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .driver-page .page-content {
+    padding: 1rem;
+  }
+  
+  .driver-page .missions-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .driver-page .route-section {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .driver-page .route-arrow {
+    transform: rotate(90deg);
+  }
+  
+  .driver-page .mission-actions {
+    flex-direction: column;
+  }
+  
+  .driver-page .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .driver-page .driver-welcome {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .driver-page .summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .driver-page .vehicle-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .driver-page .empty-tips {
+    grid-template-columns: 1fr;
+  }
+}
