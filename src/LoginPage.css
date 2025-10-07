@@ -34,32 +34,6 @@ body, html {
   margin-bottom: 30px;
 }
 
-.toggle-form {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-  background: #1f2937;
-  border-radius: 10px;
-  padding: 4px;
-}
-
-.toggle-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  background: transparent;
-  color: #aaa;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.toggle-btn.active {
-  background: #00d4ff;
-  color: #000;
-  font-weight: bold;
-}
-
 .login-form .input-group {
   display: flex;
   align-items: center;
@@ -68,6 +42,7 @@ body, html {
   padding: 10px 15px;
   border-radius: 10px;
   transition: 0.3s;
+  position: relative;
 }
 
 .login-form .input-group:hover {
@@ -79,8 +54,7 @@ body, html {
   color: #00d4ff;
 }
 
-.login-form input, 
-.login-form select {
+.login-form input {
   background: transparent;
   border: none;
   outline: none;
@@ -89,9 +63,19 @@ body, html {
   font-size: 1rem;
 }
 
-.login-form select option {
-  background: #1f2937;
-  color: #fff;
+.password-toggle {
+  background: transparent;
+  border: none;
+  color: #00d4ff;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: #00bcd4;
 }
 
 .btn-primary {
@@ -118,23 +102,6 @@ body, html {
   cursor: not-allowed;
 }
 
-.btn-secondary {
-  width: 100%;
-  padding: 12px;
-  background: transparent;
-  border: 1px solid #00d4ff;
-  border-radius: 10px;
-  color: #00d4ff;
-  font-weight: bold;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-.btn-secondary:hover {
-  background: rgba(0, 212, 255, 0.1);
-}
-
 .login-error {
   color: #ef4444;
   margin: 10px 0;
@@ -144,42 +111,14 @@ body, html {
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.login-success {
-  color: #10b981;
-  margin: 10px 0;
-  padding: 10px;
-  background: rgba(16, 185, 129, 0.1);
-  border-radius: 6px;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-}
-
-.form-divider {
-  margin: 20px 0;
-  color: #6b7280;
-  font-size: 0.9rem;
-  position: relative;
-}
-
-.form-divider::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: #374151;
-}
-
-.form-divider span {
-  background: #111827;
-  padding: 0 10px;
-  position: relative;
-}
-
-.role-description {
-  font-size: 0.8rem;
+.login-footer {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #374151;
   color: #94a3b8;
-  margin-top: 5px;
-  text-align: left;
-  padding-left: 10px;
+  font-size: 0.9rem;
+}
+
+.login-footer p {
+  margin: 0;
 }

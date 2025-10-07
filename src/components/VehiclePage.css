@@ -983,7 +983,66 @@
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+  /* Status buttons alternative */
+.vehicle-page .status-buttons {
+  display: flex;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.vehicle-page .status-btn {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.8);
+  color: #94a3b8;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vehicle-page .status-btn:hover:not(.disabled) {
+  background: rgba(30, 41, 59, 0.95);
+  border-color: rgba(0, 212, 255, 0.5);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.vehicle-page .status-btn.active {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+  color: #00d4ff;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.vehicle-page .status-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Specific status button colors */
+.vehicle-page .status-btn:nth-child(1).active {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+  color: #00d4ff;
+}
+
+.vehicle-page .status-btn:nth-child(2).active {
+  background: rgba(245, 158, 11, 0.2);
+  border-color: #f59e0b;
+  color: #f59e0b;
+}
+
+.vehicle-page .status-btn:nth-child(3).active {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #ef4444;
+}
   .vehicle-page .bulk-select {
     min-width: auto;
     width: 100%;

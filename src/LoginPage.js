@@ -83,11 +83,6 @@ export default function LoginPage({ onLogin }) {
 
         <div className="login-footer">
           <p>Contact administrator for account access</p>
-          <div className="demo-accounts">
-            <p><strong>Demo Accounts:</strong></p>
-            <p>superadmin / admin123</p>
-            <p>driver1 / driver123</p>
-          </div>
         </div>
       </div>
     </div>

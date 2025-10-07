@@ -2,60 +2,80 @@ import React, { useState, useEffect } from "react";
 import { 
   FaUserPlus, FaUser, FaUserShield, FaTrash, FaCrown, FaSync, 
   FaTimes, FaSave, FaExclamationTriangle, FaEdit, FaEye, FaSearch,
-  FaKey, FaLock
+  FaKey, FaLock, FaCheckCircle, FaEyeSlash
 } from "react-icons/fa";
 import userService from "../service/UserService";
 import "./UserManagementPage.css";
 
 export default function UserManagementPage({ users, currentUser, onUserCreated, onUserDeleted, onUserUpdated }) {
-  const [showForm, setShowForm] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordUser, setPasswordUser] = useState(null);
+  
   const [formData, setFormData] = useState({ 
     username: "", 
     password: "", 
     role: "DRIVER" 
   });
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [adminCount, setAdminCount] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   
-  // New states for password modal
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordUser, setPasswordUser] = useState(null);
-  const [passwordData, setPasswordData] = useState({
-    newPassword: "",
-    confirmPassword: ""
-  });
+  // Password modal states
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: [] });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Calculate admin count from the actual users prop
   useEffect(() => {
-    const admins = users.filter(user => user.role === "ADMIN" || user.role === "SUPERADMIN").length;
+    const admins = users.filter(user => user.role === "ADMIN" || isSuperAdminUser(user)).length;
     setAdminCount(admins);
   }, [users]);
 
   // Enhanced super admin detection
   const isSuperAdmin = () => {
+    if (!currentUser) return false;
+    
     const superAdminIndicators = [
-      currentUser?.isSuperUser,
-      currentUser?.role === "SUPER_ADMIN",
-      currentUser?.role === "SUPERADMIN", 
-      currentUser?.username === "superadmin",
+      currentUser.isSuperUser === true,
+      currentUser.role === "SUPER_ADMIN",
+      currentUser.role === "SUPERADMIN", 
+      currentUser.username === "superadmin",
+      currentUser.username?.toLowerCase().includes("super"),
+      currentUser.role?.toLowerCase().includes("super"),
     ];
     
-    const isSuper = superAdminIndicators.some(indicator => 
-      indicator === true || (typeof indicator === 'string' && indicator.includes('SUPER'))
-    );
+    return superAdminIndicators.some(indicator => indicator === true);
+  };
+
+  // Improved super admin user detection
+  const isSuperAdminUser = (user) => {
+    if (!user) return false;
     
-    return isSuper;
+    const superAdminIndicators = [
+      user.isSuperUser === true,
+      user.role === "SUPER_ADMIN",
+      user.role === "SUPERADMIN", 
+      user.username === "superadmin",
+      user.username?.toLowerCase().includes("super"),
+      user.role?.toLowerCase().includes("super"),
+    ];
+    
+    return superAdminIndicators.some(indicator => indicator === true);
   };
 
   // Filter users based on search term
   const filteredUsers = users.filter(user => 
     user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (user.isSuperUser && "super admin".includes(searchTerm.toLowerCase()))
+    (isSuperAdminUser(user) && "super admin".includes(searchTerm.toLowerCase()))
   );
 
   // Permission checks
@@ -69,25 +89,10 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     return false;
   };
 
-  const canEditUser = (targetUser) => {
-    if (!targetUser) return false;
-    
-    // Super Admin can edit anyone (admins and drivers)
-    if (isSuperAdmin()) return true;
-    
-    // Admin can only edit drivers, NOT other admins
-    if (currentUser?.role === "ADMIN") {
-      return targetUser.role === "DRIVER";
-    }
-    
-    // Drivers cannot edit anyone
-    return false;
-  };
-
   const canDeleteUser = (targetUser) => {
     if (!targetUser) return false;
     
-    // ONLY Super Admin can delete users (admins or drivers)
+    // ONLY Super Admin can delete users (admins and drivers)
     if (!isSuperAdmin()) return false;
     
     // Super Admin cannot delete themselves
@@ -98,24 +103,129 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     return true;
   };
 
-  // New permission check for password updates
+  // Permission check for password updates
   const canUpdatePassword = (targetUser) => {
-    if (!targetUser) return false;
+    if (!targetUser || !currentUser) return false;
     
-    // Users can always update their own password
-    if (targetUser.username === currentUser?.username) {
+    // Rule 1: Users can always update their own password
+    if (targetUser.username === currentUser.username) {
       return true;
     }
     
-    // Super Admin can update anyone's password
-    if (isSuperAdmin()) return true;
+    // Rule 2: Super Admin can update anyone's password
+    if (isSuperAdmin()) {
+      return true;
+    }
     
-    // Admin can update drivers' passwords
-    if (currentUser?.role === "ADMIN" && targetUser.role === "DRIVER") {
+    // Rule 3: Admin can update drivers' passwords
+    if (currentUser.role === "ADMIN" && targetUser.role === "DRIVER") {
       return true;
     }
     
     return false;
+  };
+
+  // Password strength checker
+  const checkPasswordStrength = (password) => {
+    const feedback = [];
+    let score = 0;
+
+    // Length check
+    if (password.length >= 8) {
+      score += 1;
+    } else {
+      feedback.push("At least 8 characters");
+    }
+
+    // Uppercase check
+    if (/[A-Z]/.test(password)) {
+      score += 1;
+    } else {
+      feedback.push("One uppercase letter");
+    }
+
+    // Lowercase check
+    if (/[a-z]/.test(password)) {
+      score += 1;
+    } else {
+      feedback.push("One lowercase letter");
+    }
+
+    // Number check
+    if (/\d/.test(password)) {
+      score += 1;
+    } else {
+      feedback.push("One number");
+    }
+
+    // Special character check
+    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      score += 1;
+    } else {
+      feedback.push("One special character");
+    }
+
+    // Common password check
+    const commonPasswords = [
+      '123456', 'password', '12345678', 'qwerty', '123456789', 
+      '12345', '1234', '111111', '1234567', 'dragon', '123123',
+      'admin', 'letmein', 'welcome', 'monkey', 'password1'
+    ];
+    
+    if (commonPasswords.includes(password.toLowerCase())) {
+      score = 0;
+      feedback.push("This password is too common");
+    }
+
+    return { score, feedback };
+  };
+
+  // Real-time password strength indicator component
+  const PasswordStrengthIndicator = ({ strength }) => {
+    const { score, feedback } = strength;
+    
+    const getStrengthColor = () => {
+      if (score <= 2) return '#ff4444';
+      if (score <= 3) return '#ffaa00';
+      if (score <= 4) return '#00aa44';
+      return '#00aa44';
+    };
+
+    const getStrengthText = () => {
+      if (score <= 2) return 'Weak';
+      if (score <= 3) return 'Fair';
+      if (score <= 4) return 'Good';
+      return 'Strong';
+    };
+
+    return (
+      <div className="password-strength-indicator">
+        <div className="strength-bar">
+          <div 
+            className="strength-fill"
+            style={{
+              width: `${(score / 5) * 100}%`,
+              backgroundColor: getStrengthColor()
+            }}
+          ></div>
+        </div>
+        <div className="strength-info">
+          <span style={{ color: getStrengthColor() }}>
+            Strength: {getStrengthText()} ({score}/5)
+          </span>
+          {feedback.length > 0 && (
+            <div className="strength-feedback">
+              <small>Requirements missing:</small>
+              <ul>
+                {feedback.map((item, idx) => (
+                  <li key={idx}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   const handleCreateUser = async (e) => {
@@ -142,54 +252,10 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
       const newUser = await userService.registerByAdmin(currentUser.username, formData);
       setSuccess(`User ${newUser.username} created successfully as ${newUser.role}`);
       setFormData({ username: "", password: "", role: "DRIVER" });
-      setShowForm(false);
+      setShowCreateModal(false);
       onUserCreated(newUser);
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEditUser = (user) => {
-    setEditingUser(user);
-    setFormData({
-      username: user.username,
-      password: "",
-      role: user.role
-    });
-    setShowForm(true);
-  };
-
-  const handleUpdateUser = async (e) => {
-    e.preventDefault();
-    if (!formData.username) {
-      setError("Username is required");
-      return;
-    }
-
-    // Check if trying to change role to admin when not allowed
-    if (formData.role === "ADMIN" && editingUser.role !== "ADMIN" && !canCreateAdmin()) {
-      setError("Cannot change user to admin. Maximum limit of 3 admins reached.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      const updatedUser = await userService.updateUser(
-        currentUser.username, 
-        editingUser.username, 
-        formData
-      );
-      setSuccess(`User ${updatedUser.username} updated successfully`);
-      setShowForm(false);
-      setEditingUser(null);
-      setFormData({ username: "", password: "", role: "DRIVER" });
-      onUserUpdated(updatedUser);
-    } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to create user");
     } finally {
       setLoading(false);
     }
@@ -199,7 +265,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     const userToDelete = users.find(u => u.username === username);
     
     // Extra confirmation for admin deletion
-    if (userToDelete?.role === "ADMIN" || userToDelete?.role === "SUPERADMIN") {
+    if (userToDelete?.role === "ADMIN" || isSuperAdminUser(userToDelete)) {
       if (!window.confirm(`⚠️ ADMIN DELETION: You are about to delete Administrator "${username}". This action cannot be undone. Are you absolutely sure?`)) {
         return;
       }
@@ -212,32 +278,57 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
       setSuccess(`User ${username} deleted successfully`);
       onUserDeleted({ username });
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Failed to delete user");
     }
   };
 
-  // New password update handlers
+  // Password update handlers
   const handleOpenPasswordModal = (user) => {
     setPasswordUser(user);
-    setPasswordData({ newPassword: "", confirmPassword: "" });
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setPasswordStrength({ score: 0, feedback: [] });
+    setShowCurrentPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
     setShowPasswordModal(true);
+  };
+
+  const handleNewPasswordChange = (password) => {
+    setNewPassword(password);
+    setPasswordStrength(checkPasswordStrength(password));
   };
 
   const handleUpdatePassword = async (e) => {
     e.preventDefault();
     
-    if (!passwordData.newPassword || !passwordData.confirmPassword) {
-      setError("Please fill all password fields");
+    // Validation
+    if (!newPassword) {
+      setError("Please enter a new password");
       return;
     }
 
-    if (passwordData.newPassword.length < 4) {
-      setError("Password must be at least 4 characters");
+    if (newPassword !== confirmPassword) {
+      setError("New passwords do not match");
       return;
     }
 
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError("Passwords do not match");
+    // Enhanced password strength validation
+    if (passwordStrength.score < 3) {
+      setError("Password is too weak. Please meet the requirements above.");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+
+    // Special case: If user is updating their own password, require current password
+    const isUpdatingOwnPassword = passwordUser.username === currentUser.username;
+    if (isUpdatingOwnPassword && !currentPassword) {
+      setError("Please enter your current password for security verification");
       return;
     }
 
@@ -245,38 +336,104 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     setError("");
 
     try {
+      // Prepare password data for the service
+      const passwordData = {
+        newPassword: newPassword
+      };
+
+      // Only include current password if user is updating their own password
+      if (isUpdatingOwnPassword) {
+        passwordData.currentPassword = currentPassword;
+      }
+
       await userService.updateUserPassword(
         currentUser.username, 
         passwordUser.username, 
-        passwordData.newPassword
+        passwordData
       );
       
       setSuccess(`Password for ${passwordUser.username} updated successfully`);
       setShowPasswordModal(false);
       setPasswordUser(null);
-      setPasswordData({ newPassword: "", confirmPassword: "" });
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setPasswordStrength({ score: 0, feedback: [] });
       
     } catch (err) {
-      setError(err.message);
+      console.error('❌ Password update error:', err);
+      
+      // Provide more specific error messages
+      let errorMessage = err.message || "Failed to update password";
+      
+      if (err.message.includes("current password") || err.message.includes("Current password")) {
+        errorMessage = "Current password is incorrect. Please try again.";
+      } else if (err.message.includes("permission") || err.message.includes("Permission")) {
+        errorMessage = "You don't have permission to update this user's password.";
+      } else if (err.message.includes("400")) {
+        errorMessage = "Invalid password format. Please check the requirements.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const closePasswordModal = () => {
+  const closeModals = () => {
+    setShowCreateModal(false);
     setShowPasswordModal(false);
     setPasswordUser(null);
-    setPasswordData({ newPassword: "", confirmPassword: "" });
+    setFormData({ username: "", password: "", role: "DRIVER" });
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setPasswordStrength({ score: 0, feedback: [] });
+  };
+
+  // Generate a secure random password
+  const generateSecurePassword = () => {
+    const length = 12;
+    const lowercase = "abcdefghijklmnopqrstuvwxyz";
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    const special = "!@#$%^&*";
+    
+    // Ensure at least one of each type
+    let password = "";
+    password += lowercase[Math.floor(Math.random() * lowercase.length)];
+    password += uppercase[Math.floor(Math.random() * uppercase.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    password += special[Math.floor(Math.random() * special.length)];
+    
+    // Fill the rest
+    const allChars = lowercase + uppercase + numbers + special;
+    for (let i = password.length; i < length; i++) {
+      password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+    
+    // Shuffle the password
+    password = password.split('').sort(() => Math.random() - 0.5).join('');
+    
+    setNewPassword(password);
+    setConfirmPassword(password);
+    setPasswordStrength(checkPasswordStrength(password));
+  };
+
+  const generateRandomPassword = () => {
+    const length = 12;
+    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += charset.charAt(Math.floor(Math.random() * charset.length));
+    }
+    setFormData({ ...formData, password });
   };
 
   const getRoleIcon = (user) => {
     if (!user) return <FaUser />;
-    if (user.isSuperUser || isSuperAdminUser(user)) return <FaCrown className="super-user-icon" />;
+    if (isSuperAdminUser(user)) return <FaCrown className="super-user-icon" />;
     return user.role === "ADMIN" ? <FaUserShield /> : <FaUser />;
-  };
-
-  const isSuperAdminUser = (user) => {
-    return user?.isSuperUser || user?.role === "SUPER_ADMIN" || user?.role === "SUPERADMIN";
   };
 
   const getRoleDisplay = (user) => {
@@ -293,12 +450,6 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
   const clearMessages = () => {
     setError("");
     setSuccess("");
-  };
-
-  const cancelForm = () => {
-    setShowForm(false);
-    setEditingUser(null);
-    setFormData({ username: "", password: "", role: "DRIVER" });
   };
 
   const clearSearch = () => {
@@ -323,20 +474,6 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
       );
     }
     
-    // Edit Button - Super Admin can edit anyone, Admin can only edit drivers
-    if (canEditUser(user)) {
-      buttons.push(
-        <button 
-          key="edit"
-          className="btn btn-edit"
-          onClick={() => handleEditUser(user)}
-          title={`Edit ${user.username}`}
-        >
-          <FaEdit /> Edit User
-        </button>
-      );
-    }
-    
     // Delete Button - ONLY Super Admin can delete (and not themselves)
     if (canDeleteUser(user)) {
       buttons.push(
@@ -356,7 +493,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
       let message = "No Management Access";
       if (user.username === currentUser?.username) {
         message = "Your Account";
-      } else if (currentUser?.role === "ADMIN" && user.role === "ADMIN") {
+      } else if (currentUser?.role === "ADMIN" && (user.role === "ADMIN" || isSuperAdminUser(user))) {
         message = "Admin Account (View Only)";
       } else if (currentUser?.role === "DRIVER") {
         message = "View Only";
@@ -388,7 +525,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     },
     { 
       label: "Drivers", 
-      value: users.filter(user => user.role === "DRIVER").length, 
+      value: users.filter(user => user.role === "DRIVER" && !isSuperAdminUser(user)).length, 
       icon: <FaUser />, 
       color: "#f59e0b" 
     },
@@ -411,7 +548,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
             <h1>Pangolin Fleet</h1>
             <p>User Management & Access Control</p>
             <div className="user-permission-level">
-              <span className={`permission-badge ${currentUser?.role?.toLowerCase()} ${isSuperAdmin() ? 'super' : ''}`}>
+              <span className={`permission-badge ${isSuperAdmin() ? 'super' : currentUser?.role?.toLowerCase()}`}>
                 {isSuperAdmin() ? "⭐ Super Administrator - Full System Control" : 
                  currentUser?.role === "ADMIN" ? "🛡️ Administrator - Can Manage Drivers" : 
                  "👤 Driver - View Only Access"}
@@ -468,7 +605,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
               <FaUserShield className="notice-icon" />
               <div>
                 <p><strong>Administrator Access</strong></p>
-                <p>You can create and edit drivers. You can view all users but cannot delete anyone. Administrator accounts: {adminCount} / 3</p>
+                <p>You can create drivers and update passwords. You can view all users but cannot delete anyone. Administrator accounts: {adminCount} / 3</p>
                 {adminCount >= 3 && (
                   <p className="warning">You have reached the maximum number of administrator accounts.</p>
                 )}
@@ -483,7 +620,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
               <FaEye className="notice-icon" />
               <div>
                 <p><strong>View Only Access</strong></p>
-                <p>As a Driver, you can view user information but cannot create, edit, or delete users.</p>
+                <p>As a Driver, you can view user information but cannot create or delete users. You can only update your own password.</p>
               </div>
             </div>
           </div>
@@ -497,7 +634,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
         )}
         {success && (
           <div className="alert success" onClick={clearMessages}>
-            <FaSave /> {success}
+            <FaCheckCircle /> {success}
           </div>
         )}
 
@@ -535,7 +672,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
             {canCreateUsers() && (
               <button 
                 className="btn-compact btn-primary-compact"
-                onClick={() => setShowForm(true)}
+                onClick={() => setShowCreateModal(true)}
                 disabled={formData.role === "ADMIN" && !canCreateAdmin()}
               >
                 <FaUserPlus /> Create New User
@@ -588,7 +725,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                       <span className="info-label">Access Level:</span>
                       <span className="info-value">
                         <span className={`permission-indicator ${
-                          canEditUser(user) ? 'editable' : 'view-only'
+                          canUpdatePassword(user) ? 'editable' : 'view-only'
                         }`}>
                           {isSuperAdminUser(user) ? "Super Admin" : 
                            user.role === "ADMIN" ? "Administrator" : "Driver"}
@@ -623,7 +760,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                 canCreateUsers() && (
                   <button 
                     className="btn btn-primary" 
-                    onClick={() => setShowForm(true)}
+                    onClick={() => setShowCreateModal(true)}
                   >
                     <FaUserPlus /> Create First User
                   </button>
@@ -634,24 +771,24 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
         </div>
       </div>
 
-      {/* Create/Edit User Modal */}
-      {showForm && (
+      {/* Create User Modal */}
+      {showCreateModal && (
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
               <h2>
-                {editingUser ? <><FaEdit /> Edit User</> : <><FaUserPlus /> Create New User</>}
+                <FaUserPlus /> Create New User
               </h2>
               <button 
                 className="modal-close"
-                onClick={cancelForm}
+                onClick={closeModals}
                 disabled={loading}
               >
                 <FaTimes />
               </button>
             </div>
             
-            <form onSubmit={editingUser ? handleUpdateUser : handleCreateUser}>
+            <form onSubmit={handleCreateUser}>
               <div className="form-grid">
                 <div className="form-group">
                   <label className="form-label">
@@ -665,34 +802,37 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                     className="form-input"
                     placeholder="Enter username"
                     required
-                    disabled={loading || !!editingUser}
+                    disabled={loading}
                   />
-                  {editingUser && (
-                    <div className="info-text">
-                      Username cannot be changed
-                    </div>
-                  )}
                 </div>
 
                 <div className="form-group">
                   <label className="form-label">
-                    <FaKey style={{ marginRight: '8px' }} /> 
-                    {editingUser ? "New Password" : "Password *"}
+                    <FaLock style={{ marginRight: '8px' }} /> 
+                    Password *
                   </label>
-                  <input
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    className="form-input"
-                    placeholder={editingUser ? "Enter new password to change, or leave blank to keep current" : "Enter password (min 4 characters)"}
-                    required={!editingUser}
-                    disabled={loading}
-                  />
-                  {editingUser && (
-                    <div className="info-text">
-                      <FaKey /> Leave blank to keep current password, or enter new password to change
-                    </div>
-                  )}
+                  <div className="password-input-group">
+                    <input
+                      type="text"
+                      value={formData.password}
+                      onChange={(e) => setFormData({...formData, password: e.target.value})}
+                      className="form-input"
+                      placeholder="Enter password (min 4 characters)"
+                      required
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="generate-password-btn"
+                      onClick={generateRandomPassword}
+                      title="Generate secure password"
+                    >
+                      <FaKey />
+                    </button>
+                  </div>
+                  <div className="info-text">
+                    <FaKey /> Password must be at least 4 characters long
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -704,17 +844,11 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                     value={formData.role}
                     onChange={(e) => setFormData({...formData, role: e.target.value})}
                     className="form-select"
-                    disabled={loading || (editingUser && isSuperAdminUser(editingUser))}
+                    disabled={loading}
                   >
                     <option value="DRIVER">Driver</option>
                     <option value="ADMIN">Administrator</option>
                   </select>
-                  
-                  {editingUser && isSuperAdminUser(editingUser) && (
-                    <div className="validation-message info">
-                      <FaCrown /> Super Admin role cannot be changed
-                    </div>
-                  )}
                   
                   {formData.role === "ADMIN" && !canCreateAdmin() && (
                     <div className="validation-message error">
@@ -724,7 +858,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                   
                   {formData.role === "ADMIN" && canCreateAdmin() && (
                     <div className="validation-message success">
-                      <FaSave /> You can create admin accounts ({3 - adminCount} remaining)
+                      <FaCheckCircle /> You can create admin accounts ({3 - adminCount} remaining)
                     </div>
                   )}
                 </div>
@@ -734,7 +868,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                 <button 
                   type="button" 
                   className="btn btn-cancel"
-                  onClick={cancelForm}
+                  onClick={closeModals}
                   disabled={loading}
                 >
                   <FaTimes /> Cancel
@@ -743,12 +877,11 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                   type="submit" 
                   className="btn btn-save"
                   disabled={loading || 
-                    (formData.role === "ADMIN" && !canCreateAdmin()) ||
-                    (editingUser && isSuperAdminUser(editingUser) && formData.role !== "ADMIN")
+                    (formData.role === "ADMIN" && !canCreateAdmin())
                   }
                 >
-                  {loading ? <FaSync className="spin" /> : (editingUser ? <FaSave /> : <FaUserPlus />)}
-                  {loading ? "Saving..." : (editingUser ? "Update User" : "Create User")}
+                  {loading ? <FaSync className="spin" /> : <FaUserPlus />}
+                  {loading ? "Creating..." : "Create User"}
                 </button>
               </div>
             </form>
@@ -757,16 +890,16 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
       )}
 
       {/* Update Password Modal */}
-      {showPasswordModal && (
+      {showPasswordModal && passwordUser && (
         <div className="modal-overlay">
           <div className="modal">
             <div className="modal-header">
               <h2>
-                <FaLock /> Update Password for {passwordUser?.username}
+                <FaLock /> Update Password for {passwordUser.username}
               </h2>
               <button 
                 className="modal-close"
-                onClick={closePasswordModal}
+                onClick={closeModals}
                 disabled={loading}
               >
                 <FaTimes />
@@ -775,39 +908,117 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
             
             <form onSubmit={handleUpdatePassword}>
               <div className="form-grid">
+                {/* Current Password (only required when user is updating their own password) */}
+                {passwordUser.username === currentUser.username && (
+                  <div className="form-group">
+                    <label className="form-label">
+                      <FaLock style={{ marginRight: '8px' }} /> 
+                      Current Password *
+                    </label>
+                    <div className="password-input-group">
+                      <input
+                        type={showCurrentPassword ? "text" : "password"}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        className="form-input"
+                        placeholder="Enter your current password"
+                        required
+                        disabled={loading}
+                      />
+                      <button
+                        type="button"
+                        className="password-toggle-btn"
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                        title={showCurrentPassword ? "Hide password" : "Show password"}
+                      >
+                        {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
+                      </button>
+                    </div>
+                    <div className="info-text">
+                      <FaKey /> You must verify your current password to change it
+                    </div>
+                  </div>
+                )}
+
+                {/* New Password */}
                 <div className="form-group">
                   <label className="form-label">
                     <FaLock style={{ marginRight: '8px' }} /> 
                     New Password *
                   </label>
-                  <input
-                    type="password"
-                    value={passwordData.newPassword}
-                    onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                    className="form-input"
-                    placeholder="Enter new password (min 4 characters)"
-                    required
-                    disabled={loading}
-                  />
+                  <div className="password-input-group">
+                    <input
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={(e) => handleNewPasswordChange(e.target.value)}
+                      className="form-input"
+                      placeholder="Enter new password (min 8 characters)"
+                      required
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle-btn"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      title={showNewPassword ? "Hide password" : "Show password"}
+                    >
+                      {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                    <button
+                      type="button"
+                      className="generate-password-btn"
+                      onClick={generateSecurePassword}
+                      title="Generate secure password"
+                    >
+                      <FaKey />
+                    </button>
+                  </div>
+                  
+                  {/* Password Strength Indicator */}
+                  {newPassword && (
+                    <PasswordStrengthIndicator strength={passwordStrength} />
+                  )}
+                  
                   <div className="info-text">
-                    Password must be at least 4 characters long
+                    <FaKey /> Password must be at least 8 characters with uppercase, lowercase, number, and special character
                   </div>
                 </div>
 
+                {/* Confirm New Password */}
                 <div className="form-group">
                   <label className="form-label">
                     <FaLock style={{ marginRight: '8px' }} /> 
-                    Confirm Password *
+                    Confirm New Password *
                   </label>
-                  <input
-                    type="password"
-                    value={passwordData.confirmPassword}
-                    onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                    className="form-input"
-                    placeholder="Confirm new password"
-                    required
-                    disabled={loading}
-                  />
+                  <div className="password-input-group">
+                    <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      className={`form-input ${confirmPassword && newPassword !== confirmPassword ? 'input-error' : ''}`}
+                      placeholder="Confirm your new password"
+                      required
+                      disabled={loading}
+                    />
+                    <button
+                      type="button"
+                      className="password-toggle-btn"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      title={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                  {confirmPassword && newPassword !== confirmPassword && (
+                    <div className="validation-message error">
+                      <FaExclamationTriangle /> Passwords do not match
+                    </div>
+                  )}
+                  {confirmPassword && newPassword === confirmPassword && passwordStrength.score >= 3 && (
+                    <div className="validation-message success">
+                      <FaCheckCircle /> Passwords match and meet security requirements
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -815,7 +1026,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                 <button 
                   type="button" 
                   className="btn btn-cancel"
-                  onClick={closePasswordModal}
+                  onClick={closeModals}
                   disabled={loading}
                 >
                   <FaTimes /> Cancel
@@ -823,7 +1034,13 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                 <button 
                   type="submit" 
                   className="btn btn-save"
-                  disabled={loading}
+                  disabled={loading || 
+                    !newPassword || 
+                    !confirmPassword || 
+                    newPassword !== confirmPassword || 
+                    passwordStrength.score < 3 ||
+                    (passwordUser.username === currentUser.username && !currentPassword)
+                  }
                 >
                   {loading ? <FaSync className="spin" /> : <FaKey />}
                   {loading ? "Updating..." : "Update Password"}
