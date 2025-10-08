@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { FaEdit, FaTrash, FaSave, FaTimes, FaRoad, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSave, FaTimes, FaRoad, FaPlus, FaCar, FaCheck, FaWrench, FaClock, FaFilter, FaTimesCircle, FaCheckSquare, FaSquare, FaUser } from "react-icons/fa";
 import "./VehiclePage.css";
 
 function SummaryCard({ label, value, icon, color }) {
   return (
     <div className="summary-card">
       <div className="summary-card-content">
-        <div className="summary-icon">{icon}</div>
+        <div className="summary-icon" style={{ color }}>
+          {icon}
+        </div>
         <div className="summary-text">
           <div className="summary-value" style={{ color }}>
             {value}
@@ -29,7 +31,11 @@ function VehicleCard({
   onFieldEdit,
   onIncrementMileage,
   onUpdateStatus,
-  userRole
+  userRole,
+  onStatusChange,
+  isSelected,
+  onSelectVehicle,
+  users = [] // ADD USERS PROP
 }) {
   const statusClass = vehicle.status.toLowerCase().replace(' ', '-');
 
@@ -38,9 +44,19 @@ function VehicleCard({
     return requiredFields.every(field => editableVehicle[field]?.toString().trim());
   };
 
-  const handleStatusChange = (newStatus) => {
+  // ENHANCED: Handle status change with driver assignment
+  const handleStatusChange = async (newStatus) => {
     if (newStatus !== vehicle.status) {
-      onUpdateStatus(vehicle.vin, newStatus);
+      await onStatusChange(vehicle.vin, newStatus);
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'Available': return <FaCheck className="status-icon" />;
+      case 'In Use': return <FaCar className="status-icon" />;
+      case 'In Maintenance': return <FaWrench className="status-icon" />;
+      default: return <FaClock className="status-icon" />;
     }
   };
 
@@ -49,7 +65,10 @@ function VehicleCard({
       <div className={`vehicle-card editing ${statusClass}`}>
         <div className="card-header">
           <div className="card-title">Edit Vehicle</div>
-          <span className={`status-pill ${statusClass}`}>{vehicle.status}</span>
+          <span className={`status-pill ${statusClass}`}>
+            {getStatusIcon(vehicle.status)}
+            {vehicle.status}
+          </span>
         </div>
         <div className="card-body">
           <div className="edit-form">
@@ -111,10 +130,10 @@ function VehicleCard({
                   value={editableVehicle.description || ""}
                   onChange={(e) => onFieldEdit(vehicle.vin, 'description', e.target.value)}
                   placeholder="Vehicle description"
-                  rows="3"
+                  rows="2"
                 />
               </div>
-              <div className="form-group full-width">
+              <div className="form-group">
                 <label className="form-label">Disc Expiry</label>
                 <input
                   className="form-input"
@@ -123,7 +142,7 @@ function VehicleCard({
                   onChange={(e) => onFieldEdit(vehicle.vin, 'discExpiryDate', e.target.value)}
                 />
               </div>
-              <div className="form-group full-width">
+              <div className="form-group">
                 <label className="form-label">License Expiry</label>
                 <input
                   className="form-input"
@@ -132,7 +151,7 @@ function VehicleCard({
                   onChange={(e) => onFieldEdit(vehicle.vin, 'licenseExpiryDate', e.target.value)}
                 />
               </div>
-              <div className="form-group full-width">
+              <div className="form-group">
                 <label className="form-label">Insurance Expiry</label>
                 <input
                   className="form-input"
@@ -154,7 +173,7 @@ function VehicleCard({
                   onClick={() => onSave(vehicle.vin)}
                   disabled={!isFormValid()}
                 >
-                  <FaSave /> Save Changes
+                  <FaSave /> Save
                 </button>
                 <button className="btn btn-cancel" onClick={() => onCancel(vehicle.vin)}>
                   <FaTimes /> Cancel
@@ -168,66 +187,115 @@ function VehicleCard({
   }
 
   return (
-    <div className={`vehicle-card ${statusClass}`}>
+    <div className={`vehicle-card ${statusClass} ${isSelected ? 'selected' : ''}`}>
+      {/* Selection Checkbox */}
+      {userRole === "ADMIN" && (
+        <div className="vehicle-checkbox">
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onSelectVehicle(vehicle.vin)}
+            className="selection-checkbox"
+          />
+        </div>
+      )}
+
       <div className="card-header">
-        <div className="card-title">{vehicle.make} {vehicle.model}</div>
-        <span className={`status-pill ${statusClass}`}>{vehicle.status}</span>
+        <div className="vehicle-title">
+          <h3>{vehicle.make} {vehicle.model}</h3>
+          <span className="vehicle-year">{vehicle.year}</span>
+        </div>
+        <span className={`status-pill ${statusClass}`}>
+          {getStatusIcon(vehicle.status)}
+          {vehicle.status}
+          {vehicle.status === "In Use" && vehicle.assignedDriver && (
+            <span className="assigned-driver-badge">
+              <FaUser /> {vehicle.assignedDriver}
+            </span>
+          )}
+        </span>
       </div>
       <div className="card-body">
         <div className="vehicle-info">
-          <div className="info-row">
-            <span className="info-label">VIN:</span>
-            <span className="info-value">{vehicle.vin}</span>
+          <div className="info-section">
+            <div className="info-row">
+              <span className="info-label">VIN:</span>
+              <span className="info-value">{vehicle.vin}</span>
+            </div>
+            <div className="info-row">
+              <span className="info-label">Mileage:</span>
+              <span className="info-value">
+                <div className="mileage-content">
+                  <span>{vehicle.mileage?.toLocaleString()} km</span>
+                  <button
+                    onClick={() => onIncrementMileage(vehicle.vin, 100)}
+                    className="btn-mileage"
+                    title="Add 100 km"
+                  >
+                    <FaRoad /> +100
+                  </button>
+                </div>
+              </span>
+            </div>
           </div>
-          <div className="info-row">
-            <span className="info-label">Year:</span>
-            <span className="info-value">{vehicle.year}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Mileage:</span>
-            <span className="info-value">
-              <div className="mileage-section">
-                <span>{vehicle.mileage?.toLocaleString()} km</span>
-                <button
-                  onClick={() => onIncrementMileage(vehicle.vin, 100)}
-                  className="btn-mileage"
-                  title="Add 100 km"
+
+          <div className="info-section">
+            <div className="info-row">
+              <span className="info-label">Status:</span>
+              <span className="info-value">
+                <select
+                  value={vehicle.status}
+                  onChange={(e) => handleStatusChange(e.target.value)}
+                  className="status-select"
+                  disabled={userRole !== "ADMIN"}
                 >
-                  <FaRoad /> +100
-                </button>
+                  <option value="Available">Available</option>
+                  <option value="In Use">In Use</option>
+                  <option value="In Maintenance">Maintenance</option>
+                </select>
+              </span>
+            </div>
+            
+            {/* SHOW ASSIGNED DRIVER */}
+            {vehicle.status === "In Use" && vehicle.assignedDriver && (
+              <div className="info-row">
+                <span className="info-label">Assigned Driver:</span>
+                <span className="info-value driver-assigned">
+                  <FaUser /> {vehicle.assignedDriver}
+                </span>
               </div>
-            </span>
+            )}
+            
+            {vehicle.description && (
+              <div className="info-row">
+                <span className="info-label">Description:</span>
+                <span className="info-value description-text">{vehicle.description}</span>
+              </div>
+            )}
           </div>
-          <div className="info-row">
-            <span className="info-label">Status:</span>
-            <span className="info-value">
-              <select
-                value={vehicle.status}
-                onChange={(e) => handleStatusChange(e.target.value)}
-                className="status-select"
-                disabled={userRole !== "ADMIN"}
-              >
-                <option value="Available">Available</option>
-                <option value="In Use">In Use</option>
-                <option value="In Maintenance">Maintenance</option>
-              </select>
-            </span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Description:</span>
-            <span className="info-value">{vehicle.description || "N/A"}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Disc Expiry:</span>
-            <span className="info-value">{vehicle.discExpiryDate || "N/A"}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">License Expiry:</span>
-            <span className="info-value">{vehicle.licenseExpiryDate || "N/A"}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">Insurance Expiry:</span>
-            <span className="info-value">{vehicle.insuranceExpiryDate || "N/A"}</span>
+
+          <div className="expiry-section">
+            <h4 className="expiry-title">Expiry Dates</h4>
+            <div className="expiry-grid">
+              <div className="expiry-item">
+                <span className="expiry-label">Disc:</span>
+                <span className={`expiry-value ${!vehicle.discExpiryDate || new Date(vehicle.discExpiryDate) < new Date() ? 'expired' : ''}`}>
+                  {vehicle.discExpiryDate || "Not set"}
+                </span>
+              </div>
+              <div className="expiry-item">
+                <span className="expiry-label">License:</span>
+                <span className={`expiry-value ${!vehicle.licenseExpiryDate || new Date(vehicle.licenseExpiryDate) < new Date() ? 'expired' : ''}`}>
+                  {vehicle.licenseExpiryDate || "Not set"}
+                </span>
+              </div>
+              <div className="expiry-item">
+                <span className="expiry-label">Insurance:</span>
+                <span className={`expiry-value ${!vehicle.insuranceExpiryDate || new Date(vehicle.insuranceExpiryDate) < new Date() ? 'expired' : ''}`}>
+                  {vehicle.insuranceExpiryDate || "Not set"}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -248,15 +316,33 @@ function VehicleCard({
 
 export default function VehiclePage({
   vehicles,
+  allVehicles,
   deleteVehicle,
   editVehicle,
   setShowModal,
   incrementMileage,
   updateStatus,
-  user
+  user,
+  onMaintenanceStatusChange,
+  // Enhanced props
+  selectedVehicles,
+  setSelectedVehicles,
+  handleBulkStatusChange,
+  handleBulkDelete,
+  advancedFilters,
+  setAdvancedFilters,
+  clearAllFilters,
+  // Existing props
+  searchQuery,
+  setSearchQuery,
+  filterStatus,
+  setFilterStatus,
+  statusCounts,
+  users = [] // ADD USERS PROP
 }) {
   const [editingVin, setEditingVin] = useState(null);
   const [editableVehicles, setEditableVehicles] = useState({});
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const handleEditClick = (vehicle) => {
     setEditingVin(vehicle.vin);
@@ -283,18 +369,94 @@ export default function VehiclePage({
     setEditableVehicles(prev => { const newState = { ...prev }; delete newState[vin]; return newState; });
   };
 
+  // ENHANCED: Status change handler with driver assignment
+  const handleStatusChange = async (vin, newStatus) => {
+    const vehicle = vehicles.find(v => v.vin === vin);
+    
+    // Call the parent updateStatus which now handles driver assignment
+    await updateStatus(vin, newStatus);
+    
+    // Maintenance status change handling
+    if (newStatus === "In Maintenance" && vehicle.status !== "In Maintenance") {
+      if (onMaintenanceStatusChange) {
+        await onMaintenanceStatusChange(vehicle, "add");
+      }
+    } else if (vehicle.status === "In Maintenance" && newStatus !== "In Maintenance") {
+      if (onMaintenanceStatusChange) {
+        await onMaintenanceStatusChange(vehicle, "remove");
+      }
+    }
+  };
+
+  // Selection handlers
+  const handleSelectVehicle = (vin) => {
+    setSelectedVehicles(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(vin)) {
+        newSet.delete(vin);
+      } else {
+        newSet.add(vin);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedVehicles.size === vehicles.length) {
+      setSelectedVehicles(new Set());
+    } else {
+      setSelectedVehicles(new Set(vehicles.map(v => v.vin)));
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedVehicles(new Set());
+  };
+
+  // Advanced filter handlers
+  const handleAdvancedFilterChange = (field, value) => {
+    setAdvancedFilters(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const clearAdvancedFilters = () => {
+    setAdvancedFilters({
+      make: '',
+      model: '',
+      yearFrom: '',
+      yearTo: '',
+      mileageFrom: '',
+      mileageTo: ''
+    });
+  };
+
+  const hasActiveFilters = searchQuery || filterStatus || 
+    Object.values(advancedFilters).some(value => value !== '');
+
   const summaryCards = [
-    { label: "Total Vehicles", value: vehicles.length, icon: "🚗", color: "#00d4ff" },
-    { label: "Available", value: vehicles.filter(v => v.status === "Available").length, icon: "✅", color: "#10b981" },
-    { label: "In Use", value: vehicles.filter(v => v.status === "In Use").length, icon: "🛣️", color: "#f59e0b" },
-    { label: "Maintenance", value: vehicles.filter(v => v.status === "In Maintenance").length, icon: "🔧", color: "#ef4444" }
+    { label: "Total Vehicles", value: allVehicles.length, icon: <FaCar />, color: "#6366f1" },
+    { label: "Available", value: allVehicles.filter(v => v.status === "Available").length, icon: <FaCheck />, color: "#10b981" },
+    { label: "In Use", value: allVehicles.filter(v => v.status === "In Use").length, icon: <FaCar />, color: "#f59e0b" },
+    { label: "Maintenance", value: allVehicles.filter(v => v.status === "In Maintenance").length, icon: <FaWrench />, color: "#ef4444" }
   ];
 
   return (
-    <div className="unified-page vehicle-page">
+    <div className="vehicle-page">
       <div className="page-header">
-        <h1>Vehicle Fleet</h1>
-        <p>Manage your vehicle inventory</p>
+        <div className="header-content">
+          <div className="header-main">
+            <h1>Vehicle Fleet</h1>
+            <p>Manage your vehicle inventory efficiently</p>
+          </div>
+          <div className="header-actions">
+            <div className="user-info">
+              <span className="user-name">Welcome, {user?.name || user?.username || 'User'}</span>
+              <span className="user-role">({user?.role || 'User'})</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="page-content">
@@ -306,15 +468,180 @@ export default function VehiclePage({
           </div>
         </div>
 
-        {user.role === "ADMIN" && (
-          <div className="page-toolbar">
-            <button className="btn btn-primary" onClick={() => setShowModal(true)}>
-              <FaPlus /> Add Vehicle
-            </button>
+        {/* Bulk Actions */}
+        {user.role === "ADMIN" && selectedVehicles.size > 0 && (
+          <div className="bulk-actions">
+            <div className="bulk-info">
+              <span className="selected-count">{selectedVehicles.size}</span> vehicles selected
+            </div>
+            <div className="bulk-buttons">
+              <select 
+                onChange={(e) => handleBulkStatusChange(e.target.value)}
+                className="bulk-select"
+                defaultValue=""
+              >
+                <option value="" disabled>Change Status...</option>
+                <option value="Available">Available</option>
+                <option value="In Use">In Use</option>
+                <option value="In Maintenance">Maintenance</option>
+              </select>
+              <button 
+                onClick={handleBulkDelete}
+                className="btn-compact btn-cancel-compact"
+              >
+                <FaTrash /> Delete Selected
+              </button>
+              <button 
+                onClick={handleClearSelection}
+                className="btn-compact btn-mileage-compact"
+              >
+                <FaTimesCircle /> Clear
+              </button>
+            </div>
           </div>
         )}
 
-        <div className="content-grid">
+        {/* Toolbar with Search and Filters */}
+        <div className="page-toolbar">
+          <div className="search-filters">
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Search vehicles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+            </div>
+            
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">All Status</option>
+              <option value="Available">Available</option>
+              <option value="In Use">In Use</option>
+              <option value="In Maintenance">Maintenance</option>
+            </select>
+
+            <button 
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className={`btn-compact ${showAdvancedFilters ? 'btn-primary-compact' : 'btn-mileage-compact'}`}
+            >
+              <FaFilter /> {showAdvancedFilters ? 'Hide' : 'Filters'}
+            </button>
+
+            {hasActiveFilters && (
+              <button 
+                onClick={clearAllFilters}
+                className="btn-compact btn-cancel-compact"
+              >
+                <FaTimesCircle /> Clear
+              </button>
+            )}
+
+            {user.role === "ADMIN" && vehicles.length > 0 && (
+              <button 
+                onClick={handleSelectAll}
+                className="btn-compact btn-mileage-compact"
+              >
+                {selectedVehicles.size === vehicles.length ? <FaCheckSquare /> : <FaSquare />}
+                {selectedVehicles.size === vehicles.length ? 'Deselect All' : 'Select All'}
+              </button>
+            )}
+          </div>
+
+          <div className="action-buttons">
+            {user.role === "ADMIN" && (
+              <button className="btn-compact btn-primary-compact" onClick={() => setShowModal(true)}>
+                <FaPlus /> Add Vehicle
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Advanced Filters */}
+        {showAdvancedFilters && (
+          <div className="advanced-filters">
+            <div className="filter-header">
+              <h4>Advanced Filters</h4>
+              <button onClick={clearAdvancedFilters} className="btn-compact btn-mileage-compact">
+                <FaTimesCircle /> Clear Filters
+              </button>
+            </div>
+            <div className="filter-grid">
+              <div className="form-group">
+                <label className="form-label">Make</label>
+                <input
+                  type="text"
+                  value={advancedFilters.make}
+                  onChange={(e) => handleAdvancedFilterChange('make', e.target.value)}
+                  className="form-input"
+                  placeholder="Filter by make"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Model</label>
+                <input
+                  type="text"
+                  value={advancedFilters.model}
+                  onChange={(e) => handleAdvancedFilterChange('model', e.target.value)}
+                  className="form-input"
+                  placeholder="Filter by model"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Year From</label>
+                <input
+                  type="number"
+                  value={advancedFilters.yearFrom}
+                  onChange={(e) => handleAdvancedFilterChange('yearFrom', e.target.value)}
+                  className="form-input"
+                  placeholder="From year"
+                  min="1900"
+                  max="2030"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Year To</label>
+                <input
+                  type="number"
+                  value={advancedFilters.yearTo}
+                  onChange={(e) => handleAdvancedFilterChange('yearTo', e.target.value)}
+                  className="form-input"
+                  placeholder="To year"
+                  min="1900"
+                  max="2030"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Mileage From</label>
+                <input
+                  type="number"
+                  value={advancedFilters.mileageFrom}
+                  onChange={(e) => handleAdvancedFilterChange('mileageFrom', e.target.value)}
+                  className="form-input"
+                  placeholder="Min mileage"
+                  min="0"
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Mileage To</label>
+                <input
+                  type="number"
+                  value={advancedFilters.mileageTo}
+                  onChange={(e) => handleAdvancedFilterChange('mileageTo', e.target.value)}
+                  className="form-input"
+                  placeholder="Max mileage"
+                  min="0"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="content-section">
           {vehicles.length > 0 ? (
             <div className="vehicles-grid">
               {vehicles.map(vehicle => (
@@ -329,8 +656,12 @@ export default function VehiclePage({
                   onCancel={handleCancel}
                   onFieldEdit={handleFieldEdit}
                   onIncrementMileage={incrementMileage}
-                  onUpdateStatus={updateStatus}
+                  onStatusChange={handleStatusChange}
                   userRole={user.role}
+                  // Enhanced props
+                  isSelected={selectedVehicles.has(vehicle.vin)}
+                  onSelectVehicle={handleSelectVehicle}
+                  users={users} // PASS USERS TO VEHICLE CARD
                 />
               ))}
             </div>
@@ -338,10 +669,20 @@ export default function VehiclePage({
             <div className="empty-state">
               <div className="empty-icon">🚗</div>
               <h3>No vehicles found</h3>
-              <p>Get started by adding your first vehicle to the fleet</p>
-              {user.role === "ADMIN" && (
+              <p>
+                {hasActiveFilters 
+                  ? "Try adjusting your search criteria or clear filters" 
+                  : "Get started by adding your first vehicle to the fleet"
+                }
+              </p>
+              {user.role === "ADMIN" && !hasActiveFilters && (
                 <button className="btn btn-primary" onClick={() => setShowModal(true)}>
                   <FaPlus /> Add First Vehicle
+                </button>
+              )}
+              {hasActiveFilters && (
+                <button className="btn btn-primary" onClick={clearAllFilters}>
+                  <FaTimesCircle /> Clear Filters
                 </button>
               )}
             </div>

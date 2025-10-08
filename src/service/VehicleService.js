@@ -1,56 +1,36 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/service/users"; // Updated to match your controller
+const API_URL = "http://localhost:8080/service/vehicle";
 
-const login = async (username, password) => {
-  try {
-    const response = await axios.post(`${API_URL}/login`, { 
-      username, 
-      password 
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Login failed:", error.response?.data || error.message);
-    throw error;
-  }
+const VehicleService = {
+  getAllVehicles: async () => {
+    const res = await axios.get(API_URL);
+    return res.data;
+  },
+
+  addVehicle: async (vehicle) => {
+    try {
+      const res = await axios.post(`${API_URL}/add`, vehicle);
+      return res.data;
+    } catch (err) {
+      if (err.response && err.response.status === 409) {
+        // VIN already exists
+        throw new Error(err.response.data);
+      } else {
+        throw new Error("Failed to add vehicle. Please try again.");
+      }
+    }
+  },
+
+  updateVehicle: async (vin, vehicle) => {
+    const res = await axios.put(`${API_URL}/${vin}`, vehicle);
+    return res.data;
+  },
+
+  deleteVehicle: async (vin) => {
+    const res = await axios.delete(`${API_URL}/delete/${vin}`);
+    return res.data;
+  },
 };
 
-const register = async (user) => {
-  try {
-    const response = await axios.post(`${API_URL}/register`, user);
-    return response.data;
-  } catch (error) {
-    console.error("Registration failed:", error.response?.data || error.message);
-    throw error;
-  }
-};
-
-// Optional: Add permission check methods for your frontend
-const checkPermissions = async (username) => {
-  try {
-    const [canEdit, canAdd, canDelete] = await Promise.all([
-      axios.get(`${API_URL}/check/${username}/edit`),
-      axios.get(`${API_URL}/check/${username}/add`),
-      axios.get(`${API_URL}/check/${username}/delete`)
-    ]);
-    
-    return {
-      canEdit: canEdit.data,
-      canAdd: canAdd.data,
-      canDelete: canDelete.data
-    };
-  } catch (error) {
-    console.error("Permission check failed:", error);
-    return {
-      canEdit: false,
-      canAdd: false,
-      canDelete: false
-    };
-  }
-};
-
-export default {
-  login,
-  register,
-  checkPermissions
-};
+export default VehicleService;

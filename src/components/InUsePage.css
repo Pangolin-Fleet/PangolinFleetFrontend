@@ -1,4 +1,4 @@
-/* InUsePage.css - PANGO FLEET PREMIUM MATCH */
+/* InUsePage.css - PROFESSIONAL FULL-WIDTH LAYOUT */
 .inuse-container {
   width: 100%;
   min-height: 100vh;
@@ -36,30 +36,39 @@
   to { background-position: 400px 400px; }
 }
 
-/* COMMAND CENTER HEADER */
+/* HEADER */
 .inuse-container .page-header {
   background: linear-gradient(135deg, 
     rgba(10, 14, 23, 0.95) 0%, 
     rgba(26, 35, 126, 0.8) 100%);
-  padding: 2rem 2.5rem;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
   backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  padding: 2rem 0;
   position: relative;
   z-index: 10;
   box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
+  width: 100%;
 }
 
-.inuse-container .page-header::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.6), 
-    transparent);
+.inuse-container .header-content {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  box-sizing: border-box;
+}
+
+.inuse-container .header-main {
+  flex: 1;
+}
+
+.inuse-container .header-actions {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .inuse-container .page-header h1 {
@@ -70,45 +79,76 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 700;
-  letter-spacing: -0.5px;
   text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
 }
 
 .inuse-container .page-header p {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #94a3b8;
   font-weight: 400;
 }
 
-/* COMMAND CENTER CONTENT */
+/* USER INFO */
+.inuse-container .user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.inuse-container .user-name {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.inuse-container .user-role {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* MAIN CONTENT */
 .inuse-container .page-content {
-  padding: 2rem 2.5rem;
   width: 100%;
-  box-sizing: border-box;
+  margin: 0;
+  padding: 2rem;
   position: relative;
   z-index: 5;
+  box-sizing: border-box;
 }
 
-/* ACTIVE MISSIONS GRID */
+/* CONTENT SECTION */
+.inuse-container .content-section {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* VEHICLE GRID */
 .inuse-container .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
   gap: 1.5rem;
+  width: 100%;
+  align-items: stretch;
 }
 
-/* MISSION CARD - SPACECRAFT IN FLIGHT */
+/* VEHICLE CARD */
 .inuse-container .inuse-card {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   position: relative;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  height: fit-content;
+  min-height: 450px;
 }
 
 .inuse-container .inuse-card::before {
@@ -125,125 +165,252 @@
 }
 
 .inuse-container .inuse-card:hover {
-  transform: translateY(-3px);
+  transform: translateY(-2px);
   border-color: #00d4ff;
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
 
 .inuse-container .inuse-card.editing {
-  border: 2px solid rgba(0, 212, 255, 0.5);
-  box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+  border-color: #00d4ff;
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
 
-/* MISSION HEADER */
+/* Status border */
+.inuse-container .inuse-card {
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(90deg, 
+    rgba(245, 158, 11, 0.05) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+/* CARD HEADER */
 .inuse-container .card-header {
-  padding: 1.25rem;
+  padding: 1.25rem 1.5rem;
   background: rgba(30, 41, 59, 0.8);
   border-bottom: 1px solid rgba(0, 212, 255, 0.2);
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: 1rem;
   backdrop-filter: blur(5px);
 }
 
-.inuse-container .vehicle-title {
-  font-size: 1.2rem;
+.inuse-container .vehicle-title h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
   font-weight: 600;
-  margin: 0;
   color: white;
+  line-height: 1.3;
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
+.inuse-container .vehicle-year {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+/* STATUS PILL */
 .inuse-container .status-pill {
-  padding: 0.4rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
+}
+
+.inuse-container .status-pill.in-use {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
   color: white;
 }
 
-/* MISSION DATA DISPLAY */
+.inuse-container .status-icon {
+  font-size: 0.7rem;
+}
+
+/* CARD BODY */
 .inuse-container .card-body {
-  padding: 1.25rem;
+  padding: 1.5rem;
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 1.25rem;
 }
 
-/* MISSION INFO - LEFT-ALIGNED GRID */
-.inuse-container .card-info {
-  margin-bottom: 1.5rem;
+/* INFO SECTIONS */
+.inuse-container .vehicle-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.inuse-container .info-section {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.inuse-container .card-info p {
+.inuse-container .info-row {
   display: grid;
-  grid-template-columns: 140px 1fr;
-  gap: 1rem;
+  grid-template-columns: 80px 1fr;
+  gap: 0.75rem;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 0.25rem 0;
   border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-  font-size: 0.9rem;
 }
 
-.inuse-container .card-info p:last-child {
+.inuse-container .info-row:last-child {
   border-bottom: none;
 }
 
-.inuse-container .card-info .icon {
-  color: #00d4ff;
-  margin-right: 0.5rem;
-}
-
-.inuse-container .card-info .label {
+.inuse-container .info-label {
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* MISSION TIMELINE */
-.inuse-container .timestamps {
-  background: rgba(0, 0, 0, 0.3);
-  padding: 1rem;
-  border-radius: 8px;
-  margin: 1rem 0;
-  border-left: 3px solid #00d4ff;
+.inuse-container .info-value {
+  font-size: 0.875rem;
+  color: white;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
-.inuse-container .ts-row {
-  display: grid;
-  grid-template-columns: 100px 1fr;
-  gap: 1rem;
+/* MILEAGE SECTION */
+.inuse-container .mileage-content {
+  display: flex;
   align-items: center;
-  margin-bottom: 0.5rem;
+  gap: 0.5rem;
+  justify-content: space-between;
+}
+
+.inuse-container .btn-mileage {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 6px;
+  color: #00d4ff;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.inuse-container .btn-mileage:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+  transform: translateY(-1px);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+/* PITSTOPS SECTION */
+.inuse-container .pitstops-section {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.inuse-container .pitstops-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inuse-container .pitstops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inuse-container .pitstop-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
   font-size: 0.8rem;
-  color: #b0bec5;
 }
 
-.inuse-container .ts-row:last-child {
-  margin-bottom: 0;
+.inuse-container .pitstop-location {
+  color: white;
+  font-weight: 500;
 }
 
-.inuse-container .ts-row .icon {
-  color: #ff6d00;
-  margin-right: 0.5rem;
+.inuse-container .pitstop-notes {
+  color: #94a3b8;
+  font-style: italic;
 }
 
-/* MISSION CONTROLS */
+/* TIMESTAMPS SECTION */
+.inuse-container .timestamps-section {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.inuse-container .timestamps-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #94a3b8;
+  margin: 0 0 0.75rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inuse-container .timestamps-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inuse-container .timestamp-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.inuse-container .timestamp-item:last-child {
+  border-bottom: none;
+}
+
+.inuse-container .timestamp-label {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.inuse-container .timestamp-value {
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: #cbd5e1;
+}
+
+/* CARD ACTIONS */
 .inuse-container .card-actions {
   display: flex;
   gap: 0.75rem;
   margin-top: auto;
-  padding-top: 1.5rem;
+  padding-top: 1.25rem;
   border-top: 1px solid rgba(51, 65, 85, 0.5);
-  width: 100%;
 }
 
 .inuse-container .card-actions button {
@@ -257,7 +424,7 @@
   cursor: pointer;
   flex: 1;
   justify-content: center;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
@@ -281,137 +448,72 @@
   left: 100%;
 }
 
-.inuse-container .btn-yellow {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+.inuse-container .btn-edit {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
 }
 
-.inuse-container .btn-yellow:hover:not(:disabled) {
-  background: linear-gradient(135deg, #e6900b 0%, #c46a05 100%);
+.inuse-container .btn-edit:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
-.inuse-container .btn-green {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.inuse-container .btn-green:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0da271 0%, #047852 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-}
-
-.inuse-container .btn-red {
+.inuse-container .btn-delete {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
 }
 
-.inuse-container .btn-red:hover:not(:disabled) {
+.inuse-container .btn-delete:hover {
   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
 }
 
-/* MISSION FORM - EDIT MODE */
-.inuse-container .form-group {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.inuse-container .label {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
+.inuse-container .btn-save {
+  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
   color: white;
-  font-size: 0.9rem;
+  border: none;
 }
 
-.inuse-container .label .icon {
-  margin-right: 0.5rem;
-  color: #00d4ff;
+.inuse-container .btn-save:hover:not(:disabled) {
+  background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
 }
 
-.inuse-container .input,
-.inuse-container .textarea {
+.inuse-container .btn-save:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.inuse-container .btn-cancel {
+  background: #6b7280;
+  color: white;
+  border: none;
+}
+
+.inuse-container .btn-cancel:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
+/* EMPTY STATE */
+.inuse-container .empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  margin: 2rem 0;
+  position: relative;
   width: 100%;
-  padding: 0.6rem;
-  border: 1px solid rgba(71, 85, 105, 0.5);
-  border-radius: 6px;
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
-.inuse-container .input:focus,
-.inuse-container .textarea:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.inuse-container .textarea {
-  resize: vertical;
-  min-height: 80px;
-  font-family: inherit;
-}
-
-.inuse-container .input.error,
-.inuse-container .textarea.error {
-  border-color: #ef4444;
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
-}
-
-/* MISSION STATUS MESSAGES */
-.inuse-container .status-msg {
-  padding: 0.75rem;
-  border-radius: 6px;
-  margin-top: 1rem;
-  font-weight: 600;
-  text-align: center;
-  font-size: 0.85rem;
-}
-
-.inuse-container .status-msg.success {
-  background: rgba(16, 185, 129, 0.2);
-  color: #34d399;
-  border: 1px solid rgba(52, 211, 153, 0.3);
-}
-
-.inuse-container .status-msg.error {
-  background: rgba(239, 68, 68, 0.2);
-  color: #f87171;
-  border: 1px solid rgba(248, 113, 113, 0.3);
-}
-
-/* MISSION VALIDATION ERRORS */
-.inuse-container .error-message {
-  color: #f87171;
-  font-size: 0.8rem;
-  margin-top: 0.25rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-/* EMPTY DOCKING BAY */
-.inuse-container .no-vehicles-message {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #64748b;
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  position: relative;
-}
-
-.inuse-container .no-vehicles-message::before {
+.inuse-container .empty-state::before {
   content: '';
   position: absolute;
   top: 0;
@@ -424,78 +526,41 @@
     transparent);
 }
 
-.inuse-container .no-vehicles-message .icon-large {
-  font-size: 4rem;
+.inuse-container .empty-icon {
+  font-size: 3rem;
   margin-bottom: 1rem;
   opacity: 0.7;
   filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
   animation: float 3s ease-in-out infinite;
 }
 
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
-
-.inuse-container .no-vehicles-message h3 {
+.inuse-container .empty-state h3 {
   color: #94a3b8;
   margin-bottom: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
-.inuse-container .no-vehicles-message p {
+.inuse-container .empty-state p {
   margin-bottom: 1.5rem;
-  font-size: 1rem;
-}
-
-/* LOADING STATE */
-.inuse-container .loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 6rem 2rem;
-  text-align: center;
-  color: white;
-}
-
-.inuse-container .loading-container .spin.large {
-  font-size: 3rem;
-  color: #00d4ff;
-  margin-bottom: 1rem;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.inuse-container .spin {
-  animation: spin 1s linear infinite;
+  font-size: 0.9rem;
 }
 
 /* RESPONSIVE DESIGN */
 @media (max-width: 1200px) {
   .inuse-container .vehicles-grid {
-    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .inuse-container .page-header,
   .inuse-container .page-content {
-    padding: 1.5rem;
+    padding: 1rem;
   }
   
   .inuse-container .vehicles-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
-  }
-  
-  .inuse-container .card-actions {
-    flex-direction: column;
   }
   
   .inuse-container .card-header {
@@ -504,31 +569,32 @@
     gap: 0.75rem;
   }
   
-  .inuse-container .card-info p {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
+  .inuse-container .info-row {
+    grid-template-columns: 70px 1fr;
   }
   
-  .inuse-container .ts-row {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
+  .inuse-container .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .inuse-container .user-info {
+    align-items: center;
   }
 }
 
 @media (max-width: 480px) {
-  .inuse-container .page-header {
-    padding: 1.25rem;
+  .inuse-container .header-content {
+    padding: 0 1rem;
   }
   
-  .inuse-container .page-content {
-    padding: 1.25rem;
+  .inuse-container .header-actions {
+    width: 100%;
+    justify-content: center;
   }
   
-  .inuse-container .page-header h1 {
-    font-size: 1.75rem;
-  }
-  
-  .inuse-container .status-pill {
-    align-self: flex-start;
+  .inuse-container .card-actions {
+    flex-direction: column;
   }
 }

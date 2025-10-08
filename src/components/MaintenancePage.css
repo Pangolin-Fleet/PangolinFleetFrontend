@@ -1,5 +1,5 @@
-/* MaintenancePage.css - PANGO FLEET PREMIUM MATCH */
-.maintenance-container {
+/* MaintenancePage.css - PROFESSIONAL FULL-WIDTH LAYOUT */
+.maintenance-page {
   width: 100%;
   min-height: 100vh;
   background: 
@@ -13,7 +13,7 @@
 }
 
 /* SPACE BACKGROUND EFFECTS */
-.maintenance-container::before {
+.maintenance-page::before {
   content: '';
   position: absolute;
   top: 0;
@@ -36,33 +36,36 @@
   to { background-position: 400px 400px; }
 }
 
-/* COMMAND CENTER HEADER */
-.maintenance-container .page-header {
+/* HEADER */
+.maintenance-page .page-header {
   background: linear-gradient(135deg, 
     rgba(10, 14, 23, 0.95) 0%, 
     rgba(26, 35, 126, 0.8) 100%);
-  padding: 2rem 2.5rem;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
   backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  padding: 2rem 0;
   position: relative;
   z-index: 10;
   box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
+  width: 100%;
 }
 
-.maintenance-container .page-header::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.6), 
-    transparent);
+.maintenance-page .header-content {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  box-sizing: border-box;
 }
 
-.maintenance-container .page-header h1 {
+.maintenance-page .header-main {
+  flex: 1;
+}
+
+.maintenance-page .page-header h1 {
   font-size: 2rem;
   margin: 0 0 0.5rem 0;
   background: linear-gradient(135deg, #00d4ff 0%, #4facfe 100%);
@@ -70,244 +73,221 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 700;
-  letter-spacing: -0.5px;
   text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
 }
 
-.maintenance-container .page-header p {
+.maintenance-page .page-header p {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #94a3b8;
   font-weight: 400;
 }
 
-/* COMMAND CENTER CONTENT */
-.maintenance-container .page-content {
-  padding: 2rem 2.5rem;
+.maintenance-page .user-info {
+  text-align: right;
+}
+
+.maintenance-page .user-name {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.25rem;
+}
+
+.maintenance-page .user-role {
+  color: #94a3b8;
+  font-size: 0.875rem;
+}
+
+/* MAIN CONTENT */
+.maintenance-page .page-content {
   width: 100%;
-  box-sizing: border-box;
+  margin: 0;
+  padding: 2rem;
   position: relative;
   z-index: 5;
-}
-
-/* MAINTENANCE CONTROL PANEL */
-.maintenance-container .filter-section {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.maintenance-container .search-box {
-  flex: 1;
-  min-width: 300px;
-  position: relative;
-}
-
-.maintenance-container .search-input {
-  width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
   box-sizing: border-box;
-  backdrop-filter: blur(5px);
 }
 
-.maintenance-container .search-input:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+/* SUMMARY CARDS */
+.maintenance-page .summary-section {
+  margin-bottom: 2rem;
+  width: 100%;
 }
 
-.maintenance-container .search-icon {
-  position: absolute;
-  left: 0.75rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #00d4ff;
+.maintenance-page .summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  width: 100%;
 }
 
-.maintenance-container .filter-select {
-  padding: 0.75rem 1rem;
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-  min-width: 150px;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-}
-
-.maintenance-container .filter-select:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-}
-
-/* MAINTENANCE FORM - SERVICE BAY */
-.maintenance-container .maintenance-form-card {
-  background: rgba(255, 255, 255, 0.03);
+.maintenance-page .summary-card {
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 12px;
-  overflow: hidden;
+  padding: 1.25rem;
   transition: all 0.3s ease;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
   position: relative;
+  overflow: hidden;
 }
 
-.maintenance-container .maintenance-form-card::before {
+.maintenance-page .summary-card::before {
   content: '';
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
+  left: -100%;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(90deg, 
     transparent, 
-    rgba(0, 212, 255, 0.4), 
+    rgba(0, 212, 255, 0.1), 
     transparent);
+  transition: left 0.5s;
 }
 
-.maintenance-container .maintenance-form-card:hover {
-  transform: translateY(-3px);
+.maintenance-page .summary-card:hover::before {
+  left: 100%;
+}
+
+.maintenance-page .summary-card:hover {
+  transform: translateY(-2px);
   border-color: #00d4ff;
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
 
-/* SERVICE FORM HEADER */
-.maintenance-container .card-header {
-  padding: 1.25rem;
-  background: rgba(30, 41, 59, 0.8);
-  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+.maintenance-page .summary-card-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.maintenance-page .summary-icon {
+  font-size: 1.5rem;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
+}
+
+.maintenance-page .summary-text {
+  flex: 1;
+}
+
+.maintenance-page .summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  line-height: 1;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+}
+
+.maintenance-page .summary-label {
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ENHANCED TOOLBAR LAYOUT */
+.maintenance-page .page-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  backdrop-filter: blur(5px);
-}
-
-.maintenance-container .vehicle-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin: 0;
-  color: white;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.maintenance-container .status-pill {
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-/* SERVICE FORM BODY */
-.maintenance-container .card-body {
-  padding: 1.25rem;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* SERVICE FORM GRID */
-.maintenance-container .form-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-.maintenance-container .span-full {
-  grid-column: 1 / -1;
-}
-
-/* SERVICE FORM CONTROLS */
-.maintenance-container .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.maintenance-container .label {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  color: white;
-  font-size: 0.9rem;
-  gap: 0.5rem;
-}
-
-.maintenance-container .label .icon {
-  color: #00d4ff;
-}
-
-.maintenance-container .input,
-.maintenance-container .textarea,
-.maintenance-container select {
+  margin-bottom: 2rem;
   width: 100%;
-  padding: 0.6rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.maintenance-page .search-filters {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.maintenance-page .search-bar {
+  flex: 1;
+  min-width: 250px;
+  max-width: 400px;
+  position: relative;
+}
+
+.maintenance-page .search-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
   border: 1px solid rgba(71, 85, 105, 0.5);
-  border-radius: 6px;
+  border-radius: 8px;
   background: rgba(30, 41, 59, 0.8);
   color: white;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   transition: all 0.2s ease;
-  box-sizing: border-box;
-  backdrop-filter: blur(5px);
 }
 
-.maintenance-container .input:focus,
-.maintenance-container .textarea:focus,
-.maintenance-container select:focus {
+.maintenance-page .search-input:focus {
   outline: none;
   border-color: #00d4ff;
   box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
-.maintenance-container .textarea {
-  resize: vertical;
-  min-height: 100px;
-  font-family: inherit;
+.maintenance-page .search-input::placeholder {
+  color: #94a3b8;
 }
 
-/* SERVICE FORM ACTIONS */
-.maintenance-container .card-actions {
+.maintenance-page .filter-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  font-size: 0.875rem;
+  min-width: 140px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.maintenance-page .filter-select:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.maintenance-page .action-buttons {
   display: flex;
+  align-items: center;
   gap: 0.75rem;
-  margin-top: 1rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(51, 65, 85, 0.5);
-  width: 100%;
+  flex-shrink: 0;
 }
 
-.maintenance-container .card-actions button {
-  display: flex;
+/* COMPACT BUTTON STYLES */
+.maintenance-page .btn-compact {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.6rem 1rem;
   border: none;
-  border-radius: 6px;
-  font-weight: 500;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.8rem;
   cursor: pointer;
-  flex: 1;
+  transition: all 0.3s ease;
+  text-decoration: none;
   justify-content: center;
-  font-size: 0.85rem;
-  transition: all 0.2s ease;
+  font-family: inherit;
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
 }
 
-.maintenance-container .card-actions button::before {
+.maintenance-page .btn-compact::before {
   content: '';
   position: absolute;
   top: 0;
@@ -321,55 +301,205 @@
   transition: left 0.5s;
 }
 
-.maintenance-container .card-actions button:hover::before {
+.maintenance-page .btn-compact:hover::before {
   left: 100%;
 }
 
-.maintenance-container .btn-green {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
+.maintenance-page .btn-primary-compact {
+  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
+  color: #0a0e17;
+  box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.maintenance-container .btn-green:hover:not(:disabled) {
-  background: linear-gradient(135deg, #0da271 0%, #047852 100%);
+.maintenance-page .btn-primary-compact:hover {
+  background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
 }
 
-.maintenance-container .btn-red {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
+.maintenance-page .btn-mileage-compact {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: #00d4ff;
+  font-size: 0.75rem;
 }
 
-.maintenance-container .btn-red:hover:not(:disabled) {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+.maintenance-page .btn-mileage-compact:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
 }
 
-/* MAINTENANCE RECORDS GRID */
-.maintenance-container .vehicles-grid {
+.maintenance-page .btn-cancel-compact {
+  background: rgba(107, 114, 128, 0.1);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  color: #94a3b8;
+  font-size: 0.75rem;
+}
+
+.maintenance-page .btn-cancel-compact:hover {
+  background: rgba(107, 114, 128, 0.2);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* MAINTENANCE FORM CARD */
+.maintenance-page .maintenance-form-card {
+  margin-bottom: 2rem;
+}
+
+.maintenance-page .maintenance-form-card .card-body {
+  padding: 1.5rem;
+}
+
+/* FORM STYLES */
+.maintenance-page .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 1.5rem;
-  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-/* MAINTENANCE RECORD CARD */
-.maintenance-container .inuse-card {
+.maintenance-page .form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.maintenance-page .form-group.span-full {
+  grid-column: 1 / -1;
+}
+
+.maintenance-page .form-label {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.maintenance-page .form-input,
+.maintenance-page .form-select,
+.maintenance-page .form-textarea {
+  padding: 0.75rem;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.maintenance-page .form-input:focus,
+.maintenance-page .form-select:focus,
+.maintenance-page .form-textarea:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.maintenance-page .form-textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.maintenance-page .form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-start;
+  border-top: 1px solid rgba(51, 65, 85, 0.5);
+  padding-top: 1.5rem;
+}
+
+/* BUTTON STYLES */
+.maintenance-page .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  text-decoration: none;
+  justify-content: center;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+}
+
+.maintenance-page .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s;
+}
+
+.maintenance-page .btn:hover::before {
+  left: 100%;
+}
+
+.maintenance-page .btn-save {
+  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
+  color: #0a0e17;
+}
+
+.maintenance-page .btn-save:hover {
+  background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+}
+
+.maintenance-page .btn-cancel {
+  background: rgba(107, 114, 128, 0.1);
+  border: 1px solid rgba(107, 114, 128, 0.3);
+  color: #94a3b8;
+}
+
+.maintenance-page .btn-cancel:hover {
+  background: rgba(107, 114, 128, 0.2);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.maintenance-page .btn-primary {
+  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
+  color: #0a0e17;
+  box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
+}
+
+.maintenance-page .btn-primary:hover {
+  background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+}
+
+/* VEHICLE CARD STYLES (Reused from VehiclePage) */
+.maintenance-page .vehicle-card {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   position: relative;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  height: fit-content;
 }
 
-.maintenance-container .inuse-card::before {
+.maintenance-page .vehicle-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -382,65 +512,247 @@
     transparent);
 }
 
-.maintenance-container .inuse-card:hover {
-  transform: translateY(-3px);
+.maintenance-page .vehicle-card:hover {
+  transform: translateY(-2px);
   border-color: #00d4ff;
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
 
-/* MAINTENANCE RECORD INFO */
-.maintenance-container .card-info {
-  margin-bottom: 1.5rem;
+/* Status borders for maintenance cards */
+.maintenance-page .vehicle-card.low { 
+  border-left: 4px solid #10b981;
+  background: linear-gradient(90deg, 
+    rgba(16, 185, 129, 0.05) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+.maintenance-page .vehicle-card.medium { 
+  border-left: 4px solid #f59e0b;
+  background: linear-gradient(90deg, 
+    rgba(245, 158, 11, 0.05) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+.maintenance-page .vehicle-card.high { 
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(90deg, 
+    rgba(239, 68, 68, 0.05) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+.maintenance-page .vehicle-card.critical { 
+  border-left: 4px solid #dc2626;
+  background: linear-gradient(90deg, 
+    rgba(220, 38, 38, 0.08) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+/* CARD HEADER */
+.maintenance-page .card-header {
+  padding: 1.25rem 1.5rem;
+  background: rgba(30, 41, 59, 0.8);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  backdrop-filter: blur(5px);
+}
+
+.maintenance-page .vehicle-title h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1.3;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.maintenance-page .vehicle-year {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  font-weight: 400;
+}
+
+/* STATUS PILL */
+.maintenance-page .status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.maintenance-page .status-pill.low {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+}
+
+.maintenance-page .status-pill.medium {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.maintenance-page .status-pill.high {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
+}
+
+.maintenance-page .status-pill.critical {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* CARD BODY */
+.maintenance-page .card-body {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* INFO SECTIONS */
+.maintenance-page .info-section {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.maintenance-container .card-info p {
+.maintenance-page .info-row {
   display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 1rem;
+  grid-template-columns: 80px 1fr;
+  gap: 0.75rem;
   align-items: center;
-  padding: 0.5rem 0;
+  padding: 0.25rem 0;
   border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-  font-size: 0.9rem;
 }
 
-.maintenance-container .card-info p:last-child {
+.maintenance-page .info-row:last-child {
   border-bottom: none;
 }
 
-.maintenance-container .card-info .icon {
-  color: #00d4ff;
-  margin-right: 0.5rem;
-}
-
-.maintenance-container .card-info .label {
+.maintenance-page .info-label {
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-/* MAINTENANCE RECORD ACTIONS */
-.maintenance-container .btn-yellow {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+.maintenance-page .info-value {
+  font-size: 0.875rem;
+  color: white;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+/* Special styling for maintenance fields */
+.maintenance-page .info-row.problem .info-value {
+  color: #f8fafc;
+  font-style: italic;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border-left: 2px solid rgba(0, 212, 255, 0.5);
+}
+
+.maintenance-page .info-row.cost .info-value {
+  color: #10b981;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.maintenance-page .info-row.date .info-value {
+  color: #f59e0b;
+  font-weight: 500;
+}
+
+/* CARD ACTIONS */
+.maintenance-page .card-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+.maintenance-page .card-actions button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  flex: 1;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.maintenance-page .card-actions button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(255, 255, 255, 0.2), 
+    transparent);
+  transition: left 0.5s;
+}
+
+.maintenance-page .card-actions button:hover::before {
+  left: 100%;
+}
+
+.maintenance-page .btn-edit {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
 }
 
-.maintenance-container .btn-yellow:hover:not(:disabled) {
-  background: linear-gradient(135deg, #e6900b 0%, #c46a05 100%);
+.maintenance-page .btn-edit:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
-/* MAINTENANCE HISTORY HEADER */
-.maintenance-container .maintenance-records {
-  margin-top: 2rem;
+.maintenance-page .btn-delete {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: white;
 }
 
-.maintenance-container .maintenance-records h2 {
+.maintenance-page .btn-delete:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+}
+
+/* MAINTENANCE RECORDS SECTION */
+.maintenance-page .maintenance-records {
+  margin-top: 3rem;
+  position: relative;
+}
+
+.maintenance-page .maintenance-records h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
   display: flex;
@@ -448,21 +760,56 @@
   gap: 0.75rem;
   color: white;
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-/* EMPTY SERVICE BAY */
-.maintenance-container .no-vehicles-message {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #64748b;
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(10px);
-  border-radius: 12px;
-  border: 1px solid rgba(0, 212, 255, 0.2);
+  font-weight: 600;
   position: relative;
+  padding-bottom: 0.75rem;
 }
 
-.maintenance-container .no-vehicles-message::before {
+.maintenance-page .maintenance-records h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #00d4ff, transparent);
+  border-radius: 2px;
+}
+
+.maintenance-page .records-count {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+/* VEHICLES GRID */
+.maintenance-page .vehicles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+/* EMPTY STATE */
+.maintenance-page .empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  margin: 2rem 0;
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.maintenance-page .empty-state::before {
   content: '';
   position: absolute;
   top: 0;
@@ -475,8 +822,8 @@
     transparent);
 }
 
-.maintenance-container .no-vehicles-message .icon-large {
-  font-size: 4rem;
+.maintenance-page .empty-icon {
+  font-size: 3rem;
   margin-bottom: 1rem;
   opacity: 0.7;
   filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
@@ -488,34 +835,36 @@
   50% { transform: translateY(-10px); }
 }
 
-.maintenance-container .no-vehicles-message h3 {
+.maintenance-page .empty-state h3 {
   color: #94a3b8;
   margin-bottom: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 600;
 }
 
-.maintenance-container .no-vehicles-message p {
+.maintenance-page .empty-state p {
   margin-bottom: 1.5rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
-/* LOADING STATE */
-.maintenance-container .loading-container {
+/* LOADING STYLES */
+.maintenance-page .loading-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 6rem 2rem;
+  padding: 4rem 2rem;
   text-align: center;
-  color: white;
 }
 
-.maintenance-container .loading-container .spin.large {
-  font-size: 3rem;
-  color: #00d4ff;
-  margin-bottom: 1rem;
+.maintenance-page .spin {
   animation: spin 1s linear infinite;
+}
+
+.maintenance-page .spin.large {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  color: #00d4ff;
 }
 
 @keyframes spin {
@@ -523,70 +872,100 @@
   to { transform: rotate(360deg); }
 }
 
-.maintenance-container .spin {
-  animation: spin 1s linear infinite;
-}
-
 /* RESPONSIVE DESIGN */
 @media (max-width: 1200px) {
-  .maintenance-container .vehicles-grid {
+  .maintenance-page .vehicles-grid {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  }
+  
+  .maintenance-page .search-filters {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+  
+  .maintenance-page .search-bar {
+    min-width: 200px;
+    max-width: 300px;
   }
 }
 
 @media (max-width: 768px) {
-  .maintenance-container .page-header,
-  .maintenance-container .page-content {
-    padding: 1.5rem;
+  .maintenance-page .page-content {
+    padding: 1rem;
   }
   
-  .maintenance-container .vehicles-grid {
+  .maintenance-page .vehicles-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   
-  .maintenance-container .filter-section {
-    flex-direction: column;
+  .maintenance-page .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .maintenance-container .search-box {
-    min-width: auto;
-  }
-  
-  .maintenance-container .form-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .maintenance-container .card-actions {
-    flex-direction: column;
-  }
-  
-  .maintenance-container .card-header {
+  .maintenance-page .card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
   }
   
-  .maintenance-container .card-info p {
+  .maintenance-page .info-row {
+    grid-template-columns: 70px 1fr;
+  }
+  
+  .maintenance-page .header-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .maintenance-page .page-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .maintenance-page .search-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .maintenance-page .search-bar {
+    max-width: none;
+  }
+  
+  .maintenance-page .action-buttons {
+    justify-content: center;
+  }
+  
+  .maintenance-page .form-grid {
     grid-template-columns: 1fr;
-    gap: 0.25rem;
+  }
+  
+  .maintenance-page .form-actions {
+    flex-direction: column;
   }
 }
 
 @media (max-width: 480px) {
-  .maintenance-container .page-header {
-    padding: 1.25rem;
+  .maintenance-page .header-content {
+    padding: 0 1rem;
   }
   
-  .maintenance-container .page-content {
-    padding: 1.25rem;
+  .maintenance-page .summary-cards {
+    grid-template-columns: 1fr;
   }
   
-  .maintenance-container .page-header h1 {
-    font-size: 1.75rem;
+  .maintenance-page .card-actions {
+    flex-direction: column;
   }
   
-  .maintenance-container .status-pill {
-    align-self: flex-start;
+  .maintenance-page .search-filters {
+    gap: 0.5rem;
+  }
+  
+  .maintenance-page .btn-compact {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
   }
 }
