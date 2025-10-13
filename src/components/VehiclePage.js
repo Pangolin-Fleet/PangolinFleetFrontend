@@ -35,7 +35,8 @@ function VehicleCard({
   onStatusChange,
   isSelected,
   onSelectVehicle,
-  users = [] // ADD USERS PROP
+  users = [], // ADD USERS PROP
+  canEditVehicles // ADD PERMISSION PROP
 }) {
   const statusClass = vehicle.status.toLowerCase().replace(' ', '-');
 
@@ -189,7 +190,7 @@ function VehicleCard({
   return (
     <div className={`vehicle-card ${statusClass} ${isSelected ? 'selected' : ''}`}>
       {/* Selection Checkbox */}
-      {userRole === "ADMIN" && (
+      {canEditVehicles && (
         <div className="vehicle-checkbox">
           <input
             type="checkbox"
@@ -247,7 +248,7 @@ function VehicleCard({
                   value={vehicle.status}
                   onChange={(e) => handleStatusChange(e.target.value)}
                   className="status-select"
-                  disabled={userRole !== "ADMIN"}
+                  disabled={!canEditVehicles}
                 >
                   <option value="Available">Available</option>
                   <option value="In Use">In Use</option>
@@ -299,7 +300,7 @@ function VehicleCard({
           </div>
         </div>
 
-        {userRole === "ADMIN" && (
+        {canEditVehicles && (
           <div className="card-actions">
             <button className="btn btn-edit" onClick={() => onEdit(vehicle)}>
               <FaEdit /> Edit
@@ -338,11 +339,28 @@ export default function VehiclePage({
   filterStatus,
   setFilterStatus,
   statusCounts,
-  users = [] // ADD USERS PROP
+  users = [], // ADD USERS PROP
+  canEdit // ADD PERMISSION PROP FROM PARENT
 }) {
   const [editingVin, setEditingVin] = useState(null);
   const [editableVehicles, setEditableVehicles] = useState({});
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+
+  // Enhanced permission checking
+  const canEditVehicles = () => {
+    if (!user) return false;
+    
+    const userRole = user.role?.toUpperCase();
+    const isSuperAdmin = 
+      user.isSuperUser === true ||
+      userRole === "SUPER_ADMIN" || 
+      userRole === "SUPERADMIN" ||
+      user.username?.toLowerCase().includes("super");
+    
+    return isSuperAdmin || userRole === "ADMIN";
+  };
+
+  const hasEditPermissions = canEditVehicles();
 
   const handleEditClick = (vehicle) => {
     setEditingVin(vehicle.vin);
@@ -453,7 +471,7 @@ export default function VehiclePage({
           <div className="header-actions">
             <div className="user-info">
               <span className="user-name">Welcome, {user?.name || user?.username || 'User'}</span>
-              <span className="user-role">({user?.role || 'User'})</span>
+              <span className="user-role">({user?.role || 'User'}) {user?.isSuperUser && "⭐"}</span>
             </div>
           </div>
         </div>
@@ -469,7 +487,7 @@ export default function VehiclePage({
         </div>
 
         {/* Bulk Actions */}
-        {user.role === "ADMIN" && selectedVehicles.size > 0 && (
+        {hasEditPermissions && selectedVehicles.size > 0 && (
           <div className="bulk-actions">
             <div className="bulk-info">
               <span className="selected-count">{selectedVehicles.size}</span> vehicles selected
@@ -541,7 +559,7 @@ export default function VehiclePage({
               </button>
             )}
 
-            {user.role === "ADMIN" && vehicles.length > 0 && (
+            {hasEditPermissions && vehicles.length > 0 && (
               <button 
                 onClick={handleSelectAll}
                 className="btn-compact btn-mileage-compact"
@@ -553,7 +571,7 @@ export default function VehiclePage({
           </div>
 
           <div className="action-buttons">
-            {user.role === "ADMIN" && (
+            {hasEditPermissions && (
               <button className="btn-compact btn-primary-compact" onClick={() => setShowModal(true)}>
                 <FaPlus /> Add Vehicle
               </button>
@@ -662,6 +680,7 @@ export default function VehiclePage({
                   isSelected={selectedVehicles.has(vehicle.vin)}
                   onSelectVehicle={handleSelectVehicle}
                   users={users} // PASS USERS TO VEHICLE CARD
+                  canEditVehicles={hasEditPermissions} // PASS PERMISSION TO VEHICLE CARD
                 />
               ))}
             </div>
@@ -675,7 +694,7 @@ export default function VehiclePage({
                   : "Get started by adding your first vehicle to the fleet"
                 }
               </p>
-              {user.role === "ADMIN" && !hasActiveFilters && (
+              {hasEditPermissions && !hasActiveFilters && (
                 <button className="btn btn-primary" onClick={() => setShowModal(true)}>
                   <FaPlus /> Add First Vehicle
                 </button>

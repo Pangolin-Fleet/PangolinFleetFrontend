@@ -43,14 +43,22 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
   const isSuperAdmin = () => {
     if (!currentUser) return false;
     
+    const userRole = currentUser.role?.toUpperCase();
     const superAdminIndicators = [
       currentUser.isSuperUser === true,
-      currentUser.role === "SUPER_ADMIN",
-      currentUser.role === "SUPERADMIN", 
+      userRole === "SUPER_ADMIN",
+      userRole === "SUPERADMIN", 
       currentUser.username === "superadmin",
       currentUser.username?.toLowerCase().includes("super"),
-      currentUser.role?.toLowerCase().includes("super"),
     ];
+    
+    console.log("🔍 Super Admin Check:", {
+      username: currentUser.username,
+      role: currentUser.role,
+      isSuperUser: currentUser.isSuperUser,
+      indicators: superAdminIndicators,
+      isSuperAdmin: superAdminIndicators.some(indicator => indicator === true)
+    });
     
     return superAdminIndicators.some(indicator => indicator === true);
   };
@@ -59,13 +67,13 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
   const isSuperAdminUser = (user) => {
     if (!user) return false;
     
+    const userRole = user.role?.toUpperCase();
     const superAdminIndicators = [
       user.isSuperUser === true,
-      user.role === "SUPER_ADMIN",
-      user.role === "SUPERADMIN", 
+      userRole === "SUPER_ADMIN",
+      userRole === "SUPERADMIN", 
       user.username === "superadmin",
       user.username?.toLowerCase().includes("super"),
-      user.role?.toLowerCase().includes("super"),
     ];
     
     return superAdminIndicators.some(indicator => indicator === true);
@@ -78,15 +86,10 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     (isSuperAdminUser(user) && "super admin".includes(searchTerm.toLowerCase()))
   );
 
-  // Permission checks
+  // Permission checks - UPDATED: Super Admin can create both ADMIN and DRIVER users
   const canCreateUsers = () => {
-    return isSuperAdmin() || currentUser?.role === "ADMIN";
-  };
-
-  const canCreateAdmin = () => {
-    if (isSuperAdmin()) return true;
-    if (currentUser?.role === "ADMIN") return adminCount < 3;
-    return false;
+    // According to backend, ONLY Super Admin can create users
+    return isSuperAdmin();
   };
 
   const canDeleteUser = (targetUser) => {
@@ -228,10 +231,17 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     );
   };
 
+  // FIXED: Handle user creation with better error handling and role validation
   const handleCreateUser = async (e) => {
     e.preventDefault();
     if (!formData.username || !formData.password) {
       setError("Please fill all fields");
+      return;
+    }
+
+    // Enhanced permission check based on backend restrictions
+    if (!isSuperAdmin()) {
+      setError("Only Super Admin can create new users. Please contact your system administrator.");
       return;
     }
 
@@ -240,8 +250,9 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
       return;
     }
 
-    if (formData.role === "ADMIN" && !canCreateAdmin()) {
-      setError("Cannot create more admin users. Maximum limit of 3 admins reached.");
+    // Validate that we're not trying to create a SUPER_ADMIN through the UI
+    if (formData.role === "SUPER_ADMIN") {
+      setError("Super Admin users can only be created through system administration tools. Please select Admin or Driver.");
       return;
     }
 
@@ -249,13 +260,45 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     setError("");
     
     try {
+      console.log("🔄 Creating user:", {
+        adminUsername: currentUser.username,
+        userData: formData,
+        isSuperAdmin: isSuperAdmin()
+      });
+
       const newUser = await userService.registerByAdmin(currentUser.username, formData);
+      
+      console.log("✅ User created successfully:", newUser);
+      
       setSuccess(`User ${newUser.username} created successfully as ${newUser.role}`);
       setFormData({ username: "", password: "", role: "DRIVER" });
       setShowCreateModal(false);
-      onUserCreated(newUser);
+      
+      // Refresh users list
+      if (onUserCreated) {
+        onUserCreated(newUser);
+      }
     } catch (err) {
-      setError(err.message || "Failed to create user");
+      console.error("❌ User creation failed:", err);
+      
+      // Enhanced error handling
+      let errorMessage = err.message || "Failed to create user";
+      
+      if (err.message.includes("Only SUPERADMIN")) {
+        errorMessage = "Only Super Admin can create new users. Please contact your system administrator.";
+      } else if (err.message.includes("Username already exists")) {
+        errorMessage = "Username already exists. Please choose a different username.";
+      } else if (err.message.includes("403")) {
+        errorMessage = "Permission denied. You don't have rights to create users.";
+      } else if (err.message.includes("409")) {
+        errorMessage = "Username already exists. Please choose a different username.";
+      } else if (err.message.includes("Network Error")) {
+        errorMessage = "Network error. Please check your connection to the server.";
+      } else if (err.response?.status === 403) {
+        errorMessage = "Permission denied. Only Super Admin can create users.";
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -439,7 +482,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
   const getRoleDisplay = (user) => {
     if (!user) return "UNKNOWN";
     if (isSuperAdminUser(user)) return "SUPER ADMIN";
-    return user.role;
+    return user.role === "ADMIN" ? "ADMINISTRATOR" : "DRIVER";
   };
 
   const getCurrentUserRoleDisplay = () => {
@@ -531,7 +574,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
     },
     { 
       label: "Your Access", 
-      value: isSuperAdmin() ? "Full Control" : currentUser?.role === "ADMIN" ? "Manage Drivers" : "View Only", 
+      value: isSuperAdmin() ? "Full Control" : currentUser?.role === "ADMIN" ? "View Only" : "View Only", 
       icon: isSuperAdmin() ? <FaCrown /> : currentUser?.role === "ADMIN" ? <FaUserShield /> : <FaEye />, 
       color: isSuperAdmin() ? "#FFD700" : currentUser?.role === "ADMIN" ? "#00d4ff" : "#94a3b8" 
     }
@@ -550,7 +593,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
             <div className="user-permission-level">
               <span className={`permission-badge ${isSuperAdmin() ? 'super' : currentUser?.role?.toLowerCase()}`}>
                 {isSuperAdmin() ? "⭐ Super Administrator - Full System Control" : 
-                 currentUser?.role === "ADMIN" ? "🛡️ Administrator - Can Manage Drivers" : 
+                 currentUser?.role === "ADMIN" ? "🛡️ Administrator - View Only" : 
                  "👤 Driver - View Only Access"}
               </span>
             </div>
@@ -586,14 +629,14 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
           </div>
         </div>
 
-        {/* Role-based Notices */}
+        {/* Role-based Notices - UPDATED */}
         {isSuperAdmin() && (
           <div className="super-admin-notice">
             <div className="notice-content">
               <FaCrown className="notice-icon" />
               <div>
                 <p><strong>Super Administrator Access</strong></p>
-                <p>You have full system control. Only you can delete users (admins and drivers). You cannot delete your own account.</p>
+                <p>You have full system control. You can create Administrator and Driver accounts, and manage all users.</p>
               </div>
             </div>
           </div>
@@ -605,10 +648,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
               <FaUserShield className="notice-icon" />
               <div>
                 <p><strong>Administrator Access</strong></p>
-                <p>You can create drivers and update passwords. You can view all users but cannot delete anyone. Administrator accounts: {adminCount} / 3</p>
-                {adminCount >= 3 && (
-                  <p className="warning">You have reached the maximum number of administrator accounts.</p>
-                )}
+                <p>You can view users and update driver passwords, but cannot create or delete users.</p>
               </div>
             </div>
           </div>
@@ -620,7 +660,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
               <FaEye className="notice-icon" />
               <div>
                 <p><strong>View Only Access</strong></p>
-                <p>As a Driver, you can view user information but cannot create or delete users. You can only update your own password.</p>
+                <p>As a Driver, you can view user information but cannot create, delete, or manage users. You can only update your own password.</p>
               </div>
             </div>
           </div>
@@ -673,7 +713,6 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
               <button 
                 className="btn-compact btn-primary-compact"
                 onClick={() => setShowCreateModal(true)}
-                disabled={formData.role === "ADMIN" && !canCreateAdmin()}
               >
                 <FaUserPlus /> Create New User
               </button>
@@ -749,7 +788,9 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
               <p>
                 {searchTerm 
                   ? `No users found matching "${searchTerm}"` 
-                  : "Get started by creating your first user account"
+                  : isSuperAdmin() 
+                    ? "Get started by creating your first user account" 
+                    : "No users available"
                 }
               </p>
               {searchTerm ? (
@@ -835,6 +876,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                   </div>
                 </div>
 
+                {/* UPDATED ROLE SELECTION - Only show DRIVER and ADMIN options */}
                 <div className="form-group">
                   <label className="form-label">
                     <FaUserShield style={{ marginRight: '8px' }} /> 
@@ -848,17 +890,18 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                   >
                     <option value="DRIVER">Driver</option>
                     <option value="ADMIN">Administrator</option>
+                    {/* REMOVED SUPER_ADMIN option - can only be created via Postman */}
                   </select>
                   
-                  {formData.role === "ADMIN" && !canCreateAdmin() && (
-                    <div className="validation-message error">
-                      <FaExclamationTriangle /> Cannot create more admin accounts. Maximum limit reached.
+                  {formData.role === "ADMIN" && (
+                    <div className="validation-message info">
+                      <FaUserShield /> Creating an Administrator account with management privileges
                     </div>
                   )}
                   
-                  {formData.role === "ADMIN" && canCreateAdmin() && (
-                    <div className="validation-message success">
-                      <FaCheckCircle /> You can create admin accounts ({3 - adminCount} remaining)
+                  {formData.role === "DRIVER" && (
+                    <div className="validation-message info">
+                      <FaUser /> Creating a Driver account with basic access
                     </div>
                   )}
                 </div>
@@ -876,9 +919,7 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
                 <button 
                   type="submit" 
                   className="btn btn-save"
-                  disabled={loading || 
-                    (formData.role === "ADMIN" && !canCreateAdmin())
-                  }
+                  disabled={loading}
                 >
                   {loading ? <FaSync className="spin" /> : <FaUserPlus />}
                   {loading ? "Creating..." : "Create User"}

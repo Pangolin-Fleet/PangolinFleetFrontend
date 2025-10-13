@@ -78,6 +78,20 @@ function App() {
     console.log("🔍 USER CHANGED:", user ? user.username : "No user");
   }, [user]);
 
+  // Add this debug useEffect to see user roles
+  useEffect(() => {
+    if (user) {
+      console.log("👤 USER ROLE DEBUG:", {
+        username: user.username,
+        role: user.role,
+        isSuperUser: user.isSuperUser,
+        isAdmin: isAdmin(),
+        isSuperAdmin: isSuperAdmin(),
+        currentPage: currentPage
+      });
+    }
+  }, [user, currentPage]);
+
   // Fetch vehicles and users
   useEffect(() => {
     const fetchData = async () => {
@@ -166,12 +180,13 @@ function App() {
       
       const userData = await userService.login(username, password);
       
+      console.log("📋 RAW USER DATA FROM BACKEND:", userData);
+
       if (!userData || typeof userData !== 'object') {
         throw new Error("Invalid response from server");
       }
 
-      console.log("📋 User data received:", userData);
-
+      // Normalize user data
       const normalizedUser = { 
         ...userData,
         role: (userData.role || "DRIVER").toUpperCase(),
@@ -179,7 +194,7 @@ function App() {
         username: userData.username || username
       };
 
-      console.log("👤 Normalized user:", normalizedUser);
+      console.log("👤 NORMALIZED USER:", normalizedUser);
 
       setUser(normalizedUser);
       setCurrentPage("dashboard"); // Always redirect to dashboard after login
@@ -208,10 +223,32 @@ function App() {
     localStorage.removeItem("fleetUser");
   };
 
-  // Check if user can access admin features
+  // FIXED: Check if user can access admin features
   const isAdmin = () => {
     if (!user) return false;
-    return user.role === "ADMIN" || user.isSuperUser;
+    
+    // Enhanced role detection
+    const userRole = user.role?.toUpperCase();
+    const isSuperAdmin = 
+      user.isSuperUser === true ||
+      userRole === "SUPER_ADMIN" || 
+      userRole === "SUPERADMIN" ||
+      user.username?.toLowerCase().includes("super");
+    
+    return isSuperAdmin || userRole === "ADMIN";
+  };
+
+  // Add this function for super admin detection
+  const isSuperAdmin = () => {
+    if (!user) return false;
+    
+    const userRole = user.role?.toUpperCase();
+    return (
+      user.isSuperUser === true ||
+      userRole === "SUPER_ADMIN" || 
+      userRole === "SUPERADMIN" ||
+      user.username?.toLowerCase().includes("super")
+    );
   };
 
   // Enhanced vehicle operations with notifications and logging
@@ -405,10 +442,10 @@ function App() {
     { id: "dashboard", name: "Dashboard", icon: <FaTachometerAlt /> },
     { id: "vehicles", name: "Vehicles", icon: <FaCar /> },
     { id: "inuse", name: "In Use", icon: <FaCar /> },
-    { id: "maintenance", name: "Maintenance", icon: <FaTools />, roles: ["ADMIN"] },
-    { id: "reports", name: "Reports", icon: <FaChartLine />, roles: ["ADMIN"] },
-    { id: "users", name: "User Management", icon: <FaUsers />, roles: ["ADMIN"] },
-    { id: "activity", name: "Activity Log", icon: <FaHistory />, roles: ["ADMIN"] },
+    { id: "maintenance", name: "Maintenance", icon: <FaTools />, roles: ["ADMIN", "SUPER_ADMIN"] },
+    { id: "reports", name: "Reports", icon: <FaChartLine />, roles: ["ADMIN", "SUPER_ADMIN"] },
+    { id: "users", name: "User Management", icon: <FaUsers />, roles: ["ADMIN", "SUPER_ADMIN"] },
+    { id: "activity", name: "Activity Log", icon: <FaHistory />, roles: ["ADMIN", "SUPER_ADMIN"] },
     // { id: "settings", name: "Settings", icon: <FaCog /> },
   ];
 
@@ -426,7 +463,7 @@ function App() {
         <div className="user-info">
           <span>{user.username}</span>
           <span className={`role-badge ${user.role.toLowerCase()}`}>
-            {user.role} {user.isSuperUser && "⭐"}
+            {user.role} {isSuperAdmin() && "⭐"}
           </span>
         </div>
         
@@ -498,6 +535,7 @@ function App() {
             advancedFilters={advancedFilters}
             setAdvancedFilters={setAdvancedFilters}
             clearAllFilters={clearAllFilters}
+            users={users}
           />
         )}
 
