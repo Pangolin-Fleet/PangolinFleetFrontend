@@ -1004,7 +1004,54 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
+/* VEHICLE CARD SELECTION - FIXED */
+.vehicle-page .vehicle-checkbox {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 20;
+}
 
+.vehicle-page .selection-checkbox {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #00d4ff;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.vehicle-page .selection-checkbox:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+}
+
+.vehicle-page .selection-checkbox:checked {
+  transform: scale(1.05);
+}
+
+/* Selected Vehicle State - SIMPLE FIX */
+.vehicle-page .vehicle-card.selected {
+  border: 2px solid #00d4ff;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+}
+
+/* BULK ACTIONS - MINIMAL IMPROVEMENT */
+.vehicle-page .bulk-actions {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.vehicle-page .selected-count {
+  background: #00d4ff;
+  color: #0a0e17;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 700;
+}
 .vehicle-page .status-btn:hover:not(.disabled) {
   background: rgba(30, 41, 59, 0.95);
   border-color: rgba(0, 212, 255, 0.5);

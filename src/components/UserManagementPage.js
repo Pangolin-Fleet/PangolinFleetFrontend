@@ -1,584 +1,244 @@
 import React, { useState, useEffect } from "react";
 import { 
-  FaUserPlus, FaUser, FaUserShield, FaTrash, FaCrown, FaSync, 
-  FaTimes, FaSave, FaExclamationTriangle, FaEdit, FaEye, FaSearch,
-  FaKey, FaLock, FaCheckCircle, FaEyeSlash
+  FaUsers, FaUserPlus, FaTrash, FaEye, FaEyeSlash, 
+  FaShieldAlt, FaUserShield, FaUser, FaSearch,
+  FaSync, FaCheck, FaTimesCircle, FaExclamationTriangle,
+  FaKey, FaStar, FaCrown, FaCar
 } from "react-icons/fa";
 import userService from "../service/UserService";
 import "./UserManagementPage.css";
 
-export default function UserManagementPage({ users, currentUser, onUserCreated, onUserDeleted, onUserUpdated }) {
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [passwordUser, setPasswordUser] = useState(null);
-  
-  const [formData, setFormData] = useState({ 
-    username: "", 
-    password: "", 
-    role: "DRIVER" 
-  });
-  
+export default function UserManagementPage({ user: currentUser, users: initialUsers = [], refreshUsers }) {
+  const [users, setUsers] = useState(initialUsers);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterRole, setFilterRole] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [adminCount, setAdminCount] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
-  
-  // Password modal states
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: [] });
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [passwordVisibility, setPasswordVisibility] = useState({});
+  const [passwordUpdate, setPasswordUpdate] = useState({});
+  const [updatingPasswords, setUpdatingPasswords] = useState({});
 
-  // Calculate admin count from the actual users prop
+  const [newUser, setNewUser] = useState({
+    username: "",
+    password: "",
+    role: "DRIVER"
+  });
+
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      const usersData = await userService.getAllUsers(currentUser.username);
+      setUsers(usersData || []);
+    } catch (error) {
+      console.error("Failed to load users:", error);
+      addNotification("Failed to load users", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const admins = users.filter(user => user.role === "ADMIN" || isSuperAdminUser(user)).length;
-    setAdminCount(admins);
-  }, [users]);
+    loadUsers();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Enhanced super admin detection
-  const isSuperAdmin = () => {
-    if (!currentUser) return false;
-    
-    const userRole = currentUser.role?.toUpperCase();
-    const superAdminIndicators = [
-      currentUser.isSuperUser === true,
-      userRole === "SUPER_ADMIN",
-      userRole === "SUPERADMIN", 
-      currentUser.username === "superadmin",
-      currentUser.username?.toLowerCase().includes("super"),
-    ];
-    
-    console.log("🔍 Super Admin Check:", {
-      username: currentUser.username,
-      role: currentUser.role,
-      isSuperUser: currentUser.isSuperUser,
-      indicators: superAdminIndicators,
-      isSuperAdmin: superAdminIndicators.some(indicator => indicator === true)
-    });
-    
-    return superAdminIndicators.some(indicator => indicator === true);
-  };
-
-  // Improved super admin user detection
-  const isSuperAdminUser = (user) => {
-    if (!user) return false;
-    
-    const userRole = user.role?.toUpperCase();
-    const superAdminIndicators = [
-      user.isSuperUser === true,
-      userRole === "SUPER_ADMIN",
-      userRole === "SUPERADMIN", 
-      user.username === "superadmin",
-      user.username?.toLowerCase().includes("super"),
-    ];
-    
-    return superAdminIndicators.some(indicator => indicator === true);
-  };
-
-  // Filter users based on search term
-  const filteredUsers = users.filter(user => 
-    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (isSuperAdminUser(user) && "super admin".includes(searchTerm.toLowerCase()))
-  );
-
-  // Permission checks - UPDATED: Super Admin can create both ADMIN and DRIVER users
-  const canCreateUsers = () => {
-    // According to backend, ONLY Super Admin can create users
-    return isSuperAdmin();
-  };
-
-  const canDeleteUser = (targetUser) => {
-    if (!targetUser) return false;
-    
-    // ONLY Super Admin can delete users (admins and drivers)
-    if (!isSuperAdmin()) return false;
-    
-    // Super Admin cannot delete themselves
-    if (targetUser.username === currentUser?.username) {
-      return false;
-    }
-    
-    return true;
-  };
-
-  // Permission check for password updates
-  const canUpdatePassword = (targetUser) => {
-    if (!targetUser || !currentUser) return false;
-    
-    // Rule 1: Users can always update their own password
-    if (targetUser.username === currentUser.username) {
-      return true;
-    }
-    
-    // Rule 2: Super Admin can update anyone's password
-    if (isSuperAdmin()) {
-      return true;
-    }
-    
-    // Rule 3: Admin can update drivers' passwords
-    if (currentUser.role === "ADMIN" && targetUser.role === "DRIVER") {
-      return true;
-    }
-    
-    return false;
-  };
-
-  // Password strength checker
-  const checkPasswordStrength = (password) => {
-    const feedback = [];
-    let score = 0;
-
-    // Length check
-    if (password.length >= 8) {
-      score += 1;
-    } else {
-      feedback.push("At least 8 characters");
-    }
-
-    // Uppercase check
-    if (/[A-Z]/.test(password)) {
-      score += 1;
-    } else {
-      feedback.push("One uppercase letter");
-    }
-
-    // Lowercase check
-    if (/[a-z]/.test(password)) {
-      score += 1;
-    } else {
-      feedback.push("One lowercase letter");
-    }
-
-    // Number check
-    if (/\d/.test(password)) {
-      score += 1;
-    } else {
-      feedback.push("One number");
-    }
-
-    // Special character check
-    if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-      score += 1;
-    } else {
-      feedback.push("One special character");
-    }
-
-    // Common password check
-    const commonPasswords = [
-      '123456', 'password', '12345678', 'qwerty', '123456789', 
-      '12345', '1234', '111111', '1234567', 'dragon', '123123',
-      'admin', 'letmein', 'welcome', 'monkey', 'password1'
-    ];
-    
-    if (commonPasswords.includes(password.toLowerCase())) {
-      score = 0;
-      feedback.push("This password is too common");
-    }
-
-    return { score, feedback };
-  };
-
-  // Real-time password strength indicator component
-  const PasswordStrengthIndicator = ({ strength }) => {
-    const { score, feedback } = strength;
-    
-    const getStrengthColor = () => {
-      if (score <= 2) return '#ff4444';
-      if (score <= 3) return '#ffaa00';
-      if (score <= 4) return '#00aa44';
-      return '#00aa44';
+  const addNotification = (message, type = "info") => {
+    const notification = {
+      id: Date.now(),
+      message,
+      type,
+      timestamp: new Date()
     };
+    
+    setNotifications(prev => [notification, ...prev.slice(0, 3)]);
+    
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== notification.id));
+    }, 5000);
+  };
 
-    const getStrengthText = () => {
-      if (score <= 2) return 'Weak';
-      if (score <= 3) return 'Fair';
-      if (score <= 4) return 'Good';
-      return 'Strong';
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = 
+      user.username?.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesRole = filterRole ? user.role === filterRole : true;
+    
+    return matchesSearch && matchesRole;
+  });
+
+  const canCreateUser = currentUser.role === "SUPERADMIN" || currentUser.role === "ADMIN";
+  const canEditUser = (targetUser) => 
+    currentUser.role === "SUPERADMIN" || 
+    (currentUser.role === "ADMIN" && targetUser.role === "DRIVER");
+  
+  const canDeleteUser = (targetUser) => 
+    currentUser.role === "SUPERADMIN" && targetUser.username !== currentUser.username;
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault();
+    
+    if (!newUser.username || !newUser.password) {
+      addNotification("Please fill in username and password", "error");
+      return;
+    }
+
+    if (newUser.password.length < 4) {
+      addNotification("Password must be at least 4 characters", "error");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await userService.registerByAdmin(currentUser.username, newUser);
+      
+      addNotification(`User ${newUser.username} created successfully!`, "success");
+      setNewUser({
+        username: "",
+        password: "",
+        role: "DRIVER"
+      });
+      setShowCreateForm(false);
+      await loadUsers();
+      
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      if (error.message.includes("Max admin users reached") || error.message.includes("maximum limit")) {
+        addNotification("Cannot create admin user - maximum admin limit reached (3 admins max)", "error");
+      } else if (error.message.includes("Username already exists")) {
+        addNotification("Username already exists", "error");
+      } else if (error.message.includes("permission") || error.message.includes("Permission") || error.message.includes("cannot create admin")) {
+        addNotification("You don't have permission to create this type of user", "error");
+      } else {
+        addNotification(error.message || "Failed to create user", "error");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (userToUpdate) => {
+    const newPassword = passwordUpdate[userToUpdate.username];
+    
+    if (!newPassword) {
+      addNotification("Please enter a new password", "error");
+      return;
+    }
+
+    if (newPassword.length < 4) {
+      addNotification("Password must be at least 4 characters", "error");
+      return;
+    }
+
+    try {
+      setUpdatingPasswords(prev => ({ ...prev, [userToUpdate.username]: true }));
+      
+      await userService.updateUserPassword(
+        currentUser.username, 
+        userToUpdate.username, 
+        newPassword
+      );
+      
+      addNotification(`Password updated for ${userToUpdate.username}`, "success");
+      setPasswordUpdate(prev => ({ ...prev, [userToUpdate.username]: "" }));
+      
+    } catch (error) {
+      console.error("Failed to update password:", error);
+      addNotification(error.message || "Failed to update password", "error");
+    } finally {
+      setUpdatingPasswords(prev => ({ ...prev, [userToUpdate.username]: false }));
+    }
+  };
+
+  const handleDeleteUser = async (userToDelete) => {
+    if (userToDelete.username === currentUser.username) {
+      addNotification("You cannot delete your own account", "error");
+      return;
+    }
+
+    if (!window.confirm(`Are you sure you want to delete user ${userToDelete.username}? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await userService.deleteUser(currentUser.username, userToDelete.username);
+      
+      addNotification(`User ${userToDelete.username} deleted successfully`, "success");
+      await loadUsers();
+      
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      addNotification(error.message || "Failed to delete user", "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const togglePasswordVisibility = (username) => {
+    setPasswordVisibility(prev => ({
+      ...prev,
+      [username]: !prev[username]
+    }));
+  };
+
+  const handlePasswordUpdate = (username, password) => {
+    setPasswordUpdate(prev => ({
+      ...prev,
+      [username]: password
+    }));
+  };
+
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: 'none', text: 'Enter password' };
+    if (password.length < 4) return { strength: 'weak', text: 'Too short' };
+    if (password.length < 8) return { strength: 'medium', text: 'Could be stronger' };
+    return { strength: 'strong', text: 'Strong password' };
+  };
+
+  const getRoleBadge = (role) => {
+    const roleConfig = {
+      SUPERADMIN: { color: "#f59e0b", icon: <FaCrown />, label: "Super Admin" },
+      ADMIN: { color: "#3b82f6", icon: <FaShieldAlt />, label: "Administrator" },
+      DRIVER: { color: "#10b981", icon: <FaCar />, label: "Driver" }
     };
-
+    
+    const config = roleConfig[role] || roleConfig.DRIVER;
+    
     return (
-      <div className="password-strength-indicator">
-        <div className="strength-bar">
-          <div 
-            className="strength-fill"
-            style={{
-              width: `${(score / 5) * 100}%`,
-              backgroundColor: getStrengthColor()
-            }}
-          ></div>
-        </div>
-        <div className="strength-info">
-          <span style={{ color: getStrengthColor() }}>
-            Strength: {getStrengthText()} ({score}/5)
-          </span>
-          {feedback.length > 0 && (
-            <div className="strength-feedback">
-              <small>Requirements missing:</small>
-              <ul>
-                {feedback.map((item, idx) => (
-                  <li key={idx}>{item}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      </div>
+      <span className="role-badge" style={{ backgroundColor: config.color }}>
+        {config.icon} {config.label}
+      </span>
     );
   };
 
-  // FIXED: Handle user creation with better error handling and role validation
-  const handleCreateUser = async (e) => {
-    e.preventDefault();
-    if (!formData.username || !formData.password) {
-      setError("Please fill all fields");
-      return;
-    }
-
-    // Enhanced permission check based on backend restrictions
-    if (!isSuperAdmin()) {
-      setError("Only Super Admin can create new users. Please contact your system administrator.");
-      return;
-    }
-
-    if (formData.password.length < 4) {
-      setError("Password must be at least 4 characters");
-      return;
-    }
-
-    // Validate that we're not trying to create a SUPER_ADMIN through the UI
-    if (formData.role === "SUPER_ADMIN") {
-      setError("Super Admin users can only be created through system administration tools. Please select Admin or Driver.");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-    
-    try {
-      console.log("🔄 Creating user:", {
-        adminUsername: currentUser.username,
-        userData: formData,
-        isSuperAdmin: isSuperAdmin()
-      });
-
-      const newUser = await userService.registerByAdmin(currentUser.username, formData);
-      
-      console.log("✅ User created successfully:", newUser);
-      
-      setSuccess(`User ${newUser.username} created successfully as ${newUser.role}`);
-      setFormData({ username: "", password: "", role: "DRIVER" });
-      setShowCreateModal(false);
-      
-      // Refresh users list
-      if (onUserCreated) {
-        onUserCreated(newUser);
-      }
-    } catch (err) {
-      console.error("❌ User creation failed:", err);
-      
-      // Enhanced error handling
-      let errorMessage = err.message || "Failed to create user";
-      
-      if (err.message.includes("Only SUPERADMIN")) {
-        errorMessage = "Only Super Admin can create new users. Please contact your system administrator.";
-      } else if (err.message.includes("Username already exists")) {
-        errorMessage = "Username already exists. Please choose a different username.";
-      } else if (err.message.includes("403")) {
-        errorMessage = "Permission denied. You don't have rights to create users.";
-      } else if (err.message.includes("409")) {
-        errorMessage = "Username already exists. Please choose a different username.";
-      } else if (err.message.includes("Network Error")) {
-        errorMessage = "Network error. Please check your connection to the server.";
-      } else if (err.response?.status === 403) {
-        errorMessage = "Permission denied. Only Super Admin can create users.";
-      }
-      
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
+  const getCardClass = (role) => {
+    switch (role) {
+      case 'SUPERADMIN': return 'user-card superadmin';
+      case 'ADMIN': return 'user-card admin';
+      case 'DRIVER': return 'user-card driver';
+      default: return 'user-card';
     }
   };
 
-  const handleDeleteUser = async (username) => {
-    const userToDelete = users.find(u => u.username === username);
-    
-    // Extra confirmation for admin deletion
-    if (userToDelete?.role === "ADMIN" || isSuperAdminUser(userToDelete)) {
-      if (!window.confirm(`⚠️ ADMIN DELETION: You are about to delete Administrator "${username}". This action cannot be undone. Are you absolutely sure?`)) {
-        return;
-      }
-    } else if (!window.confirm(`Are you sure you want to delete user ${username}?`)) {
-      return;
-    }
-
-    try {
-      await userService.deleteUser(currentUser.username, username);
-      setSuccess(`User ${username} deleted successfully`);
-      onUserDeleted({ username });
-    } catch (err) {
-      setError(err.message || "Failed to delete user");
-    }
+  const isAdminLimitReached = () => {
+    const adminCount = users.filter(u => u.role === "ADMIN" || u.role === "SUPERADMIN").length;
+    return adminCount >= 3;
   };
 
-  // Password update handlers
-  const handleOpenPasswordModal = (user) => {
-    setPasswordUser(user);
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setPasswordStrength({ score: 0, feedback: [] });
-    setShowCurrentPassword(false);
-    setShowNewPassword(false);
-    setShowConfirmPassword(false);
-    setShowPasswordModal(true);
-  };
-
-  const handleNewPasswordChange = (password) => {
-    setNewPassword(password);
-    setPasswordStrength(checkPasswordStrength(password));
-  };
-
-  const handleUpdatePassword = async (e) => {
-    e.preventDefault();
-    
-    // Validation
-    if (!newPassword) {
-      setError("Please enter a new password");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError("New passwords do not match");
-      return;
-    }
-
-    // Enhanced password strength validation
-    if (passwordStrength.score < 3) {
-      setError("Password is too weak. Please meet the requirements above.");
-      return;
-    }
-
-    if (newPassword.length < 8) {
-      setError("Password must be at least 8 characters long");
-      return;
-    }
-
-    // Special case: If user is updating their own password, require current password
-    const isUpdatingOwnPassword = passwordUser.username === currentUser.username;
-    if (isUpdatingOwnPassword && !currentPassword) {
-      setError("Please enter your current password for security verification");
-      return;
-    }
-
-    setLoading(true);
-    setError("");
-
-    try {
-      // Prepare password data for the service
-      const passwordData = {
-        newPassword: newPassword
-      };
-
-      // Only include current password if user is updating their own password
-      if (isUpdatingOwnPassword) {
-        passwordData.currentPassword = currentPassword;
-      }
-
-      await userService.updateUserPassword(
-        currentUser.username, 
-        passwordUser.username, 
-        passwordData
-      );
-      
-      setSuccess(`Password for ${passwordUser.username} updated successfully`);
-      setShowPasswordModal(false);
-      setPasswordUser(null);
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-      setPasswordStrength({ score: 0, feedback: [] });
-      
-    } catch (err) {
-      console.error('❌ Password update error:', err);
-      
-      // Provide more specific error messages
-      let errorMessage = err.message || "Failed to update password";
-      
-      if (err.message.includes("current password") || err.message.includes("Current password")) {
-        errorMessage = "Current password is incorrect. Please try again.";
-      } else if (err.message.includes("permission") || err.message.includes("Permission")) {
-        errorMessage = "You don't have permission to update this user's password.";
-      } else if (err.message.includes("400")) {
-        errorMessage = "Invalid password format. Please check the requirements.";
-      }
-      
-      setError(errorMessage);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const closeModals = () => {
-    setShowCreateModal(false);
-    setShowPasswordModal(false);
-    setPasswordUser(null);
-    setFormData({ username: "", password: "", role: "DRIVER" });
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    setPasswordStrength({ score: 0, feedback: [] });
-  };
-
-  // Generate a secure random password
-  const generateSecurePassword = () => {
-    const length = 12;
-    const lowercase = "abcdefghijklmnopqrstuvwxyz";
-    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const numbers = "0123456789";
-    const special = "!@#$%^&*";
-    
-    // Ensure at least one of each type
-    let password = "";
-    password += lowercase[Math.floor(Math.random() * lowercase.length)];
-    password += uppercase[Math.floor(Math.random() * uppercase.length)];
-    password += numbers[Math.floor(Math.random() * numbers.length)];
-    password += special[Math.floor(Math.random() * special.length)];
-    
-    // Fill the rest
-    const allChars = lowercase + uppercase + numbers + special;
-    for (let i = password.length; i < length; i++) {
-      password += allChars[Math.floor(Math.random() * allChars.length)];
-    }
-    
-    // Shuffle the password
-    password = password.split('').sort(() => Math.random() - 0.5).join('');
-    
-    setNewPassword(password);
-    setConfirmPassword(password);
-    setPasswordStrength(checkPasswordStrength(password));
-  };
-
-  const generateRandomPassword = () => {
-    const length = 12;
-    const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*";
-    let password = "";
-    for (let i = 0; i < length; i++) {
-      password += charset.charAt(Math.floor(Math.random() * charset.length));
-    }
-    setFormData({ ...formData, password });
-  };
-
-  const getRoleIcon = (user) => {
-    if (!user) return <FaUser />;
-    if (isSuperAdminUser(user)) return <FaCrown className="super-user-icon" />;
-    return user.role === "ADMIN" ? <FaUserShield /> : <FaUser />;
-  };
-
-  const getRoleDisplay = (user) => {
-    if (!user) return "UNKNOWN";
-    if (isSuperAdminUser(user)) return "SUPER ADMIN";
-    return user.role === "ADMIN" ? "ADMINISTRATOR" : "DRIVER";
-  };
-
-  const getCurrentUserRoleDisplay = () => {
-    if (isSuperAdmin()) return "SUPER ADMIN";
-    return currentUser?.role || "UNKNOWN";
-  };
-
-  const clearMessages = () => {
-    setError("");
-    setSuccess("");
-  };
-
-  const clearSearch = () => {
-    setSearchTerm("");
-  };
-
-  // Get action buttons based on user role and target user
-  const getActionButtons = (user) => {
-    const buttons = [];
-    
-    // Update Password Button - Users can update their own password, admins can update others
-    if (canUpdatePassword(user)) {
-      buttons.push(
-        <button 
-          key="password"
-          className="btn btn-password"
-          onClick={() => handleOpenPasswordModal(user)}
-          title={`Update password for ${user.username}`}
-        >
-          <FaKey /> Update Password
-        </button>
-      );
-    }
-    
-    // Delete Button - ONLY Super Admin can delete (and not themselves)
-    if (canDeleteUser(user)) {
-      buttons.push(
-        <button 
-          key="delete"
-          className="btn btn-delete"
-          onClick={() => handleDeleteUser(user.username)}
-          title={`Delete ${user.username}`}
-        >
-          <FaTrash /> Delete User
-        </button>
-      );
-    }
-    
-    // No actions available
-    if (buttons.length === 0) {
-      let message = "No Management Access";
-      if (user.username === currentUser?.username) {
-        message = "Your Account";
-      } else if (currentUser?.role === "ADMIN" && (user.role === "ADMIN" || isSuperAdminUser(user))) {
-        message = "Admin Account (View Only)";
-      } else if (currentUser?.role === "DRIVER") {
-        message = "View Only";
-      }
-      
-      buttons.push(
-        <span key="no-actions" className="no-actions">
-          {message}
-        </span>
-      );
-    }
-    
-    return buttons;
-  };
-
-  // Summary statistics
-  const summaryCards = [
-    { 
-      label: "Total Users", 
-      value: users.length, 
-      icon: <FaUser />, 
-      color: "#6366f1" 
-    },
-    { 
-      label: "Administrators", 
-      value: adminCount, 
-      icon: <FaUserShield />, 
-      color: "#10b981" 
-    },
-    { 
-      label: "Drivers", 
-      value: users.filter(user => user.role === "DRIVER" && !isSuperAdminUser(user)).length, 
-      icon: <FaUser />, 
-      color: "#f59e0b" 
-    },
-    { 
-      label: "Your Access", 
-      value: isSuperAdmin() ? "Full Control" : currentUser?.role === "ADMIN" ? "View Only" : "View Only", 
-      icon: isSuperAdmin() ? <FaCrown /> : currentUser?.role === "ADMIN" ? <FaUserShield /> : <FaEye />, 
-      color: isSuperAdmin() ? "#FFD700" : currentUser?.role === "ADMIN" ? "#00d4ff" : "#94a3b8" 
-    }
-  ];
+  if (loading && users.length === 0) {
+    return (
+      <div className="user-management-page">
+        <div className="page-header">
+          <div className="header-content">
+            <div className="header-main">
+              <h1>User Management</h1>
+              <p>Loading users...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="user-management-page">
@@ -588,509 +248,359 @@ export default function UserManagementPage({ users, currentUser, onUserCreated, 
       <div className="page-header">
         <div className="header-content">
           <div className="header-main">
-            <h1>Pangolin Fleet</h1>
-            <p>User Management & Access Control</p>
-            <div className="user-permission-level">
-              <span className={`permission-badge ${isSuperAdmin() ? 'super' : currentUser?.role?.toLowerCase()}`}>
-                {isSuperAdmin() ? "⭐ Super Administrator - Full System Control" : 
-                 currentUser?.role === "ADMIN" ? "🛡️ Administrator - View Only" : 
-                 "👤 Driver - View Only Access"}
-              </span>
-            </div>
+            <h1>
+              <FaUsers className="header-icon" />
+              User Management
+            </h1>
+            <p>Manage system users and their permissions securely</p>
           </div>
-          <div className="user-info">
-            <div className="user-name">{currentUser?.name || currentUser?.username || "Admin"}</div>
-            <div className="user-role">
-              {isSuperAdmin() ? "⭐ Super Administrator" : getCurrentUserRoleDisplay()}
+          <div className="header-actions">
+            <div className="user-info">
+              <span className="user-name">{currentUser.name || currentUser.username}</span>
+              {getRoleBadge(currentUser.role)}
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Notifications */}
+      <div className="notifications-container">
+        {notifications.map(notification => (
+          <div key={notification.id} className={`notification ${notification.type}`}>
+            {notification.type === 'success' && <FaCheck />}
+            {notification.type === 'error' && <FaTimesCircle />}
+            {notification.type === 'info' && <FaExclamationTriangle />}
+            {notification.message}
+          </div>
+        ))}
       </div>
 
       <div className="page-content">
         {/* Summary Cards */}
         <div className="summary-section">
           <div className="summary-cards">
-            {summaryCards.map((card, idx) => (
-              <div key={idx} className="summary-card">
-                <div className="summary-card-content">
-                  <div className="summary-icon" style={{ color: card.color }}>
-                    {card.icon}
+            <div className="summary-card interactive">
+              <div className="summary-card-content">
+                <div className="summary-icon" style={{ color: "#6366f1" }}>
+                  <FaUsers />
+                </div>
+                <div className="summary-text">
+                  <div className="summary-value" style={{ color: "#6366f1" }}>
+                    {users.length}
                   </div>
-                  <div className="summary-text">
-                    <div className="summary-value" style={{ color: card.color }}>
-                      {card.value}
-                    </div>
-                    <div className="summary-label">{card.label}</div>
-                  </div>
+                  <div className="summary-label">Total Users</div>
                 </div>
               </div>
-            ))}
+              <div className="card-hover-effect">View All Users</div>
+            </div>
+            <div className="summary-card interactive">
+              <div className="summary-card-content">
+                <div className="summary-icon" style={{ color: "#f59e0b" }}>
+                  <FaCrown />
+                </div>
+                <div className="summary-text">
+                  <div className="summary-value" style={{ color: "#f59e0b" }}>
+                    {users.filter(u => u.role === "SUPERADMIN").length}
+                  </div>
+                  <div className="summary-label">Super Admins</div>
+                </div>
+              </div>
+              <div className="card-hover-effect">Super Admin Team</div>
+            </div>
+            <div className="summary-card interactive">
+              <div className="summary-card-content">
+                <div className="summary-icon" style={{ color: "#3b82f6" }}>
+                  <FaShieldAlt />
+                </div>
+                <div className="summary-text">
+                  <div className="summary-value" style={{ color: "#3b82f6" }}>
+                    {users.filter(u => u.role === "ADMIN").length}
+                  </div>
+                  <div className="summary-label">Administrators</div>
+                </div>
+              </div>
+              <div className="card-hover-effect">Admin Team</div>
+            </div>
+            <div className="summary-card interactive">
+              <div className="summary-card-content">
+                <div className="summary-icon" style={{ color: "#10b981" }}>
+                  <FaCar />
+                </div>
+                <div className="summary-text">
+                  <div className="summary-value" style={{ color: "#10b981" }}>
+                    {users.filter(u => u.role === "DRIVER").length}
+                  </div>
+                  <div className="summary-label">Drivers</div>
+                </div>
+              </div>
+              <div className="card-hover-effect">Driver Team</div>
+            </div>
           </div>
         </div>
 
-        {/* Role-based Notices - UPDATED */}
-        {isSuperAdmin() && (
-          <div className="super-admin-notice">
-            <div className="notice-content">
-              <FaCrown className="notice-icon" />
-              <div>
-                <p><strong>Super Administrator Access</strong></p>
-                <p>You have full system control. You can create Administrator and Driver accounts, and manage all users.</p>
+        {/* Admin Limit Warning */}
+        {isAdminLimitReached() && (
+          <div className={`permission-notice ${currentUser.role === "SUPERADMIN" ? "superadmin" : ""}`}>
+            <FaShieldAlt /> 
+            <div>
+              <strong>Admin Limit Reached</strong>
+              <div style={{ fontSize: '0.85rem', opacity: 0.9, marginTop: '4px' }}>
+                {currentUser.role === "SUPERADMIN" 
+                  ? "You can override the 3-admin limit as a Super Admin" 
+                  : "Maximum of 3 admin users allowed. Contact Super Admin for assistance."
+                }
               </div>
             </div>
           </div>
         )}
 
-        {currentUser?.role === "ADMIN" && !isSuperAdmin() && (
-          <div className="admin-limit-notice">
-            <div className="notice-content">
-              <FaUserShield className="notice-icon" />
-              <div>
-                <p><strong>Administrator Access</strong></p>
-                <p>You can view users and update driver passwords, but cannot create or delete users.</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {currentUser?.role === "DRIVER" && !isSuperAdmin() && (
-          <div className="driver-notice">
-            <div className="notice-content">
-              <FaEye className="notice-icon" />
-              <div>
-                <p><strong>View Only Access</strong></p>
-                <p>As a Driver, you can view user information but cannot create, delete, or manage users. You can only update your own password.</p>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Messages */}
-        {error && (
-          <div className="alert error" onClick={clearMessages}>
-            <FaExclamationTriangle /> {error}
-          </div>
-        )}
-        {success && (
-          <div className="alert success" onClick={clearMessages}>
-            <FaCheckCircle /> {success}
-          </div>
-        )}
-
-        {/* Toolbar with Search */}
+        {/* Toolbar */}
         <div className="page-toolbar">
           <div className="search-filters">
             <div className="search-bar">
               <FaSearch className="search-icon" />
               <input
                 type="text"
-                placeholder="Search users by username or role..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
               />
-              {searchTerm && (
+            </div>
+            
+            <select
+              value={filterRole}
+              onChange={(e) => setFilterRole(e.target.value)}
+              className="filter-select"
+            >
+              <option value="">All Roles</option>
+              <option value="SUPERADMIN">Super Admin</option>
+              <option value="ADMIN">Administrator</option>
+              <option value="DRIVER">Driver</option>
+            </select>
+
+            <button 
+              onClick={loadUsers}
+              className="btn-compact btn-mileage-compact"
+              disabled={loading}
+            >
+              <FaSync /> Refresh
+            </button>
+          </div>
+
+          {canCreateUser && (
+            <button 
+              onClick={() => setShowCreateForm(true)}
+              className="btn-compact btn-primary-compact"
+              disabled={loading}
+            >
+              <FaUserPlus /> Create User
+            </button>
+          )}
+        </div>
+
+        {/* Create User Form */}
+        {showCreateForm && canCreateUser && (
+          <div className="create-user-form user-card">
+            <div className="card-header">
+              <div className="vehicle-title">
+                <h3>
+                  <FaUserPlus style={{ marginRight: '10px' }} />
+                  Create New User
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowCreateForm(false)}
+                className="btn-close"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="card-body">
+              {currentUser.role === "ADMIN" && (
+                <div className="permission-notice">
+                  <FaExclamationTriangle /> 
+                  <strong>Note:</strong> Admin users can only create Driver accounts. 
+                  Only SUPERADMIN can create other Admin users.
+                </div>
+              )}
+              
+              {isAdminLimitReached() && currentUser.role === "SUPERADMIN" && (
+                <div className="permission-notice superadmin-notice">
+                  <FaShieldAlt /> 
+                  <strong>Super Admin Override:</strong> Admin limit reached, but you can override this limit.
+                </div>
+              )}
+
+              <form onSubmit={handleCreateUser}>
+                <div className="form-grid">
+                  <div className="form-group">
+                    <label className="form-label">Username *</label>
+                    <input
+                      type="text"
+                      value={newUser.username}
+                      onChange={(e) => setNewUser(prev => ({ ...prev, username: e.target.value }))}
+                      className="form-input"
+                      placeholder="Enter username"
+                      required
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Password *</label>
+                    <input
+                      type="password"
+                      value={newUser.password}
+                      onChange={(e) => setNewUser(prev => ({ ...prev, password: e.target.value }))}
+                      className="form-input"
+                      placeholder="Enter password"
+                      required
+                      minLength="4"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Role *</label>
+                    <select
+                      value={newUser.role}
+                      onChange={(e) => setNewUser(prev => ({ ...prev, role: e.target.value }))}
+                      className="form-select"
+                      required
+                      disabled={currentUser.role === "ADMIN"}
+                    >
+                      <option value="DRIVER">Driver</option>
+                      {currentUser.role === "SUPERADMIN" && (
+                        <>
+                          <option value="ADMIN">Administrator</option>
+                          <option value="SUPERADMIN">Super Admin</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
+                </div>
+                <div className="form-actions">
+                  <button type="submit" className="btn btn-save" disabled={loading}>
+                    {loading ? "Creating..." : <><FaUserPlus /> Create User</>}
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowCreateForm(false)}
+                    className="btn btn-cancel"
+                  >
+                    <FaTimesCircle /> Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Users Grid */}
+        <div className="users-grid-container">
+          {filteredUsers.length === 0 ? (
+            <div className="empty-state">
+              <FaUsers className="empty-icon" />
+              <h3>No users found</h3>
+              <p>
+                {searchQuery || filterRole 
+                  ? "Try adjusting your search criteria" 
+                  : "Get started by creating your first user"
+                }
+              </p>
+              {canCreateUser && !searchQuery && !filterRole && (
                 <button 
-                  className="search-clear"
-                  onClick={clearSearch}
-                  title="Clear search"
+                  onClick={() => setShowCreateForm(true)}
+                  className="btn btn-primary"
                 >
-                  <FaTimes />
+                  <FaUserPlus /> Create First User
                 </button>
               )}
             </div>
-            
-            {searchTerm && (
-              <div className="search-results-info">
-                Found {filteredUsers.length} user(s) matching "{searchTerm}"
-              </div>
-            )}
-          </div>
-
-          <div className="action-buttons">
-            {canCreateUsers() && (
-              <button 
-                className="btn-compact btn-primary-compact"
-                onClick={() => setShowCreateModal(true)}
-              >
-                <FaUserPlus /> Create New User
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Users Grid */}
-        <div className="users-grid">
-          {filteredUsers.map(user => (
-            <div key={user.username} className={`user-card vehicle-card ${isSuperAdminUser(user) ? 'super-user' : user.role.toLowerCase()}`}>
-              <div className="card-header">
-                <div className="vehicle-title">
-                  <h3>{user.username}</h3>
-                  <span className="vehicle-year">
-                    {isSuperAdminUser(user) ? "Super Administrator" : 
-                     user.role === "ADMIN" ? "Administrator" : "Driver"}
-                    {user.username === currentUser?.username && " (You)"}
-                  </span>
-                </div>
-                <span className={`status-pill ${isSuperAdminUser(user) ? 'super' : user.role.toLowerCase()}`}>
-                  {getRoleIcon(user)}
-                  {getRoleDisplay(user)}
-                </span>
-              </div>
-
-              <div className="card-body">
-                <div className="vehicle-info">
-                  <div className="info-section">
-                    <div className="info-row">
-                      <span className="info-label">Username:</span>
-                      <span className="info-value">{user.username}</span>
+          ) : (
+            <div className="users-grid">
+              {filteredUsers.map(user => (
+                <div key={user.username} className={getCardClass(user.role)}>
+                  <div className="card-header">
+                    <div className="user-header">
+                      <div className="user-info-main">
+                        <h3>{user.username}</h3>
+                        <div className="user-meta">
+                          <span className="username">@{user.username}</span>
+                        </div>
+                      </div>
+                      <div className="user-role">
+                        {getRoleBadge(user.role)}
+                      </div>
                     </div>
-                    <div className="info-row">
-                      <span className="info-label">Role:</span>
-                      <span className="info-value">
-                        <span className={`role-badge ${isSuperAdminUser(user) ? 'super' : user.role.toLowerCase()}`}>
-                          {getRoleDisplay(user)}
-                        </span>
-                      </span>
-                    </div>
-                    <div className="info-row">
-                      <span className="info-label">Status:</span>
-                      <span className="info-value">
-                        <span className="status-active">Active</span>
-                      </span>
-                    </div>
-                    <div className="info-row">
-                      <span className="info-label">Access Level:</span>
-                      <span className="info-value">
-                        <span className={`permission-indicator ${
-                          canUpdatePassword(user) ? 'editable' : 'view-only'
-                        }`}>
-                          {isSuperAdminUser(user) ? "Super Admin" : 
-                           user.role === "ADMIN" ? "Administrator" : "Driver"}
-                        </span>
-                      </span>
+                  </div>
+
+                  <div className="card-body">
+                    {/* Security Section */}
+                    {(currentUser.role === "SUPERADMIN" || 
+                      (currentUser.role === "ADMIN" && user.role === "DRIVER")) && (
+                      <div className="security-section">
+                        <div className="security-header">
+                          <FaShieldAlt className="security-icon" />
+                          <h4>Reset Password</h4>
+                        </div>
+                        
+                        <div className="password-input-wrapper">
+                          <input
+                            type={passwordVisibility[user.username] ? "text" : "password"}
+                            value={passwordUpdate[user.username] || ""}
+                            onChange={(e) => handlePasswordUpdate(user.username, e.target.value)}
+                            placeholder="Enter new secure password..."
+                            className="form-input"
+                          />
+                          <div className="password-actions">
+                            <button
+                              type="button"
+                              className="password-toggle-btn"
+                              onClick={() => togglePasswordVisibility(user.username)}
+                              title={passwordVisibility[user.username] ? "Hide password" : "Show password"}
+                            >
+                              {passwordVisibility[user.username] ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                            <button
+                              onClick={() => handleUpdatePassword(user)}
+                              disabled={!passwordUpdate[user.username] || 
+                                       passwordUpdate[user.username].length < 4 ||
+                                       updatingPasswords[user.username]}
+                              className="btn btn-mileage"
+                            >
+                              {updatingPasswords[user.username] ? (
+                                <><FaSync /> Updating</>
+                              ) : (
+                                <><FaKey /> Update</>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="password-strength">
+                          <div className={`strength-dot ${getPasswordStrength(passwordUpdate[user.username]).strength}`} />
+                          {getPasswordStrength(passwordUpdate[user.username]).text}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="card-actions">
+                      {canDeleteUser(user) && (
+                        <button
+                          onClick={() => handleDeleteUser(user)}
+                          className="btn btn-delete"
+                        >
+                          <FaTrash /> Delete Account
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
-
-                <div className="card-actions">
-                  {getActionButtons(user)}
-                </div>
-              </div>
-            </div>
-          ))}
-          
-          {filteredUsers.length === 0 && (
-            <div className="empty-state">
-              <FaUser className="empty-icon" />
-              <h3>No Users Found</h3>
-              <p>
-                {searchTerm 
-                  ? `No users found matching "${searchTerm}"` 
-                  : isSuperAdmin() 
-                    ? "Get started by creating your first user account" 
-                    : "No users available"
-                }
-              </p>
-              {searchTerm ? (
-                <button className="btn btn-primary" onClick={clearSearch}>
-                  <FaTimes /> Clear Search
-                </button>
-              ) : (
-                canCreateUsers() && (
-                  <button 
-                    className="btn btn-primary" 
-                    onClick={() => setShowCreateModal(true)}
-                  >
-                    <FaUserPlus /> Create First User
-                  </button>
-                )
-              )}
+              ))}
             </div>
           )}
         </div>
       </div>
-
-      {/* Create User Modal */}
-      {showCreateModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>
-                <FaUserPlus /> Create New User
-              </h2>
-              <button 
-                className="modal-close"
-                onClick={closeModals}
-                disabled={loading}
-              >
-                <FaTimes />
-              </button>
-            </div>
-            
-            <form onSubmit={handleCreateUser}>
-              <div className="form-grid">
-                <div className="form-group">
-                  <label className="form-label">
-                    <FaUser style={{ marginRight: '8px' }} /> 
-                    Username *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.username}
-                    onChange={(e) => setFormData({...formData, username: e.target.value})}
-                    className="form-input"
-                    placeholder="Enter username"
-                    required
-                    disabled={loading}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">
-                    <FaLock style={{ marginRight: '8px' }} /> 
-                    Password *
-                  </label>
-                  <div className="password-input-group">
-                    <input
-                      type="text"
-                      value={formData.password}
-                      onChange={(e) => setFormData({...formData, password: e.target.value})}
-                      className="form-input"
-                      placeholder="Enter password (min 4 characters)"
-                      required
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      className="generate-password-btn"
-                      onClick={generateRandomPassword}
-                      title="Generate secure password"
-                    >
-                      <FaKey />
-                    </button>
-                  </div>
-                  <div className="info-text">
-                    <FaKey /> Password must be at least 4 characters long
-                  </div>
-                </div>
-
-                {/* UPDATED ROLE SELECTION - Only show DRIVER and ADMIN options */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <FaUserShield style={{ marginRight: '8px' }} /> 
-                    Role
-                  </label>
-                  <select
-                    value={formData.role}
-                    onChange={(e) => setFormData({...formData, role: e.target.value})}
-                    className="form-select"
-                    disabled={loading}
-                  >
-                    <option value="DRIVER">Driver</option>
-                    <option value="ADMIN">Administrator</option>
-                    {/* REMOVED SUPER_ADMIN option - can only be created via Postman */}
-                  </select>
-                  
-                  {formData.role === "ADMIN" && (
-                    <div className="validation-message info">
-                      <FaUserShield /> Creating an Administrator account with management privileges
-                    </div>
-                  )}
-                  
-                  {formData.role === "DRIVER" && (
-                    <div className="validation-message info">
-                      <FaUser /> Creating a Driver account with basic access
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="form-actions">
-                <button 
-                  type="button" 
-                  className="btn btn-cancel"
-                  onClick={closeModals}
-                  disabled={loading}
-                >
-                  <FaTimes /> Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-save"
-                  disabled={loading}
-                >
-                  {loading ? <FaSync className="spin" /> : <FaUserPlus />}
-                  {loading ? "Creating..." : "Create User"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Update Password Modal */}
-      {showPasswordModal && passwordUser && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <div className="modal-header">
-              <h2>
-                <FaLock /> Update Password for {passwordUser.username}
-              </h2>
-              <button 
-                className="modal-close"
-                onClick={closeModals}
-                disabled={loading}
-              >
-                <FaTimes />
-              </button>
-            </div>
-            
-            <form onSubmit={handleUpdatePassword}>
-              <div className="form-grid">
-                {/* Current Password (only required when user is updating their own password) */}
-                {passwordUser.username === currentUser.username && (
-                  <div className="form-group">
-                    <label className="form-label">
-                      <FaLock style={{ marginRight: '8px' }} /> 
-                      Current Password *
-                    </label>
-                    <div className="password-input-group">
-                      <input
-                        type={showCurrentPassword ? "text" : "password"}
-                        value={currentPassword}
-                        onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="form-input"
-                        placeholder="Enter your current password"
-                        required
-                        disabled={loading}
-                      />
-                      <button
-                        type="button"
-                        className="password-toggle-btn"
-                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        title={showCurrentPassword ? "Hide password" : "Show password"}
-                      >
-                        {showCurrentPassword ? <FaEyeSlash /> : <FaEye />}
-                      </button>
-                    </div>
-                    <div className="info-text">
-                      <FaKey /> You must verify your current password to change it
-                    </div>
-                  </div>
-                )}
-
-                {/* New Password */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <FaLock style={{ marginRight: '8px' }} /> 
-                    New Password *
-                  </label>
-                  <div className="password-input-group">
-                    <input
-                      type={showNewPassword ? "text" : "password"}
-                      value={newPassword}
-                      onChange={(e) => handleNewPasswordChange(e.target.value)}
-                      className="form-input"
-                      placeholder="Enter new password (min 8 characters)"
-                      required
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle-btn"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                      title={showNewPassword ? "Hide password" : "Show password"}
-                    >
-                      {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                    <button
-                      type="button"
-                      className="generate-password-btn"
-                      onClick={generateSecurePassword}
-                      title="Generate secure password"
-                    >
-                      <FaKey />
-                    </button>
-                  </div>
-                  
-                  {/* Password Strength Indicator */}
-                  {newPassword && (
-                    <PasswordStrengthIndicator strength={passwordStrength} />
-                  )}
-                  
-                  <div className="info-text">
-                    <FaKey /> Password must be at least 8 characters with uppercase, lowercase, number, and special character
-                  </div>
-                </div>
-
-                {/* Confirm New Password */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <FaLock style={{ marginRight: '8px' }} /> 
-                    Confirm New Password *
-                  </label>
-                  <div className="password-input-group">
-                    <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={`form-input ${confirmPassword && newPassword !== confirmPassword ? 'input-error' : ''}`}
-                      placeholder="Confirm your new password"
-                      required
-                      disabled={loading}
-                    />
-                    <button
-                      type="button"
-                      className="password-toggle-btn"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      title={showConfirmPassword ? "Hide password" : "Show password"}
-                    >
-                      {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  </div>
-                  {confirmPassword && newPassword !== confirmPassword && (
-                    <div className="validation-message error">
-                      <FaExclamationTriangle /> Passwords do not match
-                    </div>
-                  )}
-                  {confirmPassword && newPassword === confirmPassword && passwordStrength.score >= 3 && (
-                    <div className="validation-message success">
-                      <FaCheckCircle /> Passwords match and meet security requirements
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="form-actions">
-                <button 
-                  type="button" 
-                  className="btn btn-cancel"
-                  onClick={closeModals}
-                  disabled={loading}
-                >
-                  <FaTimes /> Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-save"
-                  disabled={loading || 
-                    !newPassword || 
-                    !confirmPassword || 
-                    newPassword !== confirmPassword || 
-                    passwordStrength.score < 3 ||
-                    (passwordUser.username === currentUser.username && !currentPassword)
-                  }
-                >
-                  {loading ? <FaSync className="spin" /> : <FaKey />}
-                  {loading ? "Updating..." : "Update Password"}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

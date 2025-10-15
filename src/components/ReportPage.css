@@ -1,25 +1,41 @@
-/* ReportsPage.css - PANGO FLEET PREMIUM MATCH */
-.reports-container {
-  width: 100%;
-  min-height: 100vh;
+/* ReportsPage.css - FULL-PAGE FIXED VERSION */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.reports-page {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background: 
     radial-gradient(ellipse at top, #0a0e17 0%, #000000 100%),
     radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.05) 0%, transparent 50%);
   color: #ffffff;
   font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  position: relative;
-  overflow-x: hidden;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-/* SPACE BACKGROUND EFFECTS */
-.reports-container::before {
+/* Space Background */
+.reports-page::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
+  width: 100%;
+  height: 100%;
   background: 
     radial-gradient(1px 1px at 20% 30%, rgba(0, 242, 254, 0.6) 50%, transparent 50%),
     radial-gradient(1px 1px at 40% 70%, rgba(79, 172, 254, 0.6) 50%, transparent 50%),
@@ -36,122 +52,133 @@
   to { background-position: 400px 400px; }
 }
 
-/* COMMAND CENTER HEADER */
-.reports-container .page-header {
+/* Header */
+.reports-page .page-header {
   background: linear-gradient(135deg, 
     rgba(10, 14, 23, 0.95) 0%, 
     rgba(26, 35, 126, 0.8) 100%);
-  padding: 2rem 2.5rem;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
   backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  padding: 2rem 0;
   position: relative;
   z-index: 10;
   box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
+  flex-shrink: 0;
 }
 
-.reports-container .page-header::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.6), 
-    transparent);
+.reports-page .header-content {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
 }
 
-.reports-container .page-header h1 {
-  font-size: 2rem;
+.reports-page .header-main {
+  flex: 1;
+}
+
+.reports-page .header-actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+.reports-page .page-header h1 {
+  font-size: 2.2rem;
   margin: 0 0 0.5rem 0;
   background: linear-gradient(135deg, #00d4ff 0%, #4facfe 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   font-weight: 700;
-  letter-spacing: -0.5px;
   text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
-.reports-container .page-header p {
+.reports-page .header-icon {
+  font-size: 2rem;
+}
+
+.reports-page .page-header p {
   margin: 0;
   font-size: 1.1rem;
   color: #94a3b8;
   font-weight: 400;
 }
 
-/* ANALYTICS DASHBOARD */
-.reports-container .page-content {
-  padding: 2rem 2.5rem;
+/* Export Section */
+.reports-page .export-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.reports-page .btn-export {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
+  border: none;
+  border-radius: 8px;
+  color: #0a0e17;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.reports-page .btn-export:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+}
+
+.reports-page .btn-export:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.reports-page .report-meta {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  text-align: right;
+}
+
+.reports-page .report-time {
+  margin-left: 0.5rem;
+  opacity: 0.8;
+}
+
+/* Main Content - This will scroll */
+.reports-page .page-content {
+  flex: 1;
+  overflow-y: auto;
   width: 100%;
-  box-sizing: border-box;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
   position: relative;
   z-index: 5;
 }
 
-/* CONTROL PANEL */
-.reports-container .filter-section {
-  display: flex;
-  gap: 1rem;
+/* Metrics Section */
+.reports-page .metrics-section {
   margin-bottom: 2rem;
-  align-items: center;
-  flex-wrap: wrap;
-  background: rgba(30, 41, 59, 0.8);
-  padding: 1.5rem;
-  border-radius: 12px;
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  backdrop-filter: blur(10px);
 }
 
-.reports-container .control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-width: 200px;
-}
-
-.reports-container .control-label {
-  display: flex;
-  align-items: center;
-  font-weight: 600;
-  color: white;
-  font-size: 0.9rem;
-  gap: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.reports-container .control-label .icon {
-  color: #00d4ff;
-}
-
-.reports-container .filter-select {
-  padding: 0.75rem 1rem;
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(15, 23, 42, 0.8);
-  color: white;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  font-size: 0.9rem;
-}
-
-.reports-container .filter-select:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
-}
-
-/* METRICS GRID - Like Maintenance Cards */
-.reports-container .metrics-grid {
+.reports-page .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
-.reports-container .metric-card {
+.reports-page .metric-card {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
@@ -160,10 +187,9 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
-.reports-container .metric-card::before {
+.reports-page .metric-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -176,20 +202,36 @@
     transparent);
 }
 
-.reports-container .metric-card:hover {
+.reports-page .metric-card:hover {
   transform: translateY(-3px);
   border-color: #00d4ff;
-  box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
 
-.reports-container .metric-header {
+.reports-page .metric-card.primary {
+  border-left: 4px solid #00d4ff;
+}
+
+.reports-page .metric-card.success {
+  border-left: 4px solid #10b981;
+}
+
+.reports-page .metric-card.warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.reports-page .metric-card.info {
+  border-left: 4px solid #3b82f6;
+}
+
+.reports-page .metric-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
 }
 
-.reports-container .metric-title {
+.reports-page .metric-title {
   font-size: 0.9rem;
   color: #94a3b8;
   text-transform: uppercase;
@@ -197,55 +239,107 @@
   font-weight: 600;
 }
 
-.reports-container .metric-icon {
+.reports-page .metric-icon {
   width: 40px;
   height: 40px;
   border-radius: 10px;
+  background: rgba(0, 212, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
-  background: rgba(0, 212, 255, 0.1);
   color: #00d4ff;
+  font-size: 1.2rem;
 }
 
-.reports-container .metric-value {
-  font-size: 2rem;
+.reports-page .metric-card.success .metric-icon {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+}
+
+.reports-page .metric-card.warning .metric-icon {
+  background: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+}
+
+.reports-page .metric-card.info .metric-icon {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+}
+
+.reports-page .metric-value {
+  font-size: 2.5rem;
   font-weight: 700;
   color: white;
   margin-bottom: 0.5rem;
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
-.reports-container .metric-trend {
+.reports-page .metric-subtitle {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reports-page .metric-progress {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+}
+
+.reports-page .progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00d4ff, #4facfe);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.reports-page .metric-card.success .progress-bar {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.reports-page .metric-trend {
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
   font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #f59e0b;
 }
 
-.reports-container .trend-up {
-  color: #00d4ff;
+.reports-page .metric-description {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  line-height: 1.4;
 }
 
-.reports-container .trend-down {
-  color: #ef4444;
+/* Charts Section */
+.reports-page .charts-section {
+  margin-bottom: 2rem;
 }
 
-/* DATA TABLES - Matching Maintenance Style */
-.reports-container .data-section {
+.reports-page .charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 1.5rem;
+}
+
+.reports-page .chart-card {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+  padding: 1.5rem;
   position: relative;
+  overflow: hidden;
 }
 
-.reports-container .data-section::before {
+.reports-page .chart-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -258,150 +352,173 @@
     transparent);
 }
 
-.reports-container .section-header {
-  padding: 1.25rem;
-  background: rgba(30, 41, 59, 0.8);
-  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  backdrop-filter: blur(5px);
+.reports-page .chart-header {
+  margin-bottom: 1.5rem;
 }
 
-.reports-container .section-header h3 {
+.reports-page .chart-header h3 {
   font-size: 1.2rem;
   font-weight: 600;
-  margin: 0;
   color: white;
+  margin: 0 0 0.5rem 0;
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
-.reports-container .section-header .icon {
-  color: #00d4ff;
-}
-
-.reports-container .section-info {
+.reports-page .chart-subtitle {
+  font-size: 0.9rem;
   color: #94a3b8;
-  font-size: 0.85rem;
 }
 
-/* TABLES */
-.reports-container .data-table {
-  width: 100%;
-  border-collapse: collapse;
+.reports-page .chart-legend {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
 }
 
-.reports-container .data-table thead {
-  background: rgba(0, 212, 255, 0.1);
-}
-
-.reports-container .data-table th {
-  padding: 1rem 1.25rem;
-  text-align: left;
-  font-weight: 600;
-  color: white;
-  border-bottom: 2px solid #00d4ff;
-  font-size: 0.85rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.reports-container .data-table td {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: white;
-  font-size: 0.9rem;
-}
-
-.reports-container .data-table tbody tr {
-  transition: all 0.3s ease;
-}
-
-.reports-container .data-table tbody tr:hover {
-  background: rgba(0, 212, 255, 0.05);
-}
-
-/* STATUS BADGES - Matching Maintenance */
-.reports-container .status-badge {
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-}
-
-.reports-container .status-available {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.reports-container .status-in-use {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
-}
-
-.reports-container .status-maintenance {
-  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  color: white;
-}
-
-/* VEHICLE INFO - Matching Maintenance */
-.reports-container .vehicle-info {
+.reports-page .legend-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #94a3b8;
 }
 
-.reports-container .vehicle-icon {
-  color: #00d4ff;
+.reports-page .legend-item.available::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+}
+
+.reports-page .legend-item.in-use::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.reports-page .legend-item.maintenance::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ef4444;
+}
+
+.reports-page .chart-container {
+  width: 100%;
+  height: 300px;
+}
+
+/* Chart Tooltip */
+.reports-page .chart-tooltip {
+  background: #1e293b;
+  border: 1px solid #374151;
+  border-radius: 6px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.reports-page .tooltip-label {
+  font-weight: 600;
+  color: white;
+  margin: 0 0 0.5rem 0;
   font-size: 0.9rem;
 }
 
-/* MONOSPACE VIN */
-.reports-container .monospace {
-  font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-  color: #00d4ff;
+.reports-page .tooltip-value {
+  margin: 0.25rem 0;
+  font-size: 0.8rem;
 }
 
-/* ACTIVITY TIMELINE */
-.reports-container .activity-timeline {
+/* Data Section */
+.reports-page .data-section {
+  margin-bottom: 2rem;
+}
+
+.reports-page .data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.reports-page .data-card {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 12px;
+  padding: 1.5rem;
+  position: relative;
   overflow: hidden;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
-.reports-container .timeline-item {
+.reports-page .data-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 212, 255, 0.4), 
+    transparent);
+}
+
+.reports-page .card-header {
+  margin-bottom: 1.5rem;
+}
+
+.reports-page .card-header h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  margin: 0 0 0.5rem 0;
   display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.reports-page .card-icon {
+  color: #00d4ff;
+}
+
+.reports-page .card-subtitle {
+  font-size: 0.9rem;
+  color: #94a3b8;
+}
+
+/* Activity List */
+.reports-page .activity-list {
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
-  padding: 1.25rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.reports-page .activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
   transition: all 0.3s ease;
 }
 
-.reports-container .timeline-item:hover {
-  background: rgba(0, 212, 255, 0.05);
-  border-radius: 6px;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+.reports-page .activity-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(5px);
 }
 
-.reports-container .timeline-item:last-child {
-  border-bottom: none;
-}
-
-.reports-container .timeline-icon {
+.reports-page .activity-icon {
   width: 32px;
   height: 32px;
-  border-radius: 50%;
+  border-radius: 6px;
   background: rgba(0, 212, 255, 0.2);
   display: flex;
   align-items: center;
@@ -409,79 +526,208 @@
   color: #00d4ff;
   font-size: 0.9rem;
   flex-shrink: 0;
-  border: 1px solid rgba(0, 212, 255, 0.3);
 }
 
-.reports-container .timeline-content {
+.reports-page .activity-content {
   flex: 1;
 }
 
-.reports-container .timeline-header {
+.reports-page .activity-message {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.reports-page .activity-details {
+  color: #94a3b8;
+  font-size: 0.8rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.reports-page .activity-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+/* Vehicle List */
+.reports-page .vehicle-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.reports-page .vehicle-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  transition: all 0.3s ease;
 }
 
-.reports-container .activity-title {
+.reports-page .vehicle-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.reports-page .vehicle-make-model {
   font-weight: 600;
   color: white;
-  font-size: 0.95rem;
+  margin-bottom: 0.25rem;
 }
 
-.reports-container .activity-time {
-  color: #94a3b8;
+.reports-page .vehicle-vin {
   font-size: 0.8rem;
-}
-
-.reports-container .activity-description {
-  margin: 0;
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-family: 'Courier New', monospace;
 }
 
-/* RESPONSIVE DESIGN */
-@media (max-width: 1200px) {
-  .reports-container .metrics-grid {
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
+.reports-page .vehicle-stats {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
+.reports-page .vehicle-mileage {
+  font-weight: 600;
+  color: #f59e0b;
+}
+
+.reports-page .vehicle-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.reports-page .vehicle-status.available {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.reports-page .vehicle-status.in-use {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.reports-page .vehicle-status.in-maintenance {
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+
+/* No Data States */
+.reports-page .no-data {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #64748b;
+}
+
+.reports-page .no-data svg {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.reports-page .no-data p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+/* Custom scrollbar */
+.reports-page .activity-list::-webkit-scrollbar,
+.reports-page .vehicle-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.reports-page .activity-list::-webkit-scrollbar-track,
+.reports-page .vehicle-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+
+.reports-page .activity-list::-webkit-scrollbar-thumb,
+.reports-page .vehicle-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 3px;
+}
+
+.reports-page .activity-list::-webkit-scrollbar-thumb:hover,
+.reports-page .vehicle-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.5);
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .reports-container .page-header,
-  .reports-container .page-content {
-    padding: 1.5rem;
+  .reports-page .page-content {
+    padding: 1rem;
   }
   
-  .reports-container .filter-section {
+  .reports-page .header-content {
     flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+    padding: 0 1rem;
   }
   
-  .reports-container .control-group {
-    min-width: auto;
+  .reports-page .header-actions {
+    align-items: center;
+    width: 100%;
   }
   
-  .reports-container .metrics-grid {
+  .reports-page .export-section {
+    align-items: center;
+    width: 100%;
+  }
+  
+  .reports-page .metrics-grid {
     grid-template-columns: 1fr;
   }
   
-  .reports-container .section-header {
-    flex-direction: column;
-    gap: 0.75rem;
-    text-align: center;
+  .reports-page .charts-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .reports-page .data-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .reports-page .chart-container {
+    height: 250px;
   }
 }
 
 @media (max-width: 480px) {
-  .reports-container .page-header {
-    padding: 1.25rem;
+  .reports-page .page-header {
+    padding: 1.5rem 0;
   }
   
-  .reports-container .page-content {
-    padding: 1.25rem;
+  .reports-page .page-header h1 {
+    font-size: 1.8rem;
   }
   
-  .reports-container .page-header h1 {
-    font-size: 1.75rem;
+  .reports-page .vehicle-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .reports-page .vehicle-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .reports-page .chart-container {
+    height: 200px;
   }
 }

@@ -1,4 +1,4 @@
-/* UserManagementPage.css - ENHANCED MODAL STYLES */
+/* UserManagementPage.css - SPACE-THEMED DESIGN */
 .user-management-page {
   width: 100%;
   min-height: 100vh;
@@ -64,6 +64,12 @@
   flex: 1;
 }
 
+.user-management-page .header-actions {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
 .user-management-page .page-header h1 {
   font-size: 2rem;
   margin: 0 0 0.5rem 0;
@@ -73,6 +79,13 @@
   background-clip: text;
   font-weight: 700;
   text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-management-page .header-icon {
+  font-size: 1.8rem;
 }
 
 .user-management-page .page-header p {
@@ -82,19 +95,18 @@
   font-weight: 400;
 }
 
+/* USER INFO */
 .user-management-page .user-info {
-  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
 }
 
 .user-management-page .user-name {
+  color: #ffffff;
   font-weight: 600;
-  color: white;
-  margin-bottom: 0.25rem;
-}
-
-.user-management-page .user-role {
-  color: #94a3b8;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
 }
 
 /* MAIN CONTENT */
@@ -107,7 +119,7 @@
   box-sizing: border-box;
 }
 
-/* SUMMARY CARDS */
+/* SUMMARY SECTION */
 .user-management-page .summary-section {
   margin-bottom: 2rem;
   width: 100%;
@@ -121,7 +133,7 @@
 }
 
 .user-management-page .summary-card {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 12px;
@@ -129,6 +141,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .user-management-page .summary-card::before {
@@ -150,7 +163,7 @@
 }
 
 .user-management-page .summary-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: #00d4ff;
   box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
@@ -194,69 +207,24 @@
   font-weight: 500;
 }
 
-/* ADMIN LIMIT NOTICE */
-.user-management-page .admin-limit-notice {
-  background: rgba(245, 158, 11, 0.1);
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-  backdrop-filter: blur(10px);
-}
-
-.user-management-page .notice-content {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.user-management-page .notice-icon {
-  color: #f59e0b;
-  font-size: 1.25rem;
-  margin-top: 0.125rem;
-}
-
-.user-management-page .admin-limit-notice p {
-  margin: 0;
-  color: #fbbf24;
-  font-weight: 500;
-}
-
-.user-management-page .admin-limit-notice .warning {
-  color: #ef4444;
+.user-management-page .card-hover-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 212, 255, 0.1);
+  color: #00d4ff;
+  font-size: 0.7rem;
   font-weight: 600;
-  margin-top: 0.5rem;
+  text-align: center;
+  padding: 0.25rem;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  border-radius: 0 0 12px 12px;
 }
 
-/* ALERTS */
-.user-management-page .alert {
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  backdrop-filter: blur(10px);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-}
-
-.user-management-page .alert:hover {
-  transform: translateY(-1px);
-}
-
-.user-management-page .alert.error {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-}
-
-.user-management-page .alert.success {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #6ee7b7;
+.user-management-page .summary-card:hover .card-hover-effect {
+  transform: translateY(0);
 }
 
 /* TOOLBAR */
@@ -265,9 +233,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
-  width: 100%;
   gap: 1rem;
-  flex-wrap: wrap;
 }
 
 .user-management-page .search-filters {
@@ -275,19 +241,25 @@
   align-items: center;
   gap: 1rem;
   flex: 1;
-  min-width: 0;
 }
 
 .user-management-page .search-bar {
-  flex: 1;
-  min-width: 250px;
-  max-width: 400px;
   position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.user-management-page .search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
 }
 
 .user-management-page .search-input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.75rem 1rem 0.75rem 3rem;
   border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: 8px;
   background: rgba(30, 41, 59, 0.8);
@@ -302,60 +274,43 @@
   box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
-.user-management-page .search-input::placeholder {
-  color: #94a3b8;
+.user-management-page .filter-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  font-size: 0.875rem;
+  min-width: 140px;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.user-management-page .action-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-shrink: 0;
+.user-management-page .filter-select:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
-/* COMPACT BUTTON STYLES */
+/* BUTTONS */
 .user-management-page .btn-compact {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1rem;
+  padding: 0.75rem 1rem;
   border: none;
   border-radius: 8px;
-  font-weight: 600;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   text-decoration: none;
-  justify-content: center;
-  font-family: inherit;
-  position: relative;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.user-management-page .btn-compact::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.2), 
-    transparent);
-  transition: left 0.5s;
-}
-
-.user-management-page .btn-compact:hover::before {
-  left: 100%;
+  color: inherit;
 }
 
 .user-management-page .btn-primary-compact {
   background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
   color: #0a0e17;
-  box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .user-management-page .btn-primary-compact:hover {
@@ -364,15 +319,19 @@
   box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
 }
 
-.user-management-page .btn-primary-compact:disabled {
-  background: rgba(107, 114, 128, 0.5);
-  color: #94a3b8;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.user-management-page .btn-mileage-compact {
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: #00d4ff;
 }
 
-/* USERS GRID */
+.user-management-page .btn-mileage-compact:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: #00d4ff;
+  transform: translateY(-1px);
+}
+
+/* USER CARDS */
 .user-management-page .users-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
@@ -381,7 +340,6 @@
   align-items: stretch;
 }
 
-/* USER CARD STYLES */
 .user-management-page .user-card {
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
@@ -414,25 +372,25 @@
   box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
 
-/* Status borders for user cards */
-.user-management-page .user-card.super-user { 
-  border-left: 4px solid #FFD700;
+/* Status border */
+.user-management-page .user-card.superadmin {
+  border-left: 4px solid #f59e0b;
   background: linear-gradient(90deg, 
-    rgba(255, 215, 0, 0.1) 0%, 
+    rgba(245, 158, 11, 0.05) 0%, 
     rgba(255, 255, 255, 0.02) 100%);
 }
 
-.user-management-page .user-card.admin { 
-  border-left: 4px solid #10b981;
-  background: linear-gradient(90deg, 
-    rgba(16, 185, 129, 0.05) 0%, 
-    rgba(255, 255, 255, 0.02) 100%);
-}
-
-.user-management-page .user-card.driver { 
+.user-management-page .user-card.admin {
   border-left: 4px solid #3b82f6;
   background: linear-gradient(90deg, 
     rgba(59, 130, 246, 0.05) 0%, 
+    rgba(255, 255, 255, 0.02) 100%);
+}
+
+.user-management-page .user-card.driver {
+  border-left: 4px solid #10b981;
+  background: linear-gradient(90deg, 
+    rgba(16, 185, 129, 0.05) 0%, 
     rgba(255, 255, 255, 0.02) 100%);
 }
 
@@ -448,7 +406,14 @@
   backdrop-filter: blur(5px);
 }
 
-.user-management-page .vehicle-title h3 {
+.user-management-page .user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.user-management-page .user-info-main h3 {
   margin: 0 0 0.25rem 0;
   font-size: 1.1rem;
   font-weight: 600;
@@ -457,14 +422,20 @@
   text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
-.user-management-page .vehicle-year {
+.user-management-page .user-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-management-page .username {
   color: #94a3b8;
   font-size: 0.875rem;
   font-weight: 400;
 }
 
-/* STATUS PILL */
-.user-management-page .status-pill {
+/* ROLE BADGE */
+.user-management-page .role-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
@@ -478,22 +449,6 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-.user-management-page .status-pill.super {
-  background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-  color: #000;
-  font-weight: 800;
-}
-
-.user-management-page .status-pill.admin {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-}
-
-.user-management-page .status-pill.driver {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-}
-
 /* CARD BODY */
 .user-management-page .card-body {
   padding: 1.5rem;
@@ -503,73 +458,86 @@
   gap: 1.25rem;
 }
 
-/* INFO SECTIONS */
-.user-management-page .info-section {
+/* SECURITY SECTION */
+.user-management-page .security-section {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.user-management-page .security-header {
   display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.user-management-page .info-row {
-  display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: 0.75rem;
   align-items: center;
-  padding: 0.25rem 0;
-  border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
 }
 
-.user-management-page .info-row:last-child {
-  border-bottom: none;
-}
-
-.user-management-page .info-label {
+.user-management-page .security-header h4 {
+  margin: 0;
   color: #94a3b8;
-  font-size: 0.8rem;
-  font-weight: 500;
+  font-size: 0.875rem;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
-.user-management-page .info-value {
+.user-management-page .security-icon {
   font-size: 0.875rem;
-  color: white;
-  font-weight: 400;
-  line-height: 1.4;
+  color: #00d4ff;
 }
 
-/* ROLE BADGE */
-.user-management-page .role-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
+.user-management-page .password-input-wrapper {
+  position: relative;
+  margin-bottom: 0.75rem;
 }
 
-.user-management-page .role-badge.super {
-  background: rgba(255, 215, 0, 0.2);
-  color: #FFD700;
-  border: 1px solid rgba(255, 215, 0, 0.3);
+.user-management-page .password-actions {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 4px;
 }
 
-.user-management-page .role-badge.admin {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.3);
+.user-management-page .password-toggle-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.user-management-page .role-badge.driver {
-  background: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
-  border: 1px solid rgba(59, 130, 246, 0.3);
+.user-management-page .password-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #94a3b8;
 }
 
-/* STATUS ACTIVE */
-.user-management-page .status-active {
-  color: #10b981;
-  font-weight: 600;
+.user-management-page .password-strength {
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #94a3b8;
 }
+
+.user-management-page .strength-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #e2e8f0;
+}
+
+.user-management-page .strength-dot.weak { background: #ef4444; }
+.user-management-page .strength-dot.medium { background: #f59e0b; }
+.user-management-page .strength-dot.strong { background: #10b981; }
 
 /* CARD ACTIONS */
 .user-management-page .card-actions {
@@ -615,6 +583,35 @@
   left: 100%;
 }
 
+.user-management-page .btn-save {
+  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
+  color: white;
+  border: none;
+}
+
+.user-management-page .btn-save:hover:not(:disabled) {
+  background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+}
+
+.user-management-page .btn-save:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.user-management-page .btn-cancel {
+  background: #6b7280;
+  color: white;
+  border: none;
+}
+
+.user-management-page .btn-cancel:hover {
+  background: #4b5563;
+  transform: translateY(-1px);
+}
+
 .user-management-page .btn-delete {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   color: white;
@@ -626,61 +623,98 @@
   box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
 }
 
-/* Password button styles */
-.user-management-page .btn-password {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.3s ease;
-  flex: 1;
-  justify-content: center;
-  position: relative;
+/* FORM STYLES */
+.user-management-page .create-user-form {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 16px;
+  margin-bottom: 2rem;
   overflow: hidden;
 }
 
-.user-management-page .btn-password::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.2), 
-    transparent);
-  transition: left 0.5s;
+.user-management-page .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
 }
 
-.user-management-page .btn-password:hover::before {
-  left: 100%;
+.user-management-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-.user-management-page .btn-password:hover {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+.user-management-page .form-group.full-width {
+  grid-column: 1 / -1;
 }
 
-.user-management-page .btn-password:disabled {
-  background: #6c757d;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.user-management-page .no-actions {
+.user-management-page .form-label {
   color: #94a3b8;
-  font-size: 0.8rem;
-  font-style: italic;
-  text-align: center;
-  padding: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-management-page .form-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+}
+
+.user-management-page .form-input:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.user-management-page .form-select {
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 8px;
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.user-management-page .form-select:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+}
+
+.user-management-page .form-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* PERMISSION NOTICE */
+.user-management-page .permission-notice {
+  padding: 1rem;
+  background: rgba(255, 251, 235, 0.1);
+  border: 1px solid rgba(252, 211, 77, 0.3);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #fcd34d;
+}
+
+.user-management-page .permission-notice.superadmin {
+  background: rgba(219, 234, 254, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
+  color: #60a5fa;
 }
 
 /* EMPTY STATE */
@@ -695,7 +729,6 @@
   position: relative;
   width: 100%;
   box-sizing: border-box;
-  grid-column: 1 / -1;
 }
 
 .user-management-page .empty-state::before {
@@ -721,7 +754,7 @@
 
 @keyframes float {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
 }
 
 .user-management-page .empty-state h3 {
@@ -736,517 +769,57 @@
   font-size: 0.9rem;
 }
 
-/* BUTTON STYLES */
-.user-management-page .btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-  text-decoration: none;
-  justify-content: center;
-  font-family: inherit;
-  position: relative;
-  overflow: hidden;
-}
-
-.user-management-page .btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.2), 
-    transparent);
-  transition: left 0.5s;
-}
-
-.user-management-page .btn:hover::before {
-  left: 100%;
-}
-
-.user-management-page .btn-save {
-  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
-  color: #0a0e17;
-}
-
-.user-management-page .btn-save:hover {
-  background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
-}
-
-.user-management-page .btn-cancel {
-  background: rgba(107, 114, 128, 0.1);
-  border: 1px solid rgba(107, 114, 128, 0.3);
-  color: #94a3b8;
-}
-
-.user-management-page .btn-cancel:hover {
-  background: rgba(107, 114, 128, 0.2);
-  color: white;
-  transform: translateY(-1px);
-}
-
-.user-management-page .btn-primary {
-  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
-  color: #0a0e17;
-  box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3);
-}
-
-.user-management-page .btn-primary:hover {
-  background: linear-gradient(135deg, #00b8e6 0%, #00838f 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
-}
-
-/* ENHANCED MODAL STYLES */
-.user-management-page .modal-overlay {
+/* NOTIFICATIONS */
+.user-management-page .notifications-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  top: 24px;
+  right: 24px;
   z-index: 1000;
-  padding: 1rem;
-}
-
-.user-management-page .modal {
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(0, 212, 255, 0.4);
-  border-radius: 20px;
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 480px;
-  box-shadow: 
-    0 25px 50px rgba(0, 212, 255, 0.3),
-    0 0 100px rgba(0, 212, 255, 0.1);
-  position: relative;
-  animation: modalSlideIn 0.3s ease-out;
-  overflow: hidden;
-}
-
-.user-management-page .modal::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    #00d4ff, 
-    transparent);
-}
-
-.user-management-page .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
-  position: relative;
-}
-
-.user-management-page .modal-header h2 {
-  margin: 0;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  background: linear-gradient(135deg, #00d4ff 0%, #4facfe 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.user-management-page .modal-close {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-  font-size: 1.25rem;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.user-management-page .modal-close:hover {
-  color: white;
-  background: rgba(239, 68, 68, 0.3);
-  transform: scale(1.1);
-}
-
-/* ENHANCED FORM STYLES */
-.user-management-page .form-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.user-management-page .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 12px;
 }
 
-.user-management-page .form-label {
-  color: #e2e8f0;
+.user-management-page .notification {
+  padding: 16px 20px;
+  border-radius: 12px;
   font-size: 0.9rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.user-management-page .form-input,
-.user-management-page .form-select {
-  padding: 1rem;
-  border: 1px solid rgba(71, 85, 105, 0.6);
-  border-radius: 10px;
-  background: rgba(30, 41, 59, 0.8);
-  color: white;
-  font-size: 0.95rem;
-  transition: all 0.3s ease;
-  font-family: inherit;
-}
-
-.user-management-page .form-input:focus,
-.user-management-page .form-select:focus {
-  outline: none;
-  border-color: #00d4ff;
-  box-shadow: 
-    0 0 0 3px rgba(0, 212, 255, 0.1),
-    0 0 20px rgba(0, 212, 255, 0.2);
-  background: rgba(30, 41, 59, 0.9);
-}
-
-.user-management-page .form-input::placeholder {
-  color: #64748b;
-}
-
-.user-management-page .form-input:disabled {
-  background: rgba(71, 85, 105, 0.3);
-  color: #94a3b8;
-  cursor: not-allowed;
-}
-
-/* INFO BOX STYLES */
-.user-management-page .info-box {
-  background: rgba(0, 212, 255, 0.05);
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 12px;
-  padding: 1.25rem;
-  margin: 1rem 0;
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-}
-
-.user-management-page .info-icon {
-  color: #00d4ff;
-  font-size: 1.25rem;
-  margin-top: 0.125rem;
-  flex-shrink: 0;
-}
-
-.user-management-page .info-content p {
-  margin: 0;
-  color: #e2e8f0;
-  font-size: 0.875rem;
-  line-height: 1.5;
-}
-
-.user-management-page .info-content p:first-child {
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-/* VALIDATION MESSAGES */
-.user-management-page .validation-message {
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-top: 0.5rem;
-  font-size: 0.8rem;
   font-weight: 500;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  animation: slideIn 0.3s ease-out;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  border: 1px solid transparent;
+  gap: 12px;
+  min-width: 300px;
+  backdrop-filter: blur(10px);
 }
 
-.user-management-page .validation-message.error {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
-}
-
-.user-management-page .validation-message.success {
-  background: rgba(16, 185, 129, 0.1);
-  border-color: rgba(16, 185, 129, 0.3);
-  color: #6ee7b7;
-}
-
-.user-management-page .validation-message.info {
-  background: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
-  color: #93c5fd;
-}
-
-/* FORM ACTIONS */
-.user-management-page .form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  border-top: 1px solid rgba(51, 65, 85, 0.5);
-  padding-top: 2rem;
-  margin-top: 1rem;
-}
-
-/* SPIN ANIMATION */
-.user-management-page .spin {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* PASSWORD STRENGTH INDICATOR */
-.password-strength-indicator {
-  margin-top: 0.5rem;
-}
-
-.strength-bar {
-  width: 100%;
-  height: 6px;
-  background: rgba(71, 85, 105, 0.5);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 0.5rem;
-}
-
-.strength-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: all 0.3s ease;
-  background: linear-gradient(90deg, #ef4444, #f59e0b, #10b981);
-}
-
-.strength-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.75rem;
-  color: #94a3b8;
-}
-
-.strength-feedback {
-  margin-top: 0.25rem;
-  color: #64748b;
-  font-size: 0.7rem;
-}
-
-.strength-feedback ul {
-  margin: 0.25rem 0;
-  padding-left: 1rem;
-}
-
-.strength-feedback li {
-  margin: 0.125rem 0;
-}
-
-/* PASSWORD INPUT GROUP */
-.password-input-group {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.password-input-group .form-input {
-  flex: 1;
-  padding-right: 100px;
-}
-
-.password-toggle-btn,
-.generate-password-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-}
-
-.password-toggle-btn:hover,
-.generate-password-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+.user-management-page .notification.success {
+  background: rgba(16, 185, 129, 0.9);
   color: white;
-  border-color: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
-.password-toggle-btn {
-  right: 46px;
+.user-management-page .notification.error {
+  background: rgba(239, 68, 68, 0.9);
+  color: white;
+  border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
-.generate-password-btn {
-  right: 8px;
-}
-
-.input-error {
-  border-color: #ef4444 !important;
-  background: rgba(239, 68, 68, 0.05) !important;
-}
-
-.input-error:focus {
-  border-color: #ef4444 !important;
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-}
-
-/* Permission Badge */
-.user-management-page .user-permission-level {
-  margin-top: 0.5rem;
-}
-
-.user-management-page .permission-badge {
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.user-management-page .permission-badge.super {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 215, 0, 0.1));
-  color: #FFD700;
-  border: 1px solid rgba(255, 215, 0, 0.3);
-}
-
-.user-management-page .permission-badge.admin {
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.1));
-  color: #00d4ff;
-  border: 1px solid rgba(0, 212, 255, 0.3);
-}
-
-.user-management-page .permission-badge.driver {
-  background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(148, 163, 184, 0.1));
-  color: #94a3b8;
-  border: 1px solid rgba(148, 163, 184, 0.3);
-}
-
-/* Driver Notice */
-.user-management-page .driver-notice {
-  background: rgba(59, 130, 246, 0.1);
+.user-management-page .notification.info {
+  background: rgba(59, 130, 246, 0.9);
+  color: white;
   border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-  backdrop-filter: blur(10px);
 }
 
-.user-management-page .driver-notice .notice-icon {
-  color: #3b82f6;
-}
-
-/* Super Admin Notice */
-.user-management-page .super-admin-notice {
-  background: rgba(255, 215, 0, 0.1);
-  border: 1px solid rgba(255, 215, 0, 0.3);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-  backdrop-filter: blur(10px);
-}
-
-.user-management-page .super-admin-notice .notice-icon {
-  color: #FFD700;
-}
-
-/* Edit Button */
-.user-management-page .btn-edit {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-  color: white;
-}
-
-.user-management-page .btn-edit:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
-}
-
-.user-management-page .info-text {
-  color: #94a3b8;
-  font-size: 0.75rem;
-  margin-top: 0.25rem;
-  font-style: italic;
-  line-height: 1.4;
-}
-
-/* Search clear button */
-.user-management-page .search-clear {
-  background: none;
-  border: none;
-  color: #94a3b8;
-  cursor: pointer;
-  padding: 0.5rem;
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-.user-management-page .search-clear:hover {
-  color: white;
-}
-
-.user-management-page .search-results-info {
-  color: #94a3b8;
-  font-size: 0.875rem;
-}
-
-/* MODAL ANIMATIONS */
-@keyframes modalSlideIn {
+@keyframes slideIn {
   from {
+    transform: translateX(100%);
     opacity: 0;
-    transform: translateY(-30px) scale(0.95);
   }
   to {
+    transform: translateX(0);
     opacity: 1;
-    transform: translateY(0) scale(1);
   }
 }
 
@@ -1254,16 +827,6 @@
 @media (max-width: 1200px) {
   .user-management-page .users-grid {
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  }
-  
-  .user-management-page .search-filters {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-  
-  .user-management-page .search-bar {
-    min-width: 200px;
-    max-width: 300px;
   }
 }
 
@@ -1277,18 +840,10 @@
     gap: 1rem;
   }
   
-  .user-management-page .summary-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  
   .user-management-page .card-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.75rem;
-  }
-  
-  .user-management-page .info-row {
-    grid-template-columns: 70px 1fr;
   }
   
   .user-management-page .header-content {
@@ -1297,52 +852,29 @@
     text-align: center;
   }
   
+  .user-management-page .user-info {
+    align-items: center;
+  }
+  
   .user-management-page .page-toolbar {
     flex-direction: column;
     align-items: stretch;
-    gap: 1rem;
   }
   
   .user-management-page .search-filters {
     flex-direction: column;
-    align-items: stretch;
   }
   
   .user-management-page .search-bar {
     max-width: none;
   }
   
-  .user-management-page .action-buttons {
-    justify-content: center;
+  .user-management-page .form-grid {
+    grid-template-columns: 1fr;
   }
   
-  .user-management-page .form-actions {
+  .user-management-page .card-actions {
     flex-direction: column;
-  }
-  
-  .user-management-page .modal {
-    padding: 1.5rem;
-    margin: 1rem;
-    max-width: calc(100vw - 2rem);
-  }
-  
-  .password-input-group .form-input {
-    padding-right: 80px;
-  }
-  
-  .password-toggle-btn,
-  .generate-password-btn {
-    width: 32px;
-    height: 32px;
-    padding: 0.375rem;
-  }
-  
-  .password-toggle-btn {
-    right: 40px;
-  }
-  
-  .generate-password-btn {
-    right: 6px;
   }
 }
 
@@ -1351,28 +883,12 @@
     padding: 0 1rem;
   }
   
+  .user-management-page .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
   .user-management-page .summary-cards {
     grid-template-columns: 1fr;
-  }
-  
-  .user-management-page .card-actions {
-    flex-direction: column;
-  }
-  
-  .user-management-page .search-filters {
-    gap: 0.5rem;
-  }
-  
-  .user-management-page .btn-compact {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.75rem;
-  }
-  
-  .user-management-page .modal {
-    padding: 1.25rem;
-  }
-  
-  .user-management-page .modal-header h2 {
-    font-size: 1.25rem;
   }
 }

@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { FaEdit, FaTrash, FaSave, FaTimes, FaRoad, FaPlus, FaCar, FaCheck, FaWrench, FaClock, FaFilter, FaTimesCircle, FaCheckSquare, FaSquare, FaUser } from "react-icons/fa";
 import "./VehiclePage.css";
 
-function SummaryCard({ label, value, icon, color }) {
+function SummaryCard({ label, value, icon, color, onClick }) {
   return (
-    <div className="summary-card">
+    <div className="summary-card interactive" onClick={onClick} style={{ borderLeftColor: color }}>
       <div className="summary-card-content">
         <div className="summary-icon" style={{ color }}>
           {icon}
@@ -16,6 +16,7 @@ function SummaryCard({ label, value, icon, color }) {
           <div className="summary-label">{label}</div>
         </div>
       </div>
+      <div className="card-hover-effect">Click to view</div>
     </div>
   );
 }
@@ -35,8 +36,7 @@ function VehicleCard({
   onStatusChange,
   isSelected,
   onSelectVehicle,
-  users = [], // ADD USERS PROP
-  canEditVehicles // ADD PERMISSION PROP
+  users = []
 }) {
   const statusClass = vehicle.status.toLowerCase().replace(' ', '-');
 
@@ -45,7 +45,6 @@ function VehicleCard({
     return requiredFields.every(field => editableVehicle[field]?.toString().trim());
   };
 
-  // ENHANCED: Handle status change with driver assignment
   const handleStatusChange = async (newStatus) => {
     if (newStatus !== vehicle.status) {
       await onStatusChange(vehicle.vin, newStatus);
@@ -190,7 +189,7 @@ function VehicleCard({
   return (
     <div className={`vehicle-card ${statusClass} ${isSelected ? 'selected' : ''}`}>
       {/* Selection Checkbox */}
-      {canEditVehicles && (
+      {(userRole === "ADMIN" || userRole === "SUPERADMIN") && (
         <div className="vehicle-checkbox">
           <input
             type="checkbox"
@@ -248,7 +247,7 @@ function VehicleCard({
                   value={vehicle.status}
                   onChange={(e) => handleStatusChange(e.target.value)}
                   className="status-select"
-                  disabled={!canEditVehicles}
+                  disabled={!(userRole === "ADMIN" || userRole === "SUPERADMIN")}
                 >
                   <option value="Available">Available</option>
                   <option value="In Use">In Use</option>
@@ -257,7 +256,6 @@ function VehicleCard({
               </span>
             </div>
             
-            {/* SHOW ASSIGNED DRIVER */}
             {vehicle.status === "In Use" && vehicle.assignedDriver && (
               <div className="info-row">
                 <span className="info-label">Assigned Driver:</span>
@@ -300,7 +298,7 @@ function VehicleCard({
           </div>
         </div>
 
-        {canEditVehicles && (
+        {(userRole === "ADMIN" || userRole === "SUPERADMIN") && (
           <div className="card-actions">
             <button className="btn btn-edit" onClick={() => onEdit(vehicle)}>
               <FaEdit /> Edit
@@ -325,7 +323,6 @@ export default function VehiclePage({
   updateStatus,
   user,
   onMaintenanceStatusChange,
-  // Enhanced props
   selectedVehicles,
   setSelectedVehicles,
   handleBulkStatusChange,
@@ -333,34 +330,19 @@ export default function VehiclePage({
   advancedFilters,
   setAdvancedFilters,
   clearAllFilters,
-  // Existing props
   searchQuery,
   setSearchQuery,
   filterStatus,
   setFilterStatus,
   statusCounts,
-  users = [], // ADD USERS PROP
-  canEdit // ADD PERMISSION PROP FROM PARENT
+  users = [],
+  // Add navigation props
+  onNavigateToMaintenance = () => console.log('Navigate to maintenance'),
+  onNavigateToReports = () => console.log('Navigate to reports')
 }) {
   const [editingVin, setEditingVin] = useState(null);
   const [editableVehicles, setEditableVehicles] = useState({});
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-
-  // Enhanced permission checking
-  const canEditVehicles = () => {
-    if (!user) return false;
-    
-    const userRole = user.role?.toUpperCase();
-    const isSuperAdmin = 
-      user.isSuperUser === true ||
-      userRole === "SUPER_ADMIN" || 
-      userRole === "SUPERADMIN" ||
-      user.username?.toLowerCase().includes("super");
-    
-    return isSuperAdmin || userRole === "ADMIN";
-  };
-
-  const hasEditPermissions = canEditVehicles();
 
   const handleEditClick = (vehicle) => {
     setEditingVin(vehicle.vin);
@@ -387,14 +369,10 @@ export default function VehiclePage({
     setEditableVehicles(prev => { const newState = { ...prev }; delete newState[vin]; return newState; });
   };
 
-  // ENHANCED: Status change handler with driver assignment
   const handleStatusChange = async (vin, newStatus) => {
     const vehicle = vehicles.find(v => v.vin === vin);
-    
-    // Call the parent updateStatus which now handles driver assignment
     await updateStatus(vin, newStatus);
     
-    // Maintenance status change handling
     if (newStatus === "In Maintenance" && vehicle.status !== "In Maintenance") {
       if (onMaintenanceStatusChange) {
         await onMaintenanceStatusChange(vehicle, "add");
@@ -406,7 +384,6 @@ export default function VehiclePage({
     }
   };
 
-  // Selection handlers
   const handleSelectVehicle = (vin) => {
     setSelectedVehicles(prev => {
       const newSet = new Set(prev);
@@ -431,7 +408,6 @@ export default function VehiclePage({
     setSelectedVehicles(new Set());
   };
 
-  // Advanced filter handlers
   const handleAdvancedFilterChange = (field, value) => {
     setAdvancedFilters(prev => ({
       ...prev,
@@ -454,10 +430,37 @@ export default function VehiclePage({
     Object.values(advancedFilters).some(value => value !== '');
 
   const summaryCards = [
-    { label: "Total Vehicles", value: allVehicles.length, icon: <FaCar />, color: "#6366f1" },
-    { label: "Available", value: allVehicles.filter(v => v.status === "Available").length, icon: <FaCheck />, color: "#10b981" },
-    { label: "In Use", value: allVehicles.filter(v => v.status === "In Use").length, icon: <FaCar />, color: "#f59e0b" },
-    { label: "Maintenance", value: allVehicles.filter(v => v.status === "In Maintenance").length, icon: <FaWrench />, color: "#ef4444" }
+    { 
+      label: "Total Vehicles", 
+      value: allVehicles.length, 
+      icon: <FaCar />, 
+      color: "#6366f1",
+      onClick: () => {
+        setFilterStatus("");
+        setSearchQuery("");
+      }
+    },
+    { 
+      label: "Available", 
+      value: allVehicles.filter(v => v.status === "Available").length, 
+      icon: <FaCheck />, 
+      color: "#10b981",
+      onClick: () => setFilterStatus("Available")
+    },
+    { 
+      label: "In Use", 
+      value: allVehicles.filter(v => v.status === "In Use").length, 
+      icon: <FaCar />, 
+      color: "#f59e0b",
+      onClick: () => setFilterStatus("In Use")
+    },
+    { 
+      label: "Maintenance", 
+      value: allVehicles.filter(v => v.status === "In Maintenance").length, 
+      icon: <FaWrench />, 
+      color: "#ef4444",
+      onClick: () => onNavigateToMaintenance()
+    }
   ];
 
   return (
@@ -471,7 +474,7 @@ export default function VehiclePage({
           <div className="header-actions">
             <div className="user-info">
               <span className="user-name">Welcome, {user?.name || user?.username || 'User'}</span>
-              <span className="user-role">({user?.role || 'User'}) {user?.isSuperUser && "⭐"}</span>
+              <span className="user-role">({user?.role || 'User'})</span>
             </div>
           </div>
         </div>
@@ -487,7 +490,7 @@ export default function VehiclePage({
         </div>
 
         {/* Bulk Actions */}
-        {hasEditPermissions && selectedVehicles.size > 0 && (
+        {(user.role === "ADMIN" || user.role === "SUPERADMIN") && selectedVehicles.size > 0 && (
           <div className="bulk-actions">
             <div className="bulk-info">
               <span className="selected-count">{selectedVehicles.size}</span> vehicles selected
@@ -559,7 +562,7 @@ export default function VehiclePage({
               </button>
             )}
 
-            {hasEditPermissions && vehicles.length > 0 && (
+            {(user.role === "ADMIN" || user.role === "SUPERADMIN") && vehicles.length > 0 && (
               <button 
                 onClick={handleSelectAll}
                 className="btn-compact btn-mileage-compact"
@@ -571,7 +574,7 @@ export default function VehiclePage({
           </div>
 
           <div className="action-buttons">
-            {hasEditPermissions && (
+            {(user.role === "ADMIN" || user.role === "SUPERADMIN") && (
               <button className="btn-compact btn-primary-compact" onClick={() => setShowModal(true)}>
                 <FaPlus /> Add Vehicle
               </button>
@@ -676,11 +679,9 @@ export default function VehiclePage({
                   onIncrementMileage={incrementMileage}
                   onStatusChange={handleStatusChange}
                   userRole={user.role}
-                  // Enhanced props
                   isSelected={selectedVehicles.has(vehicle.vin)}
                   onSelectVehicle={handleSelectVehicle}
-                  users={users} // PASS USERS TO VEHICLE CARD
-                  canEditVehicles={hasEditPermissions} // PASS PERMISSION TO VEHICLE CARD
+                  users={users}
                 />
               ))}
             </div>
@@ -694,7 +695,7 @@ export default function VehiclePage({
                   : "Get started by adding your first vehicle to the fleet"
                 }
               </p>
-              {hasEditPermissions && !hasActiveFilters && (
+              {(user.role === "ADMIN" || user.role === "SUPERADMIN") && !hasActiveFilters && (
                 <button className="btn btn-primary" onClick={() => setShowModal(true)}>
                   <FaPlus /> Add First Vehicle
                 </button>
