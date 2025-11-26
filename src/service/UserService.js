@@ -1,13 +1,25 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:8080/service/users";
+// 🔥 FIX: Change this URL to match your AuthController
+const AUTH_URL = "http://localhost:8080/api/auth";  // NEW
+const USER_URL = "http://localhost:8080/service/users";  // KEEP THIS FOR USER MANAGEMENT
 
-// --- Login ---
+// --- Login --- (FIXED ENDPOINT)
 const login = async (username, password) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { username, password });
+    console.log("🔐 Attempting login at:", `${AUTH_URL}/login`);
+    
+    const response = await axios.post(`${AUTH_URL}/login`, { 
+      username, 
+      password 
+    });
+    
+    console.log("✅ Login successful:", response.data);
     return response.data;
+    
   } catch (error) {
+    console.error("❌ Login error:", error.response?.data || error.message);
+    
     const msg = error.response?.status === 401
       ? "Invalid username or password"
       : "Login failed. Please try again.";
@@ -15,10 +27,10 @@ const login = async (username, password) => {
   }
 };
 
-// --- Get all users ---
+// --- Get all users --- (KEEP THIS THE SAME)
 const getAllUsers = async (requesterUsername) => {
   try {
-    const response = await axios.get(`${API_URL}?requesterUsername=${requesterUsername}`);
+    const response = await axios.get(`${USER_URL}?requesterUsername=${requesterUsername}`);
     if (!Array.isArray(response.data)) return [];
     return response.data;
   } catch (error) {
@@ -27,23 +39,21 @@ const getAllUsers = async (requesterUsername) => {
   }
 };
 
-// --- Register user by admin ---
+// --- Register user by admin --- (KEEP THIS THE SAME)
 const registerByAdmin = async (adminUsername, userData) => {
   try {
     console.log('🔄 Registering user by admin:', { adminUsername, userData });
     
-    // SIMPLE: Only send username, password, and role - let backend handle the rest
     const backendUserData = {
       username: userData.username,
       password: userData.password,
       role: userData.role
-      // REMOVED: superUser field - backend will handle this based on role
     };
     
     console.log('📤 Sending to backend:', backendUserData);
     
     const response = await axios.post(
-      `${API_URL}/register?adminUsername=${encodeURIComponent(adminUsername)}`,
+      `${USER_URL}/register?adminUsername=${encodeURIComponent(adminUsername)}`,
       backendUserData,
       {
         headers: {
@@ -62,7 +72,6 @@ const registerByAdmin = async (adminUsername, userData) => {
       message: error.message
     });
     
-    // Get the actual error message
     let errorMessage = "Failed to create user";
     if (error.response?.data) {
       if (typeof error.response.data === 'string') {
@@ -78,11 +87,11 @@ const registerByAdmin = async (adminUsername, userData) => {
   }
 };
 
-// --- Update user password ---
+// --- Update user password --- (KEEP THIS THE SAME)
 const updateUserPassword = async (adminUsername, targetUsername, newPassword) => {
   try {
     const response = await axios.post(
-      `${API_URL}/${targetUsername}/password?adminUsername=${encodeURIComponent(adminUsername)}`,
+      `${USER_URL}/${targetUsername}/password?adminUsername=${encodeURIComponent(adminUsername)}`,
       {
         newPassword: newPassword
       }
@@ -104,11 +113,11 @@ const updateUserPassword = async (adminUsername, targetUsername, newPassword) =>
   }
 };
 
-// --- Delete user ---
+// --- Delete user --- (KEEP THIS THE SAME)
 const deleteUser = async (adminUsername, targetUsername) => {
   try {
     const response = await axios.delete(
-      `${API_URL}/admin/${targetUsername}?adminUsername=${encodeURIComponent(adminUsername)}`
+      `${USER_URL}/admin/${targetUsername}?adminUsername=${encodeURIComponent(adminUsername)}`
     );
     return response.data;
   } catch (error) {
@@ -123,22 +132,10 @@ const deleteUser = async (adminUsername, targetUsername) => {
   }
 };
 
-// --- Get admin count ---
-const getAdminCount = async (requesterUsername) => {
-  try {
-    const response = await axios.get(`${API_URL}/admin/count?requesterUsername=${requesterUsername}`);
-    return response.data;
-  } catch (error) {
-    console.error("Get admin count failed:", error.response?.data || error.message);
-    return 0;
-  }
-};
-
 export default {
   login,
   getAllUsers,
   registerByAdmin,
   deleteUser,
-  updateUserPassword,
-  getAdminCount
+  updateUserPassword
 };

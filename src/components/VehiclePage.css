@@ -1,4 +1,4 @@
-/* VehiclePage.css - PROFESSIONAL FULL-WIDTH LAYOUT */
+/* VehiclePage.css - PERFECTLY RESPONSIVE */
 .vehicle-page {
   width: 100%;
   min-height: 100vh;
@@ -43,7 +43,7 @@
     rgba(26, 35, 126, 0.8) 100%);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(0, 212, 255, 0.3);
-  padding: 2rem 0;
+  padding: clamp(1.5rem, 4vw, 2rem) 0;
   position: relative;
   z-index: 10;
   box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
@@ -52,12 +52,13 @@
 
 .vehicle-page .header-content {
   width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 clamp(1rem, 3vw, 2rem);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 2rem;
+  gap: clamp(1rem, 3vw, 2rem);
   box-sizing: border-box;
 }
 
@@ -66,7 +67,7 @@
 }
 
 .vehicle-page .page-header h1 {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 4vw, 2rem);
   margin: 0 0 0.5rem 0;
   background: linear-gradient(135deg, #00d4ff 0%, #4facfe 100%);
   -webkit-background-clip: text;
@@ -78,38 +79,48 @@
 
 .vehicle-page .page-header p {
   margin: 0;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2vw, 1rem);
   color: #94a3b8;
   font-weight: 400;
+}
+
+.vehicle-page .user-info {
+  text-align: right;
+}
+
+.vehicle-page .user-name {
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.25rem;
+  font-size: clamp(0.9rem, 2vw, 1rem);
+}
+
+.vehicle-page .user-role {
+  color: #94a3b8;
+  font-size: clamp(0.8rem, 2vw, 0.875rem);
 }
 
 /* MAIN CONTENT */
 .vehicle-page .page-content {
   width: 100%;
-  margin: 0;
-  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2rem);
   position: relative;
   z-index: 5;
   box-sizing: border-box;
 }
 
-/* CONTENT SECTION */
-.vehicle-page .content-section {
-  width: 100%;
-  margin: 0;
-  padding: 0;
-}
-
 /* SUMMARY CARDS */
 .vehicle-page .summary-section {
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
   width: 100%;
 }
 
 .vehicle-page .summary-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+  gap: clamp(0.75rem, 2vw, 1rem);
   width: 100%;
 }
 
@@ -118,10 +129,12 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 12px;
-  padding: 1.25rem;
+  padding: clamp(1rem, 3vw, 1.25rem);
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
+  min-height: 120px;
 }
 
 .vehicle-page .summary-card::before {
@@ -148,22 +161,42 @@
   box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
 
+.vehicle-page .card-hover-effect {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 212, 255, 0.1);
+  color: #00d4ff;
+  font-size: clamp(0.65rem, 2vw, 0.7rem);
+  font-weight: 600;
+  text-align: center;
+  padding: 0.25rem;
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  border-radius: 0 0 12px 12px;
+}
+
+.vehicle-page .summary-card:hover .card-hover-effect {
+  transform: translateY(0);
+}
+
 .vehicle-page .summary-card-content {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
   position: relative;
   z-index: 2;
 }
 
 .vehicle-page .summary-icon {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
   opacity: 0.9;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: clamp(35px, 8vw, 40px);
+  height: clamp(35px, 8vw, 40px);
   background: rgba(255, 255, 255, 0.1);
   border-radius: 10px;
   filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
@@ -174,7 +207,7 @@
 }
 
 .vehicle-page .summary-value {
-  font-size: 1.5rem;
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
   font-weight: 700;
   margin-bottom: 0.25rem;
   line-height: 1;
@@ -183,7 +216,7 @@
 
 .vehicle-page .summary-label {
   color: #94a3b8;
-  font-size: 0.85rem;
+  font-size: clamp(0.75rem, 2vw, 0.85rem);
   font-weight: 500;
 }
 
@@ -192,36 +225,38 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(1.5rem, 4vw, 2rem);
   width: 100%;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
   flex-wrap: wrap;
 }
 
 .vehicle-page .search-filters {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
   flex: 1;
   min-width: 0;
+  flex-wrap: wrap;
 }
 
 .vehicle-page .search-bar {
   flex: 1;
-  min-width: 250px;
+  min-width: min(250px, 100%);
   max-width: 400px;
   position: relative;
 }
 
 .vehicle-page .search-input {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: clamp(0.6rem, 2vw, 0.75rem) clamp(0.8rem, 2vw, 1rem);
   border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: 8px;
   background: rgba(30, 41, 59, 0.8);
   color: white;
-  font-size: 0.875rem;
+  font-size: clamp(0.8rem, 2vw, 0.875rem);
   transition: all 0.2s ease;
+  min-height: 44px;
 }
 
 .vehicle-page .search-input:focus {
@@ -235,15 +270,16 @@
 }
 
 .vehicle-page .filter-select {
-  padding: 0.75rem 1rem;
+  padding: clamp(0.6rem, 2vw, 0.75rem) clamp(0.8rem, 2vw, 1rem);
   border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: 8px;
   background: rgba(30, 41, 59, 0.8);
   color: white;
-  font-size: 0.875rem;
-  min-width: 140px;
+  font-size: clamp(0.8rem, 2vw, 0.875rem);
+  min-width: min(140px, 100%);
   cursor: pointer;
   transition: all 0.2s ease;
+  min-height: 44px;
 }
 
 .vehicle-page .filter-select:focus {
@@ -255,8 +291,9 @@
 .vehicle-page .action-buttons {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 /* COMPACT BUTTON STYLES */
@@ -264,11 +301,11 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1rem;
+  padding: clamp(0.5rem, 2vw, 0.6rem) clamp(0.8rem, 2vw, 1rem);
   border: none;
   border-radius: 8px;
   font-weight: 600;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
@@ -277,6 +314,7 @@
   position: relative;
   overflow: hidden;
   white-space: nowrap;
+  min-height: 44px;
 }
 
 .vehicle-page .btn-compact::before {
@@ -314,7 +352,7 @@
   background: rgba(0, 212, 255, 0.1);
   border: 1px solid rgba(0, 212, 255, 0.3);
   color: #00d4ff;
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 2vw, 0.75rem);
 }
 
 .vehicle-page .btn-mileage-compact:hover {
@@ -327,7 +365,7 @@
   background: rgba(107, 114, 128, 0.1);
   border: 1px solid rgba(107, 114, 128, 0.3);
   color: #94a3b8;
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 2vw, 0.75rem);
 }
 
 .vehicle-page .btn-cancel-compact:hover {
@@ -338,18 +376,18 @@
 
 /* BULK ACTIONS */
 .vehicle-page .bulk-actions {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 212, 255, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.3);
   border-radius: 12px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.25rem);
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
   display: flex;
   justify-content: space-between;
   align-items: center;
   animation: slideInDown 0.3s ease;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
 }
 
 .vehicle-page .bulk-info {
@@ -358,34 +396,35 @@
   gap: 0.5rem;
   color: white;
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 2vw, 0.9rem);
 }
 
 .vehicle-page .selected-count {
   background: #00d4ff;
   color: #0a0e17;
-  padding: 0.25rem 0.6rem;
+  padding: clamp(0.2rem, 2vw, 0.3rem) clamp(0.5rem, 2vw, 0.8rem);
   border-radius: 12px;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
 }
 
 .vehicle-page .bulk-buttons {
   display: flex;
-  gap: 0.75rem;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
   align-items: center;
   flex-wrap: wrap;
 }
 
 .vehicle-page .bulk-select {
-  padding: 0.5rem 0.75rem;
+  padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.6rem, 2vw, 0.75rem);
   border: 1px solid rgba(0, 212, 255, 0.3);
   border-radius: 6px;
   background: rgba(30, 41, 59, 0.8);
   color: white;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   cursor: pointer;
-  min-width: 140px;
+  min-width: min(140px, 100%);
+  min-height: 40px;
 }
 
 .vehicle-page .bulk-select:focus {
@@ -400,8 +439,8 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 12px;
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.25rem);
+  margin-bottom: clamp(1rem, 3vw, 1.5rem);
   animation: slideInDown 0.3s ease;
 }
 
@@ -409,29 +448,60 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
+  margin-bottom: clamp(0.75rem, 2vw, 1rem);
+  padding-bottom: clamp(0.5rem, 2vw, 0.75rem);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
 .vehicle-page .filter-header h4 {
   margin: 0;
   color: white;
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 2vw, 1rem);
   font-weight: 600;
 }
 
 .vehicle-page .filter-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
+  gap: clamp(0.75rem, 2vw, 1rem);
+}
+
+.vehicle-page .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vehicle-page .form-label {
+  color: #94a3b8;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
+  font-weight: 500;
+}
+
+.vehicle-page .form-input {
+  padding: clamp(0.5rem, 2vw, 0.6rem) clamp(0.6rem, 2vw, 0.75rem);
+  border: 1px solid rgba(71, 85, 105, 0.5);
+  border-radius: 6px;
+  background: rgba(30, 41, 59, 0.8);
+  color: white;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
+  transition: all 0.2s ease;
+  min-height: 40px;
+}
+
+.vehicle-page .form-input:focus {
+  outline: none;
+  border-color: #00d4ff;
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
 }
 
 /* VEHICLE GRID */
 .vehicle-page .vehicles-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(min(350px, 100%), 1fr));
+  gap: clamp(1rem, 3vw, 1.5rem);
   width: 100%;
   align-items: stretch;
 }
@@ -448,7 +518,7 @@
   flex-direction: column;
   position: relative;
   height: fit-content;
-  min-height: 400px;
+  min-height: clamp(350px, 50vw, 400px);
 }
 
 .vehicle-page .vehicle-card::before {
@@ -473,28 +543,33 @@
 /* Selection Checkbox */
 .vehicle-page .vehicle-checkbox {
   position: absolute;
-  top: 0.75rem;
-  left: 0.75rem;
-  z-index: 10;
+  top: clamp(0.75rem, 2vw, 1rem);
+  left: clamp(0.75rem, 2vw, 1rem);
+  z-index: 20;
 }
 
 .vehicle-page .selection-checkbox {
-  width: 16px;
-  height: 16px;
+  width: clamp(16px, 4vw, 20px);
+  height: clamp(16px, 4vw, 20px);
   cursor: pointer;
   accent-color: #00d4ff;
-  transform: scale(1);
-  transition: transform 0.2s ease;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .vehicle-page .selection-checkbox:hover {
   transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
+}
+
+.vehicle-page .selection-checkbox:checked {
+  transform: scale(1.05);
 }
 
 /* Selected Vehicle State */
 .vehicle-page .vehicle-card.selected {
-  border-color: #00d4ff;
-  box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+  border: 2px solid #00d4ff;
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
   background: linear-gradient(135deg, 
     rgba(0, 212, 255, 0.05) 0%, 
     rgba(255, 255, 255, 0.02) 100%);
@@ -524,19 +599,20 @@
 
 /* CARD HEADER */
 .vehicle-page .card-header {
-  padding: 1.25rem 1.5rem;
+  padding: clamp(1rem, 3vw, 1.25rem) clamp(1rem, 3vw, 1.5rem);
   background: rgba(30, 41, 59, 0.8);
   border-bottom: 1px solid rgba(0, 212, 255, 0.2);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  gap: clamp(0.75rem, 2vw, 1rem);
   backdrop-filter: blur(5px);
+  flex-wrap: wrap;
 }
 
 .vehicle-page .vehicle-title h3 {
   margin: 0 0 0.25rem 0;
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 3vw, 1.1rem);
   font-weight: 600;
   color: white;
   line-height: 1.3;
@@ -545,7 +621,7 @@
 
 .vehicle-page .vehicle-year {
   color: #94a3b8;
-  font-size: 0.875rem;
+  font-size: clamp(0.8rem, 2vw, 0.875rem);
   font-weight: 400;
 }
 
@@ -554,9 +630,9 @@
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.375rem 0.75rem;
+  padding: clamp(0.3rem, 2vw, 0.375rem) clamp(0.6rem, 2vw, 0.75rem);
   border-radius: 20px;
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 2vw, 0.75rem);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -580,29 +656,29 @@
 }
 
 .vehicle-page .status-icon {
-  font-size: 0.7rem;
+  font-size: clamp(0.65rem, 2vw, 0.7rem);
 }
 
 /* CARD BODY */
 .vehicle-page .card-body {
-  padding: 1.5rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: clamp(1rem, 3vw, 1.25rem);
 }
 
 /* INFO SECTIONS */
 .vehicle-page .info-section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
 }
 
 .vehicle-page .info-row {
   display: grid;
-  grid-template-columns: 80px 1fr;
-  gap: 0.75rem;
+  grid-template-columns: minmax(70px, 80px) 1fr;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
   align-items: center;
   padding: 0.25rem 0;
   border-bottom: 1px solid rgba(51, 65, 85, 0.5);
@@ -614,14 +690,14 @@
 
 .vehicle-page .info-label {
   color: #94a3b8;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .vehicle-page .info-value {
-  font-size: 0.875rem;
+  font-size: clamp(0.8rem, 2vw, 0.875rem);
   color: white;
   font-weight: 400;
   line-height: 1.4;
@@ -633,22 +709,24 @@
   align-items: center;
   gap: 0.5rem;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .vehicle-page .btn-mileage {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  padding: 0.375rem 0.75rem;
+  padding: clamp(0.3rem, 2vw, 0.375rem) clamp(0.6rem, 2vw, 0.75rem);
   background: rgba(0, 212, 255, 0.1);
   border: 1px solid rgba(0, 212, 255, 0.3);
   border-radius: 6px;
   color: #00d4ff;
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 2vw, 0.75rem);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  min-height: 32px;
 }
 
 .vehicle-page .btn-mileage:hover {
@@ -660,12 +738,12 @@
 
 /* STATUS SELECT */
 .vehicle-page .status-select {
-  padding: 0.5rem 0.75rem;
+  padding: clamp(0.4rem, 2vw, 0.5rem) clamp(0.6rem, 2vw, 0.75rem);
   border: 1px solid rgba(71, 85, 105, 0.5);
   border-radius: 6px;
   background: rgba(30, 41, 59, 0.8);
   color: white;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   width: 100%;
   transition: all 0.2s ease;
   appearance: none;
@@ -673,6 +751,7 @@
   background-repeat: no-repeat;
   background-position: right 0.5rem center;
   background-size: 12px;
+  min-height: 40px;
 }
 
 .vehicle-page .status-select:focus {
@@ -691,21 +770,22 @@
   color: #cbd5e1;
   font-style: italic;
   line-height: 1.4;
+  font-size: clamp(0.8rem, 2vw, 0.875rem);
 }
 
 /* EXPIRY SECTION */
 .vehicle-page .expiry-section {
   background: rgba(255, 255, 255, 0.02);
   border-radius: 8px;
-  padding: 1rem;
+  padding: clamp(0.75rem, 2vw, 1rem);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .vehicle-page .expiry-title {
-  font-size: 0.875rem;
+  font-size: clamp(0.8rem, 2vw, 0.875rem);
   font-weight: 600;
   color: #94a3b8;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 clamp(0.5rem, 2vw, 0.75rem) 0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -720,7 +800,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.375rem 0;
+  padding: clamp(0.3rem, 2vw, 0.375rem) 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -730,12 +810,12 @@
 
 .vehicle-page .expiry-label {
   color: #94a3b8;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   font-weight: 500;
 }
 
 .vehicle-page .expiry-value {
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   font-weight: 400;
   color: #cbd5e1;
 }
@@ -749,27 +829,30 @@
 /* CARD ACTIONS */
 .vehicle-page .card-actions {
   display: flex;
-  gap: 0.75rem;
+  gap: clamp(0.5rem, 2vw, 0.75rem);
   margin-top: auto;
-  padding-top: 1.25rem;
+  padding-top: clamp(1rem, 3vw, 1.25rem);
   border-top: 1px solid rgba(51, 65, 85, 0.5);
+  flex-wrap: wrap;
 }
 
 .vehicle-page .card-actions button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.6rem 1rem;
+  padding: clamp(0.5rem, 2vw, 0.6rem) clamp(0.8rem, 2vw, 1rem);
   border: none;
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
   flex: 1;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 2vw, 0.8rem);
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  min-height: 40px;
+  min-width: min-content;
 }
 
 .vehicle-page .card-actions button::before {
@@ -815,12 +898,12 @@
 /* EMPTY STATE */
 .vehicle-page .empty-state {
   text-align: center;
-  padding: 3rem 2rem;
+  padding: clamp(2rem, 6vw, 3rem) clamp(1rem, 4vw, 2rem);
   color: #64748b;
   background: rgba(255, 255, 255, 0.02);
   border-radius: 16px;
   border: 1px solid rgba(0, 212, 255, 0.2);
-  margin: 2rem 0;
+  margin: clamp(1.5rem, 4vw, 2rem) 0;
   position: relative;
   width: 100%;
   box-sizing: border-box;
@@ -840,7 +923,7 @@
 }
 
 .vehicle-page .empty-icon {
-  font-size: 3rem;
+  font-size: clamp(2rem, 8vw, 3rem);
   margin-bottom: 1rem;
   opacity: 0.7;
   filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5));
@@ -855,13 +938,13 @@
 .vehicle-page .empty-state h3 {
   color: #94a3b8;
   margin-bottom: 0.5rem;
-  font-size: 1.25rem;
+  font-size: clamp(1.1rem, 4vw, 1.25rem);
   font-weight: 600;
 }
 
 .vehicle-page .empty-state p {
   margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  font-size: clamp(0.8rem, 3vw, 0.9rem);
 }
 
 /* ANIMATIONS */
@@ -876,23 +959,34 @@
   }
 }
 
-/* RESPONSIVE DESIGN */
-@media (max-width: 1200px) {
+/* ULTRA-RESPONSIVE BREAKPOINTS */
+
+/* Large desktops and TVs */
+@media (min-width: 1920px) {
+  .vehicle-page .header-content,
+  .vehicle-page .page-content {
+    max-width: 1600px;
+  }
+  
   .vehicle-page .vehicles-grid {
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+    gap: 2rem;
   }
   
-  .vehicle-page .search-filters {
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-  
-  .vehicle-page .search-bar {
-    min-width: 200px;
-    max-width: 300px;
+  .vehicle-page .summary-cards {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
   }
 }
 
+/* Tablets and small laptops */
+@media (max-width: 1024px) {
+  .vehicle-page .vehicles-grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+/* Mobile devices */
 @media (max-width: 768px) {
   .vehicle-page .page-content {
     padding: 1rem;
@@ -940,6 +1034,7 @@
   
   .vehicle-page .action-buttons {
     justify-content: center;
+    width: 100%;
   }
   
   .vehicle-page .bulk-actions {
@@ -955,8 +1050,13 @@
   .vehicle-page .filter-grid {
     grid-template-columns: 1fr;
   }
+  
+  .vehicle-page .card-actions {
+    flex-direction: column;
+  }
 }
 
+/* Small phones */
 @media (max-width: 480px) {
   .vehicle-page .header-content {
     padding: 0 1rem;
@@ -966,10 +1066,6 @@
     grid-template-columns: 1fr;
   }
   
-  .vehicle-page .card-actions {
-    flex-direction: column;
-  }
-  
   .vehicle-page .search-filters {
     gap: 0.5rem;
   }
@@ -977,121 +1073,76 @@
   .vehicle-page .btn-compact {
     padding: 0.5rem 0.75rem;
     font-size: 0.75rem;
+    width: 100%;
   }
   
   .vehicle-page .bulk-buttons {
     flex-direction: column;
     gap: 0.5rem;
   }
-  /* Status buttons alternative */
-.vehicle-page .status-buttons {
-  display: flex;
-  gap: 0.25rem;
-  width: 100%;
-}
-
-.vehicle-page .status-btn {
-  flex: 1;
-  padding: 0.4rem 0.5rem;
-  border: 1px solid rgba(71, 85, 105, 0.5);
-  border-radius: 6px;
-  background: rgba(30, 41, 59, 0.8);
-  color: #94a3b8;
-  font-size: 0.7rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-/* VEHICLE CARD SELECTION - FIXED */
-.vehicle-page .vehicle-checkbox {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  z-index: 20;
-}
-
-.vehicle-page .selection-checkbox {
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-  accent-color: #00d4ff;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-}
-
-.vehicle-page .selection-checkbox:hover {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.6));
-}
-
-.vehicle-page .selection-checkbox:checked {
-  transform: scale(1.05);
-}
-
-/* Selected Vehicle State - SIMPLE FIX */
-.vehicle-page .vehicle-card.selected {
-  border: 2px solid #00d4ff;
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-}
-
-/* BULK ACTIONS - MINIMAL IMPROVEMENT */
-.vehicle-page .bulk-actions {
-  background: rgba(0, 212, 255, 0.1);
-  border: 1px solid rgba(0, 212, 255, 0.3);
-  border-radius: 12px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.vehicle-page .selected-count {
-  background: #00d4ff;
-  color: #0a0e17;
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-weight: 700;
-}
-.vehicle-page .status-btn:hover:not(.disabled) {
-  background: rgba(30, 41, 59, 0.95);
-  border-color: rgba(0, 212, 255, 0.5);
-  color: white;
-  transform: translateY(-1px);
-}
-
-.vehicle-page .status-btn.active {
-  background: rgba(0, 212, 255, 0.2);
-  border-color: #00d4ff;
-  color: #00d4ff;
-  font-weight: 600;
-  box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.vehicle-page .status-btn.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Specific status button colors */
-.vehicle-page .status-btn:nth-child(1).active {
-  background: rgba(0, 212, 255, 0.2);
-  border-color: #00d4ff;
-  color: #00d4ff;
-}
-
-.vehicle-page .status-btn:nth-child(2).active {
-  background: rgba(245, 158, 11, 0.2);
-  border-color: #f59e0b;
-  color: #f59e0b;
-}
-
-.vehicle-page .status-btn:nth-child(3).active {
-  background: rgba(239, 68, 68, 0.2);
-  border-color: #ef4444;
-  color: #ef4444;
-}
+  
   .vehicle-page .bulk-select {
     min-width: auto;
     width: 100%;
+  }
+  
+  .vehicle-page .info-row {
+    grid-template-columns: 60px 1fr;
+    gap: 0.5rem;
+  }
+  
+  .vehicle-page .page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .vehicle-page .vehicle-title h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+  .vehicle-page .page-content {
+    padding: 0.75rem;
+  }
+  
+  .vehicle-page .summary-card {
+    padding: 0.75rem;
+  }
+  
+  .vehicle-page .card-body {
+    padding: 0.75rem;
+  }
+  
+  .vehicle-page .expiry-section {
+    padding: 0.5rem;
+  }
+}
+
+/* Prevent zoom on iOS inputs */
+.vehicle-page .form-input,
+.vehicle-page .form-select,
+.vehicle-page .form-textarea,
+.vehicle-page .search-input {
+  font-size: 16px;
+}
+
+/* Ensure touch targets are adequate */
+@media (max-width: 768px) {
+  .vehicle-page .btn,
+  .vehicle-page .btn-compact,
+  .vehicle-page .card-actions button,
+  .vehicle-page .summary-card {
+    min-height: 44px;
+  }
+  
+  .vehicle-page .form-input,
+  .vehicle-page .form-select,
+  .vehicle-page .search-input {
+    min-height: 44px;
+  }
+  
+  .vehicle-page .btn-mileage {
+    min-height: 36px;
   }
 }

@@ -1,733 +1,453 @@
-/* ReportsPage.css - FULL-PAGE FIXED VERSION */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
-}
-
+/* ReportsPage.css - MODERN RESPONSIVE VERSION */
 .reports-page {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: 
-    radial-gradient(ellipse at top, #0a0e17 0%, #000000 100%),
-    radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(120, 119, 198, 0.05) 0%, transparent 50%);
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
   color: #ffffff;
-  font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Space Background */
-.reports-page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: 
-    radial-gradient(1px 1px at 20% 30%, rgba(0, 242, 254, 0.6) 50%, transparent 50%),
-    radial-gradient(1px 1px at 40% 70%, rgba(79, 172, 254, 0.6) 50%, transparent 50%),
-    radial-gradient(1px 1px at 60% 20%, rgba(255, 255, 255, 0.8) 50%, transparent 50%),
-    radial-gradient(1px 1px at 80% 50%, rgba(0, 230, 118, 0.6) 50%, transparent 50%);
-  background-size: 400px 400px;
-  animation: stars 100s linear infinite;
-  pointer-events: none;
-  z-index: 0;
-}
-
-@keyframes stars {
-  from { background-position: 0 0; }
-  to { background-position: 400px 400px; }
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 /* Header */
-.reports-page .page-header {
-  background: linear-gradient(135deg, 
-    rgba(10, 14, 23, 0.95) 0%, 
-    rgba(26, 35, 126, 0.8) 100%);
+.page-header {
+  background: rgba(15, 23, 42, 0.8);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
-  padding: 2rem 0;
-  position: relative;
-  z-index: 10;
-  box-shadow: 0 4px 30px rgba(0, 212, 255, 0.2);
-  flex-shrink: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
-.reports-page .header-content {
-  width: 100%;
-  max-width: 1400px;
+.header-content {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 1rem;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 2rem;
+  align-items: center;
+  gap: 1rem;
 }
 
-.reports-page .header-main {
-  flex: 1;
-}
-
-.reports-page .header-actions {
-  display: flex;
-  align-items: flex-end;
-}
-
-.reports-page .page-header h1 {
-  font-size: 2.2rem;
-  margin: 0 0 0.5rem 0;
-  background: linear-gradient(135deg, #00d4ff 0%, #4facfe 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.header-text h1 {
+  font-size: 1.5rem;
   font-weight: 700;
-  text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+  margin: 0 0 0.25rem 0;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
-.reports-page .header-icon {
-  font-size: 2rem;
+.header-icon {
+  color: #00d4ff;
 }
 
-.reports-page .page-header p {
+.header-text p {
   margin: 0;
-  font-size: 1.1rem;
   color: #94a3b8;
-  font-weight: 400;
+  font-size: 0.9rem;
 }
 
-/* Export Section */
-.reports-page .export-section {
+.header-actions {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 0.5rem;
 }
 
-.reports-page .btn-export {
+.btn-export {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%);
+  padding: 0.5rem 1rem;
+  background: #00d4ff;
+  color: #0f172a;
   border: none;
-  border-radius: 8px;
-  color: #0a0e17;
+  border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-size: 0.9rem;
 }
 
-.reports-page .btn-export:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.4);
+.btn-export:hover:not(:disabled) {
+  background: #00b8e6;
+  transform: translateY(-1px);
 }
 
-.reports-page .btn-export:disabled {
+.btn-export:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-.reports-page .report-meta {
+.report-info {
   font-size: 0.8rem;
-  color: #94a3b8;
-  text-align: right;
+  color: #64748b;
 }
 
-.reports-page .report-time {
-  margin-left: 0.5rem;
-  opacity: 0.8;
-}
-
-/* Main Content - This will scroll */
-.reports-page .page-content {
-  flex: 1;
-  overflow-y: auto;
-  width: 100%;
-  max-width: 1400px;
+/* Main Content */
+.page-content {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
-  position: relative;
-  z-index: 5;
+  padding: 2rem 1rem;
 }
 
-/* Metrics Section */
-.reports-page .metrics-section {
-  margin-bottom: 2rem;
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #f8fafc;
 }
 
-.reports-page .metrics-grid {
+/* Metrics Grid */
+.metrics-section {
+  margin-bottom: 3rem;
+}
+
+.metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.metric-icon.utilization {
+  background: rgba(0, 212, 255, 0.2);
+  color: #00d4ff;
+}
+
+.metric-icon.availability {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+}
+
+.metric-icon.maintenance {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+
+.metric-icon.mileage {
+  background: rgba(139, 92, 246, 0.2);
+  color: #8b5cf6;
+}
+
+.metric-content h3 {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
+}
+
+.metric-description {
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Charts Section */
+.charts-section {
+  margin-bottom: 3rem;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
 }
 
-.reports-page .metric-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 212, 255, 0.2);
+.chart-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
   padding: 1.5rem;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
 
-.reports-page .metric-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.4), 
-    transparent);
-}
-
-.reports-page .metric-card:hover {
-  transform: translateY(-3px);
-  border-color: #00d4ff;
-  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
-}
-
-.reports-page .metric-card.primary {
-  border-left: 4px solid #00d4ff;
-}
-
-.reports-page .metric-card.success {
-  border-left: 4px solid #10b981;
-}
-
-.reports-page .metric-card.warning {
-  border-left: 4px solid #f59e0b;
-}
-
-.reports-page .metric-card.info {
-  border-left: 4px solid #3b82f6;
-}
-
-.reports-page .metric-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.chart-header {
   margin-bottom: 1rem;
 }
 
-.reports-page .metric-title {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.chart-header h3 {
+  font-size: 1rem;
   font-weight: 600;
+  margin: 0;
+  color: #f8fafc;
 }
 
-.reports-page .metric-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+.chart-container {
+  width: 100%;
+  height: 250px;
+}
+
+/* Data Section */
+.data-section {
+  margin-bottom: 2rem;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.data-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.card-header {
+  margin-bottom: 1rem;
+}
+
+.card-header h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Activity List */
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.activity-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.activity-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   background: rgba(0, 212, 255, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
   color: #00d4ff;
-  font-size: 1.2rem;
-}
-
-.reports-page .metric-card.success .metric-icon {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-}
-
-.reports-page .metric-card.warning .metric-icon {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
-}
-
-.reports-page .metric-card.info .metric-icon {
-  background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
-}
-
-.reports-page .metric-value {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: white;
-  margin-bottom: 0.5rem;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.reports-page .metric-subtitle {
-  font-size: 0.9rem;
-  color: #94a3b8;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.reports-page .metric-progress {
-  width: 100%;
-  height: 6px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-  margin-bottom: 0.75rem;
-  overflow: hidden;
-}
-
-.reports-page .progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, #00d4ff, #4facfe);
-  border-radius: 3px;
-  transition: width 0.3s ease;
-}
-
-.reports-page .metric-card.success .progress-bar {
-  background: linear-gradient(90deg, #10b981, #34d399);
-}
-
-.reports-page .metric-trend {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-  color: #f59e0b;
-}
-
-.reports-page .metric-description {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  line-height: 1.4;
-}
-
-/* Charts Section */
-.reports-page .charts-section {
-  margin-bottom: 2rem;
-}
-
-.reports-page .charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-  gap: 1.5rem;
-}
-
-.reports-page .chart-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 12px;
-  padding: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.reports-page .chart-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.4), 
-    transparent);
-}
-
-.reports-page .chart-header {
-  margin-bottom: 1.5rem;
-}
-
-.reports-page .chart-header h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: white;
-  margin: 0 0 0.5rem 0;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.reports-page .chart-subtitle {
-  font-size: 0.9rem;
-  color: #94a3b8;
-}
-
-.reports-page .chart-legend {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.reports-page .legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8rem;
-  color: #94a3b8;
-}
-
-.reports-page .legend-item.available::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #10b981;
-}
-
-.reports-page .legend-item.in-use::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #f59e0b;
-}
-
-.reports-page .legend-item.maintenance::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ef4444;
-}
-
-.reports-page .chart-container {
-  width: 100%;
-  height: 300px;
-}
-
-/* Chart Tooltip */
-.reports-page .chart-tooltip {
-  background: #1e293b;
-  border: 1px solid #374151;
-  border-radius: 6px;
-  padding: 0.75rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.reports-page .tooltip-label {
-  font-weight: 600;
-  color: white;
-  margin: 0 0 0.5rem 0;
-  font-size: 0.9rem;
-}
-
-.reports-page .tooltip-value {
-  margin: 0.25rem 0;
-  font-size: 0.8rem;
-}
-
-/* Data Section */
-.reports-page .data-section {
-  margin-bottom: 2rem;
-}
-
-.reports-page .data-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1.5rem;
-}
-
-.reports-page .data-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 212, 255, 0.2);
-  border-radius: 12px;
-  padding: 1.5rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.reports-page .data-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(0, 212, 255, 0.4), 
-    transparent);
-}
-
-.reports-page .card-header {
-  margin-bottom: 1.5rem;
-}
-
-.reports-page .card-header h3 {
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: white;
-  margin: 0 0 0.5rem 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
-}
-
-.reports-page .card-icon {
-  color: #00d4ff;
-}
-
-.reports-page .card-subtitle {
-  font-size: 0.9rem;
-  color: #94a3b8;
-}
-
-/* Activity List */
-.reports-page .activity-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.reports-page .activity-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  transition: all 0.3s ease;
-}
-
-.reports-page .activity-item:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateX(5px);
-}
-
-.reports-page .activity-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  background: rgba(0, 212, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #00d4ff;
   font-size: 0.9rem;
   flex-shrink: 0;
 }
 
-.reports-page .activity-content {
+.activity-content {
   flex: 1;
 }
 
-.reports-page .activity-message {
-  font-weight: 600;
-  color: white;
-  margin-bottom: 0.25rem;
+.activity-message {
   font-size: 0.9rem;
-}
-
-.reports-page .activity-details {
-  color: #94a3b8;
-  font-size: 0.8rem;
-  margin-bottom: 0.5rem;
+  color: #ffffff;
+  margin-bottom: 0.25rem;
   line-height: 1.4;
 }
 
-.reports-page .activity-meta {
+.activity-meta {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   font-size: 0.75rem;
   color: #64748b;
 }
 
 /* Vehicle List */
-.reports-page .vehicle-list {
+.vehicle-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  max-height: 400px;
-  overflow-y: auto;
 }
 
-.reports-page .vehicle-item {
+.vehicle-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
-  transition: all 0.3s ease;
+  transition: background 0.2s ease;
 }
 
-.reports-page .vehicle-item:hover {
-  background: rgba(255, 255, 255, 0.08);
+.vehicle-item:hover {
+  background: rgba(255, 255, 255, 0.06);
 }
 
-.reports-page .vehicle-make-model {
+.vehicle-name {
   font-weight: 600;
-  color: white;
+  color: #ffffff;
   margin-bottom: 0.25rem;
 }
 
-.reports-page .vehicle-vin {
+.vehicle-details {
   font-size: 0.8rem;
-  color: #94a3b8;
-  font-family: 'Courier New', monospace;
-}
-
-.reports-page .vehicle-stats {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.reports-page .vehicle-mileage {
-  font-weight: 600;
-  color: #f59e0b;
-}
-
-.reports-page .vehicle-status {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.4rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.reports-page .vehicle-status.available {
-  background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
-}
-
-.reports-page .vehicle-status.in-use {
-  background: rgba(245, 158, 11, 0.2);
-  color: #f59e0b;
-}
-
-.reports-page .vehicle-status.in-maintenance {
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-}
-
-/* No Data States */
-.reports-page .no-data {
-  text-align: center;
-  padding: 3rem 2rem;
   color: #64748b;
 }
 
-.reports-page .no-data svg {
+.vehicle-mileage {
+  font-weight: 600;
+  color: #f59e0b;
+  font-size: 0.9rem;
+}
+
+/* No Data States */
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+.no-data svg {
   font-size: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   opacity: 0.5;
 }
 
-.reports-page .no-data p {
+.no-data h3 {
+  margin: 0 0 0.5rem 0;
+  color: #94a3b8;
+}
+
+.no-data p {
   margin: 0;
   font-size: 0.9rem;
 }
 
-/* Custom scrollbar */
-.reports-page .activity-list::-webkit-scrollbar,
-.reports-page .vehicle-list::-webkit-scrollbar {
-  width: 6px;
+/* Chart Tooltip */
+.chart-tooltip {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.reports-page .activity-list::-webkit-scrollbar-track,
-.reports-page .vehicle-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
+.tooltip-label {
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0 0 0.5rem 0;
 }
 
-.reports-page .activity-list::-webkit-scrollbar-thumb,
-.reports-page .vehicle-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 212, 255, 0.3);
-  border-radius: 3px;
-}
-
-.reports-page .activity-list::-webkit-scrollbar-thumb:hover,
-.reports-page .vehicle-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 212, 255, 0.5);
+.tooltip-value {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .reports-page .page-content {
-    padding: 1rem;
-  }
-  
-  .reports-page .header-content {
+  .header-content {
     flex-direction: column;
+    align-items: flex-start;
     gap: 1rem;
-    text-align: center;
-    padding: 0 1rem;
   }
-  
-  .reports-page .header-actions {
-    align-items: center;
+
+  .header-actions {
+    align-items: flex-start;
     width: 100%;
   }
-  
-  .reports-page .export-section {
-    align-items: center;
+
+  .btn-export {
     width: 100%;
+    justify-content: center;
   }
-  
-  .reports-page .metrics-grid {
+
+  .metrics-grid {
     grid-template-columns: 1fr;
   }
-  
-  .reports-page .charts-grid {
+
+  .charts-grid {
     grid-template-columns: 1fr;
   }
-  
-  .reports-page .data-grid {
+
+  .data-grid {
     grid-template-columns: 1fr;
   }
-  
-  .reports-page .chart-container {
-    height: 250px;
+
+  .chart-container {
+    height: 200px;
+  }
+
+  .page-content {
+    padding: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .reports-page .page-header {
-    padding: 1.5rem 0;
-  }
-  
-  .reports-page .page-header h1 {
-    font-size: 1.8rem;
-  }
-  
-  .reports-page .vehicle-item {
+  .metric-card {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+    text-align: center;
+    gap: 1rem;
   }
-  
-  .reports-page .vehicle-stats {
-    width: 100%;
-    justify-content: space-between;
+
+  .header-text h1 {
+    font-size: 1.25rem;
   }
-  
-  .reports-page .chart-container {
-    height: 200px;
+
+  .chart-card {
+    padding: 1rem;
   }
+
+  .data-card {
+    padding: 1rem;
+  }
+}
+
+/* Custom scrollbar */
+.activity-list::-webkit-scrollbar,
+.vehicle-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.activity-list::-webkit-scrollbar-track,
+.vehicle-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.activity-list::-webkit-scrollbar-thumb,
+.vehicle-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
 }
