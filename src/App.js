@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { 
   FaCar, FaTools, FaTachometerAlt, 
-  FaHistory, FaChartLine, FaUsers
+  FaHistory, FaChartLine, FaUsers,
+  FaBars, FaTimes, FaSignOutAlt
 } from "react-icons/fa";
 
 import VehiclePage from "./components/VehiclePage";
@@ -25,7 +26,8 @@ import "./App.css";
 const USER_ROLES = {
   SUPERADMIN: {
     name: "Super Admin",
-    permissions: ["all", "users:manage"]
+    permissions: ["all", "users:manage"],
+    color: "linear-gradient(135deg, #ffd600, #ff6d00)"
   },
   ADMIN: {
     name: "Administrator", 
@@ -34,8 +36,9 @@ const USER_ROLES = {
       "maintenance:all", 
       "reports:all", 
       "activity:view",
-      "users:manage" // ADMIN can manage drivers
-    ]
+      "users:manage"
+    ],
+    color: "linear-gradient(135deg, #00d4ff, #2979ff)"
   },
   DRIVER: {
     name: "Driver",
@@ -43,8 +46,31 @@ const USER_ROLES = {
       "vehicles:view", 
       "inuse:self", 
       "reports:self"
-    ]
+    ],
+    color: "linear-gradient(135deg, #00e676, #00b248)"
   }
+};
+
+// Navigation items with icons
+const NAV_ITEMS = [
+  { id: "dashboard", name: "Dashboard", icon: <FaTachometerAlt /> },
+  { id: "vehicles", name: "Vehicles", icon: <FaCar /> },
+  { id: "inuse", name: "In Use", icon: <FaCar /> },
+  { id: "maintenance", name: "Maintenance", icon: <FaTools /> },
+  { id: "reports", name: "Reports", icon: <FaChartLine /> },
+  { id: "activity", name: "Activity Log", icon: <FaHistory /> },
+  { id: "users", name: "User Management", icon: <FaUsers /> },
+];
+
+// Get user initials for avatar
+const getInitials = (name) => {
+  if (!name) return "U";
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .substring(0, 2);
 };
 
 function App() {
@@ -55,13 +81,9 @@ function App() {
   
   const [showAccessModal, setShowAccessModal] = useState(!user);
   const [vehicles, setVehicles] = useState([]);
-  const [users, setUsers] = useState([]); // Add users state
+  const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [showModal, setShowModal] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem("fleetDarkMode");
-    return saved ? JSON.parse(saved) : false;
-  });
   const [newVehicle, setNewVehicle] = useState({
     vin: "", make: "", model: "", year: "", mileage: "", status: "Available",
     description: "", discExpiryDate: "", insuranceExpiryDate: "",
@@ -80,6 +102,12 @@ function App() {
 
   // Activity log state
   const [activityLog, setActivityLog] = useState([]);
+  
+  // Mobile menu state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Get user initials for avatar
+  const userInitials = user ? getInitials(user.name || user.username) : "GU";
 
   // Permission checking function
   const hasPermission = (permission) => {
@@ -103,10 +131,10 @@ function App() {
       dashboard: true, // Everyone can access dashboard
       vehicles: hasPermission("vehicles:view") || hasPermission("vehicles:all"),
       inuse: hasPermission("vehicles:view") || hasPermission("inuse:self"),
-      maintenance: hasPermission("maintenance:all"), // Only ADMIN and SUPERADMIN
+      maintenance: hasPermission("maintenance:all"),
       reports: hasPermission("reports:all") || hasPermission("reports:self"),
       activity: hasPermission("activity:view") || hasPermission("all"),
-      users: user.role === "ADMIN" || user.role === "SUPERADMIN" // Only ADMIN and SUPERADMIN
+      users: user.role === "ADMIN" || user.role === "SUPERADMIN"
     };
     
     return permissions[pageId] || false;
@@ -141,11 +169,6 @@ function App() {
     
     return actionMap[action] || false;
   };
-
-  // Save dark mode preference
-  useEffect(() => {
-    localStorage.setItem("fleetDarkMode", JSON.stringify(darkMode));
-  }, [darkMode]);
 
   // Show access modal if no user
   useEffect(() => {
@@ -204,6 +227,25 @@ function App() {
       fetchData();
     }
   }, [user]);
+
+  // Close mobile menu when page changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [currentPage]);
+
+  // Close mobile menu when clicking outside on mobile
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (mobileMenuOpen && window.innerWidth <= 768) {
+        if (!event.target.closest('.sidebar') && !event.target.closest('.mobile-menu-toggle')) {
+          setMobileMenuOpen(false);
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [mobileMenuOpen]);
 
   // Refresh users function for UserManagementPage
   const refreshUsers = async () => {
@@ -355,6 +397,7 @@ function App() {
     setCurrentPage("dashboard");
     localStorage.removeItem("fleetUser");
     setShowAccessModal(true);
+    setMobileMenuOpen(false);
   };
 
   // Enhanced vehicle operations with permission checks
@@ -540,23 +583,11 @@ function App() {
     addNotification('All filters cleared', 'info');
   };
 
-  // Define accessible pages based on role
-  const pages = [
-    { id: "dashboard", name: "Dashboard", icon: <FaTachometerAlt /> },
-    { id: "vehicles", name: "Vehicles", icon: <FaCar /> },
-    { id: "inuse", name: "In Use", icon: <FaCar /> },
-    { id: "maintenance", name: "Maintenance", icon: <FaTools /> },
-    { id: "reports", name: "Reports", icon: <FaChartLine /> },
-    { id: "activity", name: "Activity Log", icon: <FaHistory /> },
-    { id: "users", name: "User Management", icon: <FaUsers /> },
-  ];
-
   // Show access modal if no user
   if (!user) {
     return (
       <UserAccessModal 
         onLogin={handleLogin}
-        darkMode={darkMode}
       />
     );
   }
@@ -564,49 +595,72 @@ function App() {
   console.log("🏠 User logged in:", user.username, "Role:", user.role, "Current Page:", currentPage);
 
   return (
-    <div className={`app-container ${darkMode ? "dark" : ""}`}>
-      <aside className={`sidebar ${darkMode ? "dark" : ""}`}>
-        <div className="logo">Pangolin Fleet</div>
-        <div className="user-info">
-          <span>{user.name || user.username}</span>
-          <span className={`role-badge ${user.role.toLowerCase()}`}>
-            {USER_ROLES[user.role]?.name || user.role}
-            {user.role === "SUPERADMIN" && " ⭐"}
-          </span>
+    <div className="app-container">
+      {/* Mobile Menu Toggle */}
+      <button 
+        className="mobile-menu-toggle"
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        aria-label="Toggle menu"
+      >
+        {mobileMenuOpen ? <FaTimes /> : <FaBars />}
+      </button>
+
+      {}
+      <aside className={`sidebar ${mobileMenuOpen ? "mobile-expanded" : ""}`}>
+        {/* Logo */}
+        <div className="logo-container">
+          <div className="logo-icon">🦎</div>
+          <div className="logo-text">Pangolin Fleet</div>
         </div>
-        
-        <nav>
-          {pages.map(({ id, name, icon }) => {
-            // ✅ FIXED: Only show page if user has permission to access it
-            const shouldShow = canAccessPage(id);
-            
-            console.log(`🔐 Navigation check - Page: ${id}, User: ${user.role}, Can Access: ${shouldShow}`);
-            
-            if (!shouldShow) return null;
+
+        {/* User Profile */}
+        <div className="user-profile">
+          <div className="avatar-container">
+            <div className="avatar-initials">{userInitials}</div>
+          </div>
+          <div className="user-details">
+            <div className="user-name">{user.name || user.username}</div>
+            <div 
+              className={`role-badge ${user.role.toLowerCase()}`}
+              style={{ background: USER_ROLES[user.role]?.color }}
+            >
+              {USER_ROLES[user.role]?.name || user.role}
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="sidebar-nav">
+          {NAV_ITEMS.map(({ id, name, icon }) => {
+            if (!canAccessPage(id)) return null;
             
             return (
               <button
                 key={id}
-                onClick={() => setCurrentPage(id)}
-                className={currentPage === id ? "active" : ""}
+                className={`nav-item ${currentPage === id ? "active" : ""}`}
+                onClick={() => {
+                  setCurrentPage(id);
+                  setMobileMenuOpen(false);
+                }}
               >
-                {icon} {name}
+                <span className="nav-icon">{icon}</span>
+                <span className="nav-text">{name}</span>
               </button>
             );
           })}
         </nav>
 
+        {/* Footer with Logout */}
         <div className="sidebar-footer">
-          <button className="theme-toggle" onClick={() => setDarkMode(!darkMode)}>
-            {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
-          </button>
           <button className="logout-btn" onClick={handleLogout}>
-            🚪 Logout
+            <FaSignOutAlt className="logout-icon" />
+            <span>Logout</span>
           </button>
         </div>
       </aside>
 
-      <main>
+      {/* Main Content */}
+      <main onClick={() => mobileMenuOpen && setMobileMenuOpen(false)}>
         <Header currentPage={currentPage} user={user} />
 
         <Notifications notifications={notifications} />
@@ -618,7 +672,6 @@ function App() {
             user={user}
             activityLog={activityLog}
             canPerformAction={canPerformAction}
-            // ADD THESE NAVIGATION FUNCTIONS:
             onNavigateToVehicles={(filter = 'all') => {
               console.log("🚗 Navigating to vehicles with filter:", filter);
               setCurrentPage("vehicles");
@@ -695,7 +748,6 @@ function App() {
             setSearchQuery={setSearchQuery}
             filterStatus={filterStatus}
             setFilterStatus={setFilterStatus}
-            darkMode={darkMode}
             user={user}
             canEdit={canPerformAction("edit-vehicle")}
             selectedVehicles={selectedVehicles}
@@ -707,7 +759,6 @@ function App() {
             clearAllFilters={clearAllFilters}
             canPerformAction={canPerformAction}
             users={users}
-            // Add navigation props
             onNavigateToMaintenance={() => setCurrentPage("maintenance")}
             onNavigateToReports={() => setCurrentPage("reports")}
           />
@@ -719,7 +770,6 @@ function App() {
             saveDestination={saveDestination}
             incrementMileage={incrementMileage}
             updateStatus={updateStatus}
-            darkMode={darkMode}
             editVehicleId={editVehicleId}
             setEditVehicleId={setEditVehicleId}
             user={user}
@@ -734,7 +784,6 @@ function App() {
             updateStatus={updateStatus}
             updateVehicle={updateVehicle}
             incrementMileage={incrementMileage}
-            theme={darkMode ? "dark" : "light"}
             user={user}
             canPerformAction={canPerformAction}
           />
@@ -743,7 +792,6 @@ function App() {
         {currentPage === "reports" && canAccessPage("reports") && (
           <ReportPage 
             vehicles={vehicles} 
-            darkMode={darkMode} 
             user={user} 
             activityLog={activityLog}
             canPerformAction={canPerformAction}
@@ -773,7 +821,6 @@ function App() {
           setNewVehicle={setNewVehicle}
           setShowModal={setShowModal}
           addVehicle={addVehicle}
-          darkMode={darkMode}
           user={user}
         />
       )}

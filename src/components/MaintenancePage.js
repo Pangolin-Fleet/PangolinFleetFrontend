@@ -167,7 +167,7 @@ export default function MaintenancePage({ vehicles, updateStatus, updateVehicle,
       label: "Low Severity", 
       value: maintenances.filter(m => m.severity === "Low").length, 
       icon: <FaExclamationTriangle />, 
-      color: "#10b981" 
+      color: "#11b37dff" 
     },
     { 
       label: "Medium Severity", 
